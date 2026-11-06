@@ -213,6 +213,13 @@ const spots=[
   const bc1=sph(0.17, new THREE.MeshBasicMaterial({color:0xff2222}), 0,20.4,0); g.add(bc1);
   const bc2=sph(0.12, new THREE.MeshBasicMaterial({color:0xff4444}), 0,15.4,0); g.add(bc2);
   ANIM.push(t=>{ const on=Math.sin(t*2.4)>0; bc1.material.color.setHex(on?0xff2222:0x551111); bc2.material.color.setHex(on?0x441111:0xff4444); });
+  g.add(box(4.6,1.5,2.2, texMat(facadeTex('#e3ddd2')), -3.6,0.75,3.6));
+  g.add(box(4.6,1.5,2.2, texMat(facadeTex('#ddd6e6')), 3.6,0.75,3.6));
+  g.add(box(3.4,0.8,0.16, glowMat(signTex('東京ソラマチ','#7c3aed','#ffffff',false)), -3.6,1.05,4.76));
+  g.add(box(3.4,0.8,0.16, glowMat(signTex('TOKYO Solamachi','#0c4a6e','#ffffff',false)), 3.6,1.05,4.76));
+  const plDome=sph(0.95, std({color:0x2f3b4c,roughness:0.35,metalness:0.4}), 3.6,0,2.9); plDome.scale.y=0.6; plDome.position.y=1.55; g.add(plDome);
+  g.add(box(3.2,0.9,1.6, texMat(facadeTex('#c9d1d9')), 0,0.45,5.6));
+  g.add(box(2.2,0.55,0.14, glowMat(signTex('押上駅','#334155','#ffffff',false)), 0,0.6,6.44));
   g.add(tree(3.4,4.4,0.9)); g.add(tree(-3.6,4.2,0.8)); g.add(tree(4.2,-3.4,0.85)); } },
  {id:'sensoji', name:'浅草寺', x:13, z:-19, h:8, desc:'东京最古老的寺庙：先穿过挂着大红灯笼的雷门，沿仲见世商店街走到本堂，旁边就是五重塔，适合穿和服慢慢逛。', make:g=>{ const roofT=texMat(kawaraTex()); const stone=std({color:0xcfc4a5,roughness:1}); g.add(box(11,0.3,13.5,texMat(paveTex(),{roughness:1}),0,0.15,0.4));
 const wood=std({color:0x6b4423,roughness:0.9});
@@ -271,6 +278,14 @@ g.add(tree(4.6,-4.6,1,pinkTree)); g.add(tree(-4.8,-1.4,0.9,pinkTree)); g.add(tre
   const m2=cyl(0.06,0.085,1.1, tW); m2.position.y=13.2; g.add(m2);
   const m3=cyl(0.035,0.06,1.2, tO); m3.position.y=14.3; g.add(m3);
   const bc=sph(0.12, new THREE.MeshBasicMaterial({color:0xff2222}), 0,15.05,0); g.add(bc);
+  const zj=new THREE.Group(); zj.position.set(4.3,0.3,3.7); zj.rotation.y=-0.35; g.add(zj);
+  zj.add(box(2.5,1.5,1.6, M.white, 0,0.75,-1.1)); zj.add(hipRoof(3.0,1.0,2.1, texMat(kawaraTex()), 0,1.5,-1.1));
+  [-0.85,0.85].forEach(px=>zj.add(box(0.2,1.6,0.2, std({color:0x7a4a2e,roughness:0.8}), px,0.8,0.75)));
+  zj.add(box(2.1,0.18,0.5, std({color:0x7a4a2e,roughness:0.8}), 0,1.05,0.75));
+  zj.add(hipRoof(2.5,0.62,0.95, texMat(kawaraTex()), 0,1.62,0.75));
+  zj.add(hipRoof(2.2,0.5,0.8, texMat(kawaraTex()), 0,2.28,0.75));
+  zj.add(box(1.5,0.5,0.14, glowMat(signTex('増上寺','#7f1d1d','#ffffff',false)), 0,0.55,0.78));
+  g.add(tree(2.6,5.2,1.0)); g.add(tree(5.9,1.9,0.9));
   ANIM.push(t=>{ const on=Math.sin(t*2.4)>0; bc.material.color.setHex(on?0xff2222:0x551111); });
   window.NIGHT_FNS=window.NIGHT_FNS||[]; NIGHT_FNS.push(n=>{ tO.emissive.setHex(n?0xa84800:0x000000); tO.emissiveIntensity=n?1.3:1; tW.emissive.setHex(n?0x7a4a16:0x000000); deckGlass.emissive.setHex(n?0x8a5a1e:0x000000); });
  } },
@@ -473,6 +488,18 @@ g.add(box(2.6,7.6,2.6, texMat(glassTex('#a9c8e2')), -4.9,3.8,-5.1));
 g.add(box(2.8,8.4,2.8, texMat(glassTex('#8fb4d4')), 1.6,4.2,-5.2));
 g.add(box(2.2,5.4,2.2, texMat(facadeTex('#e3e7ec')), 5.4,2.7,-5));
 g.add(box(3.2,0.9,0.18, glowMat(signTex('東京駅','#991b1b','#ffffff',false)), 0,1.7,0.05));
+const kitte=new THREE.Group(); kitte.position.set(-5.4,0,3.6); kitte.rotation.y=0.12; g.add(kitte);
+kitte.add(box(2.3,6.6,2.3, texMat(facadeTex('#d8d2c4')), 0,3.3,0));
+const kTop=box(2.35,1.1,2.35, texMat(facadeTex('#c9c2b2')), 0,7.05,0); kTop.rotation.z=0.13; kitte.add(kTop);
+kitte.add(box(1.5,0.6,0.14, glowMat(signTex('KITTE','#7c2d12','#ffffff',false)), 0,1.2,1.2));
+g.add(box(7.6,0.06,1.3, std({color:0xb9b2a2,roughness:1}), 0,0.33,3.9));
+[-3.3,-1.1,1.1,3.3].forEach(tx=>g.add(tree(tx,3.9,0.95)));
+g.add(box(9.6,0.14,1.1, M.dark, 0,0.42,-4.3));
+[-3.4,3.4].forEach(cx=>g.add(box(3.6,0.1,1.5, std({color:0xd8d2c2,roughness:0.9}), cx,0.52,-4.3)));
+const shk=new THREE.Group(); shk.position.set(0.6,0.5,-4.3); g.add(shk);
+shk.add(box(3.6,0.62,0.85, M.white, 0,0.31,0));
+shk.add(box(3.7,0.2,0.6, std({color:0x2563eb,roughness:0.5}), 0,0.2,0));
+const shkNose=cone(0.42,1.1, M.white, 2.35,0,12); shkNose.rotation.z=-Math.PI/2; shkNose.position.y=0.31; shk.add(shkNose);
 people(g,10,-4,4,1.2,2.8,0.3); } },
  {id:'meiji', name:'明治神宫', x:-14, z:3, h:6, desc:'藏在市中心森林里的神社，入口的大鸟居是它的标志。紧邻原宿却安静庄严，常能碰到日式婚礼队伍。', make:g=>{ g.add(box(12.5,0.3,10.5, std({color:0x5d8a54,roughness:1}), 0,0.15,0));
 g.add(box(2.8,0.34,8.5, texMat(gravelTex(),{roughness:1}), 0,0.17,0.6));
