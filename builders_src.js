@@ -76,6 +76,13 @@ function stationTex(){ const t=cnv(1024,512,(g,w,h)=>{
   g.fillStyle='#f3e9dc'; g.fillRect(0,40,w,24); g.fillRect(0,h-60,w,24);
   for(let r=0;r<2;r++){ const y0=116+r*168; for(let x=52;x<w-40;x+=96){ g.fillStyle='#f3e9dc'; g.beginPath(); g.arc(x+28,y0+32,30,Math.PI,0); g.fill(); g.fillRect(x-2,y0+32,60,76); g.fillStyle='#2e3d4d'; g.beginPath(); g.arc(x+28,y0+32,22,Math.PI,0); g.fill(); g.fillRect(x+6,y0+32,44,68); g.fillStyle='rgba(255,255,255,0.25)'; g.fillRect(x+12,y0+40,10,52); } }
 }); t.wrapS=THREE.RepeatWrapping; return t; }
+function paveTex(){ const t=cnv(256,256,(g,w,h)=>{
+  g.fillStyle='#cfc8b8'; g.fillRect(0,0,w,h);
+  for(let i=0;i<1600;i++){ g.fillStyle=HASH(i*2.9)>0.5?'rgba(255,255,255,0.05)':'rgba(60,55,45,0.05)'; g.fillRect(HASH(i*1.3)*w, HASH(i*1.9)*h, 2, 2); }
+  g.strokeStyle='rgba(90,84,70,0.45)'; g.lineWidth=2;
+  for(let y=0;y<=h;y+=64){ g.beginPath(); g.moveTo(0,y); g.lineTo(w,y); g.stroke(); }
+  for(let y=0;y<h;y+=64) for(let x=(Math.floor(y/64)%2)*64;x<=w;x+=128){ g.beginPath(); g.moveTo(x,y); g.lineTo(x,y+64); g.stroke(); }
+}); t.wrapS=t.wrapT=THREE.RepeatWrapping; t.repeat.set(4,3); return t; }
 function yasudaTex(){ const t=cnv(512,256,(g,w,h)=>{
   g.fillStyle='#5f2a1e'; g.fillRect(0,0,w,h);
   for(let y=0;y<h;y+=12){ for(let x=-24;x<w+24;x+=48){ const bx=x+(Math.floor(y/12)%2)*24, v=HASH((y*3+x)*1.17); g.fillStyle=['#6d2f22','#63301f','#713626','#673223'][Math.floor(v*4)%4]; g.fillRect(bx+1,y+1,46,10); } }
@@ -113,7 +120,7 @@ function hipRoof(w,h,d,mat,x,y,z){ // 真·歇山式坡屋顶：带屋脊的四�
 const treeMat=std({color:0x3e7d3a, roughness:1});
 const darkGreen=std({color:0x2c5d31, roughness:1});
 const pinkTree=std({color:0xf2a7c3, roughness:1});
-function tree(x,z,sc,mat){ sc=sc||1; const g=new THREE.Group(); g.position.set(x,0,z); g.add(cyl(0.07*sc,0.1*sc,0.8*sc,M.dark,0,0,6)); g.add(sph(0.6*sc, mat||treeMat, 0, 1.25*sc, 0)); g.add(sph(0.42*sc, mat||treeMat, 0.36*sc, 1.0*sc, 0.14*sc)); return g; }
+function tree(x,z,sc,mat){ sc=sc||1; const g=new THREE.Group(); g.position.set(x,0,z); const fm=mat||treeMat; g.add(cyl(0.06*sc,0.1*sc,0.9*sc,M.dark,0,0,6)); const c1=sph(0.58*sc, fm, 0, 1.3*sc, 0); c1.scale.y*=0.85; g.add(c1); const c2=sph(0.4*sc, fm, 0.34*sc, 1.05*sc, 0.12*sc); c2.scale.y*=0.85; g.add(c2); const c3=sph(0.34*sc, fm, -0.3*sc, 1.12*sc, -0.1*sc); c3.scale.y*=0.85; g.add(c3); g.rotation.y=HASH(x*13.7+z*7.1)*3.14; return g; }
 function people(g,n,x0,x1,z0,z1,y){ const cols=[0xef4444,0x3b82f6,0xf59e0b,0x10b981,0xf8fafc,0x334155]; for(let i=0;i<n;i++){ const p=cyl(0.05,0.07,0.34, std({color:cols[i%6], roughness:0.8}), RND(x0,x1), RND(z0,z1), 6); p.position.y=(y||0.3)+0.17; g.add(p); } }
 function cable(g,x1,y1,z1,x2,y2,z2,sag,mat){ const N=8; let px=x1,py=y1,pz=z1; for(let i=1;i<=N;i++){ const u=i/N; const x=x1+(x2-x1)*u, z=z1+(z2-z1)*u, y=y1+(y2-y1)*u-Math.sin(Math.PI*u)*sag; g.add(beam(px,py,pz,x,y,z,mat,0.03)); px=x; py=y; pz=z; } }
 function blink(mat){ ANIM.push(t=>{ mat.color.setHex(Math.sin(t*2.4)>0?0xff3333:0x551111); }); return mat; }
@@ -306,22 +313,25 @@ for(let i=0;i<4;i++) g.add(tree(-5.2+i*1.6, -4.2, 0.9, pinkTree));
 g.add(tree(5.6,-4,1)); g.add(tree(-1.5,3.8,0.9));
 const panda=new THREE.Group(); panda.position.set(5.4,0.3,0.6); panda.add(sph(0.3,M.white,0,0.3,0)); panda.add(sph(0.2,M.white,0.28,0.55,0)); panda.add(sph(0.09,M.dark,0.2,0.72,0.1)); panda.add(sph(0.09,M.dark,0.36,0.72,0.1)); g.add(panda);
 people(g,8,-2.5,2.5,0.8,1.8,0.3); } },
- {id:'toudai', name:'东京大学', x:0, z:0, h:6, desc:'日本第一所国立大学，本乡校区的赤门、安田讲堂与银杏大道是东京最有书卷气的风景，校园可自由参观。', make:g=>{ g.add(box(11.5,0.3,10, std({color:0xd8d0bc,roughness:1}), 0,0.15,0));
+ {id:'toudai', name:'东京大学', x:0, z:0, h:6, desc:'日本第一所国立大学，本乡校区的赤门、安田讲堂与银杏大道是东京最有书卷气的风景，校园可自由参观。', make:g=>{ g.add(box(11.5,0.3,10, texMat(paveTex(),{roughness:1}), 0,0.15,0));
 g.add(box(2,0.34,9.6,M.dark,0,0.17,0));
 const stone=texMat(facadeTex('#cfc4ae')); const ginkgo=std({color:0xd9a92e,roughness:0.9});
-const ydBrick=texMat(yasudaTex()); const ydWing=texMat(facadeTex('#7d4030')); const ydStone=std({color:0xcfc4ae,roughness:0.9});
+const ydTex=yasudaTex(); const ydBrick=texMat(ydTex,{bumpMap:ydTex, bumpScale:0.12}); const ydWing=texMat(facadeTex('#7d4030')); const ydStone=std({color:0xcfc4ae,roughness:0.9});
 const yd=new THREE.Group(); yd.position.set(0,0.3,-3.2); g.add(yd);
 yd.add(box(4.8,1.8,2.5, ydBrick, 0,0.9,-0.4));
 yd.add(cyl(1.3,1.3,1.8, ydBrick, 0,-1.6,20));
 yd.add(box(4.9,0.1,2.6, ydStone, 0,1.85,-0.4));
 yd.add(box(1.15,3.9,1.4, ydBrick, 0,1.95,0));
-yd.add(cone(0.98,1.1, M.roof, 0,0,4,4.45));
+yd.add(hipRoof(4.95,0.85,2.65, std({color:0x3a4149,roughness:0.85}), 0,1.9,-0.4));
+yd.add(cone(0.9,1.6, std({color:0x3a4149,roughness:0.8}), 0,0,8,4.7));
+const fin=cyl(0.03,0.03,0.34, M.gold, 0,0,6); fin.position.y=5.5; yd.add(fin); yd.add(sph(0.06, M.gold, 0,5.72,0));
 yd.add(box(0.52,0.52,0.08, texMat(clockTex()), 0,3.3,0.74));
 yd.add(box(0.52,0.52,0.08, texMat(clockTex()), 0,3.3,-0.74));
 yd.add(box(0.08,0.52,0.52, texMat(clockTex()), 0.6,3.3,0));
 yd.add(box(0.08,0.52,0.52, texMat(clockTex()), -0.6,3.3,0));
 yd.add(box(0.34,1.05,0.05, M.glass, 0,2.35,0.72));
 [[-0.52,-0.62],[0.52,-0.62],[-0.52,0.62],[0.52,0.62]].forEach(([tx,tz])=>{ const tt=cyl(0.09,0.1,0.72, ydBrick, tx,tz,8); tt.position.y=3.86; yd.add(tt); yd.add(cone(0.14,0.32, M.roof, tx,tz,8,4.36)); });
+[-1.92,-0.96,0,0.96,1.92].forEach(wx=>{ yd.add(box(0.36,1.02,0.03, M.glass, wx,0.9,0.855)); yd.add(box(0.06,1.1,0.06, ydStone, wx-0.21,0.9,0.86)); yd.add(box(0.06,1.1,0.06, ydStone, wx+0.21,0.9,0.86)); yd.add(box(0.48,0.08,0.06, ydStone, wx,1.47,0.86)); yd.add(box(0.5,0.06,0.1, ydStone, wx,0.36,0.86)); });
 [-2.32,-1.55,-0.78,0.78,1.55,2.32].forEach(bx=>{ yd.add(box(0.16,2.0,0.14, ydBrick, bx,1.0,0.9)); yd.add(cone(0.1,0.36, ydStone, bx,0.9,4,2.16)); });
 [-0.42,0.42].forEach(px=>yd.add(box(0.14,0.95,0.14, ydStone, px,0.48,1.35)));
 yd.add(box(1.2,0.16,0.34, ydStone, 0,1.02,1.35));

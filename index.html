@@ -711,7 +711,7 @@ function showInfo(s){ clearStampFx(); hideWelcomeToast(); infoEl.style.display='
   setPeek(sName(s), (m?m[0]+' · '+m[1]:(locDesc(s)||'')), (typeof carList!=='undefined'&&carList.length)?carList[0].url:null);
   if(matchMedia('(pointer:coarse)').matches) setSheet('peek');
   if(inf) spotWx(s);
-  if(typeof s.x==='number') flyTo(s.x, s.z, 30, 21); }
+  if(typeof s.x==='number'){ const CF=matchMedia('(pointer:coarse)').matches; flyTo(s.x, s.z, CF?19:30, CF?12.5:21); } }
 let activeRoute=-1;
 function selectRoute(i){
   ambSet('off'); infoEl.style.display=''; activeRoute=i;
@@ -784,8 +784,8 @@ AREAS.forEach((a,ai)=>{ const b=document.createElement('button'); b.className='a
 // 昼夜与旋转
 let night=false;
 const ENVP={
- day:{el:30,az:124,sunI:2.5,hemiI:0.68,bloom:0.25,city:0.0,sunCol:new THREE.Color(0xffd9a8),gnd:new THREE.Color(0xffffff),sea:new THREE.Color(0xffffff),gem:0.42,expo:0.80,label:'白天'},
- dusk:{el:2.4,az:99,sunI:1.9,hemiI:0.5,bloom:0.62,city:0.55,sunCol:new THREE.Color(0xff9a5c),gnd:new THREE.Color(0xd8c2ae),sea:new THREE.Color(0xd8bda6),gem:0.16,expo:0.74,label:'黄昏'},
+ day:{el:30,az:124,sunI:2.5,hemiI:0.68,bloom:0.25,city:0.0,sunCol:new THREE.Color(0xffd9a8),gnd:new THREE.Color(0xd9d5cc),sea:new THREE.Color(0xffffff),gem:0.42,expo:0.80,label:'白天'},
+ dusk:{el:2.4,az:99,sunI:1.9,hemiI:0.5,bloom:0.62,city:0.55,sunCol:new THREE.Color(0xff9a5c),gnd:new THREE.Color(0xc4b098),sea:new THREE.Color(0xd8bda6),gem:0.16,expo:0.74,label:'黄昏'},
  night:{el:-2.5,az:150,sunI:0.3,hemiI:0.22,bloom:1.15,city:0.9,sunCol:new THREE.Color(0xa8c4ff),gnd:new THREE.Color(0x5f7396),sea:new THREE.Color(0x546a86),gem:0.03,expo:0.58,label:'夜晚'}};
 const envCur={el:30,az:124,sunI:2.5,hemiI:0.68,bloom:0.25,city:0.0,expo:0.80,sunCol:new THREE.Color(0xffd9a8),gnd:new THREE.Color(0xffffff),sea:new THREE.Color(0xffffff),gem:0.42};
 let envTarget=ENVP.day, daypartState='day';
