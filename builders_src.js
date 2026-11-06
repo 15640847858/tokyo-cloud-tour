@@ -563,6 +563,21 @@ g.add(tree(-4.9,3.3,1.1)); g.add(tree(-2.2,3.4,0.9));
 g.add(sph(0.16, std({color:0x8b8f94,roughness:0.9}), 2.9,0.62,-0.5, 1,1.15,1)); g.add(sph(0.11, std({color:0x8b8f94,roughness:0.9}), 2.9,0.85,-0.5));
 const bus=new THREE.Group(); bus.add(box(1.7,0.62,0.7,M.red,0,0.1,0)); bus.add(box(1.5,0.3,0.72, M.white, 0,0.5,0)); bus.position.set(0,0.35,4.6); g.add(bus);
 ANIM.push(t=>{ const u=Math.sin(t*0.22)*4.4; bus.position.x=u; bus.rotation.y=Math.cos(t*0.22)>0?0:Math.PI; });
+// ===== Ikebukuro deep refine: Sunshine City complex + station rail level + east density =====
+g.add(box(2.0,6.6,2.1, texMat(facadeTex('#ddd6c8')), 6.6,3.3,1.3));
+g.add(box(1.7,0.7,0.16, glowMat(signTex('プリンスホテル','#7c2d12','#ffffff',false)), 6.6,5.6,2.42));
+g.add(box(2.6,3.1,2.3, texMat(facadeTex('#cfd6dd')), 6.2,1.55,-1.9));
+g.add(box(2.2,0.75,0.16, glowMat(signTex('文化会館','#334155','#ffffff',false)), 6.2,2.6,-0.72));
+const aqDome=sph(0.85, M.glass, 3.4,0,1.6); aqDome.scale.y=0.55; aqDome.position.y=2.15; g.add(aqDome);
+g.add(box(3.3,2.9,2.3, texMat(facadeTex('#d8dde3')), 1.9,1.45,1.6));
+g.add(box(2.4,0.85,0.16, glowMat(signTex('ビックカメラ','#b91c1c','#ffffff',false)), 1.9,2.2,2.82));
+g.add(box(0.16,2.2,0.85, glowMat(signTex('カラオケ','#2563eb')), 3.62,1.7,1.4));
+g.add(box(6.9,0.1,0.5, M.dark, 0,1.82,-1.15)); g.add(box(6.9,0.1,0.5, M.dark, 0,1.82,-0.15));
+const trI=new THREE.Group(); [-1.9,0,1.9].forEach(oz=>{ trI.add(box(1.45,0.55,0.66, M.white, oz,0,0)); }); trI.add(box(4.9,0.14,0.68, std({color:0x80c241,roughness:0.6}), 0,0.36,0)); trI.position.set(0,1.9,-0.65); g.add(trI);
+g.add(box(4.6,0.06,1.15, std({color:0x8f8a80,roughness:1}), 3.6,0.34,4.35));
+[-0.2,2.2,4.6].forEach(lx=>{ const lp=cyl(0.045,0.045,1.5, M.dark, lx,4.35,6); g.add(lp); g.add(sph(0.09, std({color:0xfff2c0,roughness:0.4}), lx,1.62,4.35)); });
+g.add(box(2.3,4.9,2.1, texMat(facadeTex('#d5dbe1')), -5.9,2.45,1.6));
+g.add(box(1.8,0.7,0.16, glowMat(signTex('ホテルメトロポリタン','#1e3a5f','#ffffff',false)), -5.9,4.2,2.72));
 people(g,10,-4.5,4.5,3.4,4.4,0.3); } },
  {id:'waseda', name:'早稻田大学', x:0, z:0, h:6, desc:'大隈重信创办的私立名校，大隈讲堂的钟塔、演剧博物馆与村上春树图书馆都在早稻田校区，校门外是热闹的学生街。', make:g=>{ g.add(box(11.5,0.3,10, texMat(paveTex(),{roughness:1}), 0,0.15,0));
 g.add(box(4.6,0.34,3.8, M.park, -3.1,0.17,-0.4));
