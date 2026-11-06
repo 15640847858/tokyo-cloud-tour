@@ -595,18 +595,62 @@ g.add(box(2.2,0.8,0.16, glowMat(signTex('GINZA SIX','#111827','#fbbf24',false)),
 g.add(box(2.4,3.4,2.2, texMat(facadeTex('#e5e0d2')), -5.3,1.7,-3.6));
 for(let i=0;i<4;i++){ const lp=cyl(0.05,0.07,1.5,M.dark,-4.8+i*3.1,3.4,6); lp.position.y=1.05; g.add(lp); g.add(sph(0.12, std({color:0xfff2c0,roughness:0.4}), -4.8+i*3.1, 1.95, 3.4)); }
 people(g,16,-5.5,5.5,2.6,4.2,0.32); } },
- {id:'harajuku', name:'原宿', x:-12, z:7, h:5, desc:'竹下通满是年轻潮流小店和可丽饼摊，入口的彩色拱门一到周末就挤满人，和旁边的明治神宫一动一静。', make:g=>{ g.add(box(12,0.3,11, texMat(paveTex(),{roughness:1}), 0,0.15,0.5));
-g.add(box(2.3,0.34,9.5, std({color:0xe8dcc8,roughness:1}), 0,0.17,0.8));
-[-2.3,2.3].forEach(x=>{ const pl=cyl(0.14,0.18,3.1,M.pink,x,4.9,8); g.add(pl); });
-g.add(box(5.6,1.05,0.35, glowMat(archTex()), 0,3.35,4.9));
-const shopCols=[0xf9a8d4,0xfde047,0x93c5fd,0xa7f3d0,0xfca5a5,0xc4b5fd];
-for(let i=0;i<5;i++){ [-1.95,1.95].forEach(x=>{ const h=1.6+((i*53)%10)/9; g.add(box(1.5,h,1.6, std({color:shopCols[(i+(x>0?2:0))%6], roughness:0.8}), x, h/2, 3.4-i*1.85)); g.add(box(0.14,0.95,1.1, glowMat(signTex(['クレープ','古着','雑貨','カフェ','写真'][i], ['#ec4899','#2563eb','#059669','#f59e0b','#7c3aed'][(i+(x>0?1:0))%5])), x+(x>0?-0.85:0.85), 1.35, 3.4-i*1.85)); }); }
-const laf=new THREE.Group(); laf.position.set(-4.3,0,-3.2); [0,1,2].forEach(i=>{ laf.add(box(3-i*0.55,1.05,2.6-i*0.4, texMat(glassTex('#c3d9ea')), -i*0.28, 0.53+i*1.05, 0)); }); laf.add(box(2.2,0.7,0.14, glowMat(signTex('ラフォーレ','#111827','#ffffff',false)), 0,1.1,1.42)); g.add(laf);
-g.add(box(6.4,1.5,2.4, texMat(glassTex('#b7cfdf')), 2.6,0.75,-4.4));
-const slopeR=box(6.4,0.18,2.7, M.grey, 2.6,1.6,-4.4); slopeR.rotation.z=0.06; g.add(slopeR);
-for(let i=0;i<5;i++) g.add(tree(-4.6+i*2.3, -2.6, 0.95));
-const crepe=new THREE.Group(); crepe.position.set(1.1,0.3,1.4); const cc=cone(0.16,0.5, std({color:0xe8c39a,roughness:0.8}), 0,0,8); cc.rotation.x=Math.PI; cc.position.y=0.45; crepe.add(cc); crepe.add(sph(0.17,M.pink,0,0.78,0)); g.add(crepe);
-people(g,20,-0.9,0.9,-2.6,4.2,0.32); } },
+ {id:'harajuku', name:'原宿', x:-12, z:7, h:5, desc:'竹下通满是年轻潮流小店和可丽饼摊，一到周末就挤满人；明治通对面是 Laforet，车站旁是木格栅外立面的 WITH HARAJUKU，和旁边的明治神宫一动一静。', make:g=>{ g.add(box(12,0.3,11, texMat(paveTex(),{roughness:1}), 0,0.15,0.5));
+g.add(box(1.5,2.3,5.6, texMat(facadeTex('#d8cfc0')), -4.9,1.15,-0.6));
+g.add(box(1.7,0.16,5.8, M.dark, -4.9,2.38,-0.6));
+g.add(box(0.35,0.1,5.8, std({color:0x4a4640,roughness:1}), -5.8,0.35,-0.6));
+g.add(box(0.14,0.8,3.4, glowMat(signTex('原宿駅','#16a34a','#ffffff',false)), -4.08,1.7,-0.6));
+g.add(box(2.2,0.07,3.2, texMat(paveTex(),{roughness:1}), -3.55,0.34,-0.5));
+const wth=new THREE.Group(); wth.position.set(-2.95,0,-2.5); g.add(wth);
+wth.add(box(2.4,3.1,2.0, texMat(glassTex('#a9c6de')), 0,1.55,0));
+for(let i=0;i<7;i++) wth.add(box(2.44,0.09,0.06, std({color:0x8a6844,roughness:0.85}), 0,0.55+i*0.38,1.03));
+wth.add(box(2.0,0.7,0.14, glowMat(signTex('WITH HARAJUKU','#7a4a21','#ffffff',false)), 0,2.9,1.05));
+[[1.5,1.02],[1.85,1.85],[2.2,2.68]].forEach(([tx,ty],i)=>{ wth.add(box(1.5-i*0.25,0.16,1.7, std({color:0xcac2b4,roughness:1}), tx-1.2,ty,0.1)); wth.add(box(1.4-i*0.25,0.1,1.6, M.park, tx-1.2,ty+0.12,0.1)); });
+const tk=new THREE.Group(); tk.position.set(-2.3,0,-0.75); tk.rotation.y=-0.178; g.add(tk);
+tk.add(box(5.6,0.07,1.15, std({color:0x8f8a80,roughness:1}), 2.6,0.34,0));
+const shopNames=['クレープ','古着','雑貨','カフェ','写真','コスメ','タピオカ'];
+const shopSignCols=['#ec4899','#2563eb','#059669','#d97706','#7c3aed','#db2777','#0ea5e9'];
+const bldgTones=['#cfc4b0','#b9c0c7','#d8cfc0','#a8b2ba','#cbb9a0','#bfb4a4'];
+for(let i=0;i<6;i++){ [-1,1].forEach(sd=>{ const bx=0.55+i*0.88, bh=1.35+HASH(i*3.1+sd)*1.3, bz=sd*1.02;
+  tk.add(box(0.78,bh,0.85, texMat(facadeTex(bldgTones[(i+(sd>0?3:0))%6])), bx,bh/2,bz));
+  tk.add(box(0.62,0.55,0.06, M.glass, bx,0.62,bz-sd*0.46));
+  const aw=box(0.68,0.05,0.36, std({color:[0xd96a7a,0x7a9cc4,0x86b06c,0xd9a45c][(i+(sd>0?1:0))%4],roughness:0.8}), bx,0.98,bz-sd*0.6); aw.rotation.x=sd*0.32; tk.add(aw);
+  tk.add(box(0.13,0.9,0.52, glowMat(signTex(shopNames[(i+(sd>0?2:0))%7], shopSignCols[(i+(sd>0?2:0))%7])), bx+0.3,1.5,bz-sd*0.47));
+}); }
+[-0.35,0.35].forEach(px=>tk.add(cyl(0.05,0.05,2.3,M.dark,px,0,6)));
+tk.add(box(1.35,0.42,0.09, glowMat(signTex('竹下通り','#374151','#ffffff',false)), 0,2.42,0));
+people(tk,12,0.3,5.2,-0.32,0.32,0.38);
+g.add(box(1.3,0.06,11, std({color:0x3a3f45,roughness:0.95}), 3.95,0.335,0.5));
+for(let i=0;i<5;i++) g.add(box(0.09,0.02,0.55, M.white, 3.95,0.37,-3.6+i*1.9));
+const carH=new THREE.Group(); carH.position.set(3.7,0.36,-1.8); carH.add(box(0.6,0.3,1.3, std({color:0xe8e8e8,roughness:0.4,metalness:0.3}), 0,0.28,0)); carH.add(box(0.54,0.26,0.68, M.glass, 0,0.55,-0.05)); g.add(carH);
+const laf=new THREE.Group(); laf.position.set(5.25,0,-0.9); g.add(laf);
+laf.add(box(1.5,4.4,2.3, texMat(facadeTex('#c9c2b4')), 0,2.2,0));
+const lafCyl=cyl(0.52,0.52,3.5, M.glass, -0.72,1.32,14); laf.add(lafCyl);
+[1.25,2.45,3.65].forEach(y=>laf.add(box(0.1,0.17,2.0, std({color:0xd8d2c2,roughness:0.9}), -0.78,y,0)));
+laf.add(box(0.14,2.3,0.52, glowMat(signTex('ラフォーレ','#111827','#ffffff')), -0.8,2.5,-0.7));
+laf.add(box(1.1,0.09,0.8, M.dark, -0.95,0.95,1.15));
+const omo=new THREE.Group(); omo.position.set(2.45,0,3.6); g.add(omo);
+omo.add(box(1.8,3.6,1.9, texMat(glassTex('#9db8cc')), 0,1.8,0));
+const prism=cyl(0.85,1.05,2.2, M.glass, 0.85,-0.8,4); prism.rotation.y=Math.PI/4; omo.add(prism);
+omo.add(box(1.9,0.14,2.0, M.park, 0,3.67,0));
+omo.add(box(1.5,0.6,0.14, glowMat(signTex('Omokado','#0f766e','#ffffff',false)), 0,2.6,0.99));
+const hkd=new THREE.Group(); hkd.position.set(5.25,0,3.9); g.add(hkd);
+hkd.add(box(1.4,4.9,1.8, texMat(glassTex('#8fb0cc')), 0,2.45,0));
+hkd.add(box(1.55,0.3,1.95, std({color:0x51606e,roughness:0.7,metalness:0.3}), 0,3.4,0));
+hkd.add(box(1.5,0.14,1.9, M.park, 0,5.0,0));
+hkd.add(box(1.2,0.6,0.14, glowMat(signTex('Harakado','#b45309','#ffffff',false)), 0,4.3,0.94));
+const omoSt=new THREE.Group(); omoSt.position.set(3.3,0,3.3); omoSt.rotation.y=2.705; g.add(omoSt);
+omoSt.add(box(6.6,0.06,1.9, std({color:0x43484e,roughness:0.95}), 3.3,0.335,0));
+for(let i=0;i<6;i++){ omoSt.add(tree(1.1+i*1.05, 1.5, 1.2, darkGreen)); omoSt.add(tree(1.1+i*1.05, -1.5, 1.2, darkGreen)); }
+const hills=new THREE.Group(); hills.position.set(3.5,0,2.35); omoSt.add(hills);
+hills.add(box(3.9,1.5,1.7, texMat(facadeTex('#b9b0a0')), 0,0.75,0));
+hills.add(box(3.9,0.5,0.06, M.glass, 0,0.95,-0.87));
+hills.add(box(3.1,1.0,1.5, texMat(facadeTex('#c2b8a6')), -0.3,2.0,0.05));
+hills.add(box(2.2,0.55,0.14, glowMat(signTex('表参道ヒルズ','#57534e','#ffffff',false)), 0,1.15,-0.9));
+g.add(box(0.7,0.06,2.0, std({color:0x8f8a80,roughness:1}), 3.0,0.335,1.6));
+g.add(box(0.9,1.7,0.8, texMat(facadeTex('#c3ccd4')), 2.45,0.85,1.35));
+g.add(box(0.9,2.1,0.8, texMat(facadeTex('#d5dbe1')), 2.45,1.05,2.6));
+people(g,8,-1.8,2.4,-1.9,-1.2,0.36); } },
  {id:'toyosu', name:'丰洲市场', x:18, z:13, h:5, desc:'东京的厨房：白色大楼顶上有整片屋顶草坪是它的特点。清晨可以看金枪鱼拍卖、吃寿司早餐，注意休市日。', make:g=>{ g.add(box(13.5,0.3,10.5, texMat(paveTex(),{roughness:1}), 0,0.15,0));
 g.add(box(13.5,0.34,1.6,M.water,0,0.17,5));
 const roofM=std({color:0x7fa08a,roughness:0.7});
