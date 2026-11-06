@@ -145,7 +145,7 @@ const spots=[
   pairs.forEach((pr,idx)=>{ va.fromArray(pr[0]); vb.fromArray(pr[1]); dir.subVectors(vb,va); const len=dir.length(); dum.position.copy(va); dum.quaternion.setFromUnitVectors(UPV, dir.normalize()); dum.scale.set(1,len,1); dum.updateMatrix(); inst.setMatrixAt(idx, dum.matrix); });
   inst.castShadow=true; hi.add(inst);
   for(let l=0;l<=LEVELS;l+=2){ const y=nodes[l][0][1]; const ringM=new THREE.Mesh(new THREE.TorusGeometry(baseR(y)*1.0,0.035,6,48), steel); ringM.rotation.x=Math.PI/2; ringM.position.y=y; hi.add(ringM); }
-  const core=cyl(0.52,1.05,H-0.4, std({color:0xcdd9e2,roughness:0.4,metalness:0.1,transparent:true,opacity:0.22})); core.position.y=0.4+(H-0.4)/2; hi.add(core);
+  const core=cyl(0.52,1.05,H-0.4, std({color:0xcdd9e2,roughness:0.4,metalness:0.1,transparent:true,opacity:0.13})); core.position.y=0.4+(H-0.4)/2; hi.add(core);
   const deckMat=texMat(glassTex('#d4e4f0')); deckMat.emissive=new THREE.Color(0x000000);
   const rimMat=std({color:0xe8edf0, roughness:0.42, metalness:0.3});
   const glowMatN=new THREE.MeshBasicMaterial({color:0x14384f});
@@ -211,7 +211,8 @@ g.add(tree(4.6,-4.6,1,pinkTree)); g.add(tree(-4.8,-1.4,0.9,pinkTree)); g.add(tre
     g.add(beam(-w1,y1,-w1, w1,y1,-w1, m, 0.05)); g.add(beam(-w1,y1,w1, w1,y1,w1, m, 0.05)); g.add(beam(-w1,y1,-w1, -w1,y1,w1, m, 0.05)); g.add(beam(w1,y1,-w1, w1,y1,w1, m, 0.05));
   }
   g.add(box(0.34,topY,0.34, std({color:0xb8b0a2,roughness:0.85}), 0,topY/2,0));
-  g.add(box(3.9,1.5,3.1, std({color:0xe6dfd2,roughness:0.9}), 0,0.75,0));
+  const pedM=std({color:0xb8b0a2,roughness:0.95}); [[-2.34,-2.34],[2.34,-2.34],[-2.34,2.34],[2.34,2.34]].forEach(([fx,fz])=>g.add(box(0.85,0.55,0.85, pedM, fx,0.27,fz)));
+  g.add(box(3.9,1.5,3.1, texMat(facadeTex('#e6dfd2')), 0,0.75,0));
   g.add(box(4.1,0.18,3.3, std({color:0x8a4a34,roughness:0.8}), 0,1.58,0));
   g.add(box(3.9,0.5,0.06, new THREE.MeshBasicMaterial({color:0x9fc6dd}), 0,0.95,1.58));
   const deckGlass=texMat(glassTex('#aebfca')); deckGlass.emissive=new THREE.Color(0x000000);
@@ -230,7 +231,7 @@ g.add(tree(4.6,-4.6,1,pinkTree)); g.add(tree(-4.8,-1.4,0.9,pinkTree)); g.add(tre
  } },
  {id:'shibuya', name:'涩谷十字路口', x:-19, z:11, h:7, desc:'世界闻名的全向十字路口，一次绿灯上千人同时过马路。对面圆柱形的 SHIBUYA 109 和满墙大屏幕，就是日剧里最常见的东京画面。', make:g=>{ g.add(box(13.5,0.3,11.5,M.dark,0,0.15,0));
 for(let i=-2;i<=2;i++){ g.add(box(7.2,0.34,0.8,M.white,0,0.18,i*1.5)); g.add(box(0.8,0.34,7.2,M.white,i*1.5,0.18,0)); }
-const qf=box(3.6,6.6,3, texMat(facadeTex('#8b98a5')), 3.7,3.3,-2.8); g.add(qf);
+const qf=box(3.6,6.6,3, texMat(glassTex('#7d99b4')), 3.7,3.3,-2.8); g.add(qf);
 g.add(box(3.1,2.7,0.16, glowMat(screenTex(['渋谷','SHIBUYA CROSSING'])), 3.7,4.7,-1.22));
 const curveScr=new THREE.Mesh(new THREE.CylinderGeometry(2.35,2.35,2.7,18,1,true,Math.PI*0.72,Math.PI*0.52), glowMat(screenTex(['LIVE','109前']))); curveScr.position.set(3.7,4.55,-2.8); g.add(curveScr);
 const sq=box(2.0,10.6,2.0, texMat(glassTex('#7fa8cc')), 6.4,5.3,-5.2); g.add(sq);
@@ -239,6 +240,7 @@ g.add(box(1.9,1.7,0.16, glowMat(screenTex(['Scramble','Square'])), 6.4,8.6,-4.12
 g.add(box(3,5.6,2.4, texMat(facadeTex('#98a2ac')), -1.6,2.8,-4.8));
 g.add(box(0.18,3.4,1.1, glowMat(signTex('センター街','#dc2626')), 0.02,3,-4.8));
 const c109=cyl(1.55,1.55,5.8, texMat(facadeTex('#d8cfc0')), -4.9,-3.4, 20); g.add(c109);
+const c109c=cyl(1.18,1.52,0.55, std({color:0xb9c0c7,roughness:0.4,metalness:0.5}), -4.9,-3.4,20); c109c.position.y=6.05; g.add(c109c);
 g.add(box(2.4,0.95,0.2, glowMat(signTex('SHIBUYA109','#f472b6','#ffffff',false)), -4.9,6.2,-1.78));
 g.add(box(3.2,5,2.8, texMat(facadeTex('#a7b0ba')), -5,2.5,3.8));
 g.add(box(2.2,1.6,0.14, glowMat(screenTex(['MAGNET','MUSIC'])), -5,3.6,2.38));
@@ -362,8 +364,8 @@ const bridge=new THREE.Group(); bridge.position.set(0,0,4.6); bridge.add(box(3.6
 const pine=std({color:0x2f5d33,roughness:1});
 [[-5,-3.4],[-1.8,-3.8],[1.2,-4],[4.8,-3.6],[-5.2,0.8],[5.4,1.2]].forEach(q=>{ const t=tree(q[0],q[1],1.05,pine); t.children[1].scale.set(1.35,0.62,1.35); g.add(t); });
 g.add(tree(-2.6,1.8,0.9,pine)); g.add(tree(3.8,2,0.9,pine)); people(g,5,-1.5,1.5,1,2.4,0.34); } },
- {id:'tokyost', name:'东京站', x:4, z:0, h:6, desc:'红砖站舍是百年历史建筑：长长的红砖墙、白色腰线和中间的圆形穹顶是它的标志，也是新干线和成田特快 NEX 的核心枢纽。', make:g=>{ g.add(box(13,0.3,10.5, std({color:0xcac2b4,roughness:1}), 0,0.15,0));
-const bt=stationTex(); g.add(box(12.5,2.9,3.1, texMat(bt), 0,1.45,-1.6));
+ {id:'tokyost', name:'东京站', x:4, z:0, h:6, desc:'红砖站舍是百年历史建筑：长长的红砖墙、白色腰线和中间的圆形穹顶是它的标志，也是新干线和成田特快 NEX 的核心枢纽。', make:g=>{ g.add(box(13,0.3,10.5, texMat(paveTex(),{roughness:1}), 0,0.15,0));
+const bt=stationTex(); g.add(box(12.5,2.9,3.1, texMat(bt,{bumpMap:bt,bumpScale:0.1}), 0,1.45,-1.6));
 const cream=std({color:0xf3e9dc,roughness:0.9});
 g.add(box(12.7,0.16,3.3, cream, 0,1.02,-1.6)); g.add(box(12.7,0.16,3.3, cream, 0,2.52,-1.6));
 const slate=std({color:0x51606e,roughness:0.8});
@@ -372,7 +374,7 @@ g.add(hipRoof(13.1,1.05,3.8,slate,0,2.9,-1.6));
 const domeM=std({color:0x7d9b8a,roughness:0.5,metalness:0.25});
 function dome(x,r){ const drum=cyl(r*0.92,r*0.92,0.5,texMat(bt),x,-1.6,18); drum.position.y=3.8; g.add(drum); const d=sph(r, domeM, x, 4.05, -1.6, 1,0.85,1); g.add(d); const lant=cyl(r*0.16,r*0.2,0.42,domeM,x,-1.6,10); lant.position.y=4.05+r*0.85+0.1; g.add(lant); g.add(cone(0.07,0.5,M.gold,x,-1.6,6,4.55+r*0.85)); }
 dome(0,1.3); dome(-4.4,0.85); dome(4.4,0.85);
-g.add(box(11,0.26,3.6, std({color:0xd8cfb8,roughness:1}), 0,0.13,1.9));
+g.add(box(11,0.26,3.6, texMat(paveTex(),{roughness:1}), 0,0.13,1.9));
 g.add(box(9,0.28,1.1,M.dark,0,0.14,4.3));
 for(let i=0;i<6;i++) g.add(box(0.9,0.3,0.14,M.white,-3.6+i*1.45,0.15,4.3));
 [-5.2,-3.4,3.4,5.2].forEach(x=>g.add(tree(x,2,0.85)));
