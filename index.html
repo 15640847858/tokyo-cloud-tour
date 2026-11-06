@@ -370,7 +370,7 @@ const camera = new THREE.PerspectiveCamera(48, innerWidth/innerHeight, 2, 2000);
 camera.position.set(0, 86, 132);
 const renderer = new THREE.WebGLRenderer({antialias:true});
 renderer.setSize(innerWidth, innerHeight);
-renderer.setPixelRatio(Math.min(devicePixelRatio, matchMedia('(pointer:coarse)').matches ? 1.6 : 1.75));
+renderer.setPixelRatio(Math.min(devicePixelRatio, matchMedia('(pointer:coarse)').matches ? 1.75 : 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -756,7 +756,10 @@ async function loadBuildings(){
 }
 function sr(n){ const x=Math.sin(n*127.1+311.7)*43758.5453; return x-Math.floor(x); }
 
-loadBuildings();
+// 2026-11-07 策略变更：运行场景不再加载 14,000 栋普通建筑（数据完整保存在
+// GitHub Release backup-0398e05，恢复时改回调用 loadBuildings() 即可）。
+// 城市由真实地图底图 + 各景点自带的精细周边场景承载。
+(function(){ const st=document.getElementById('bldgStatus'); if(st) st.style.display='none'; window.__bldgDone=true; if(window.finishLoad) window.finishLoad(); })();
 
 // 点击景点
 const ray=new THREE.Raycaster(), mouse=new THREE.Vector2();
