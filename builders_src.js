@@ -76,6 +76,17 @@ function stationTex(){ const t=cnv(1024,512,(g,w,h)=>{
   g.fillStyle='#f3e9dc'; g.fillRect(0,40,w,24); g.fillRect(0,h-60,w,24);
   for(let r=0;r<2;r++){ const y0=116+r*168; for(let x=52;x<w-40;x+=96){ g.fillStyle='#f3e9dc'; g.beginPath(); g.arc(x+28,y0+32,30,Math.PI,0); g.fill(); g.fillRect(x-2,y0+32,60,76); g.fillStyle='#2e3d4d'; g.beginPath(); g.arc(x+28,y0+32,22,Math.PI,0); g.fill(); g.fillRect(x+6,y0+32,44,68); g.fillStyle='rgba(255,255,255,0.25)'; g.fillRect(x+12,y0+40,10,52); } }
 }); t.wrapS=THREE.RepeatWrapping; return t; }
+function yasudaTex(){ const t=cnv(512,256,(g,w,h)=>{
+  g.fillStyle='#5f2a1e'; g.fillRect(0,0,w,h);
+  for(let y=0;y<h;y+=12){ for(let x=-24;x<w+24;x+=48){ const bx=x+(Math.floor(y/12)%2)*24, v=HASH((y*3+x)*1.17); g.fillStyle=['#6d2f22','#63301f','#713626','#673223'][Math.floor(v*4)%4]; g.fillRect(bx+1,y+1,46,10); } }
+  g.strokeStyle='rgba(230,205,180,0.28)'; g.lineWidth=1; for(let y=0;y<=h;y+=12){ g.beginPath(); g.moveTo(0,y); g.lineTo(w,y); g.stroke(); }
+  g.fillStyle='#cfc4ae'; g.fillRect(0,0,w,14);
+  for(let b=0;b<5;b++){ const cx=52+b*102, wy=52, ww=44, wh=150;
+    g.fillStyle='#cfc4ae'; g.beginPath(); g.moveTo(cx-ww/2,wy+wh); g.lineTo(cx-ww/2,wy+22); g.arc(cx,wy+22,ww/2,Math.PI,0); g.lineTo(cx+ww/2,wy+wh); g.closePath(); g.fill();
+    g.fillStyle='#26313d'; g.beginPath(); g.moveTo(cx-ww/2+5,wy+wh); g.lineTo(cx-ww/2+5,wy+24); g.arc(cx,wy+24,ww/2-5,Math.PI,0); g.lineTo(cx+ww/2-5,wy+wh); g.closePath(); g.fill();
+    g.fillStyle='rgba(255,255,255,0.20)'; g.fillRect(cx-2,wy+30,4,wh-36);
+    const wg2=g.createLinearGradient(0,wy,0,wy+wh); wg2.addColorStop(0,'rgba(190,215,235,0.25)'); wg2.addColorStop(1,'rgba(190,215,235,0)'); g.fillStyle=wg2; g.fillRect(cx-ww/2+5,wy+4,ww-10,wh-8); }
+}); t.wrapS=THREE.RepeatWrapping; return t; }
 function clockTex(){ return cnv(128,128,(g,w,h)=>{ g.fillStyle='#f8f4e8'; g.beginPath(); g.arc(64,64,60,0,7); g.fill(); g.strokeStyle='#2b2b2b'; g.lineWidth=5; g.beginPath(); g.arc(64,64,58,0,7); g.stroke(); g.fillStyle='#2b2b2b'; for(let i=0;i<12;i++){ const a=i/12*Math.PI*2; g.fillRect(64+Math.cos(a)*48-2, 64+Math.sin(a)*48-2, 4, 4); } g.strokeStyle='#2b2b2b'; g.lineWidth=6; g.beginPath(); g.moveTo(64,64); g.lineTo(64,30); g.stroke(); g.lineWidth=4; g.beginPath(); g.moveTo(64,64); g.lineTo(92,74); g.stroke(); }); }
 function barrelTex(){ return cnv(128,128,(g,w,h)=>{ g.fillStyle='#f1e6cf'; g.fillRect(0,0,w,h); const cols=['#c0392b','#2456a6','#1e8449','#7d3c98','#d4a017']; for(let i=0;i<5;i++){ g.fillStyle=cols[i]; g.beginPath(); g.arc(24+(i%3)*40, 30+Math.floor(i/3)*52, 15, 0, 7); g.fill(); } g.fillStyle='#333'; g.font='bold 26px "PingFang SC","Microsoft YaHei",sans-serif'; g.textAlign='center'; g.fillText('清酒', 64, 118); }); }
 function archTex(){ return cnv(256,96,(g,w,h)=>{ g.fillStyle='#f472b6'; g.fillRect(0,0,w,h); const cols=['#fff','#fde047','#38bdf8','#a78bfa']; for(let i=0;i<14;i++){ g.fillStyle=cols[i%4]; g.beginPath(); g.arc(14+i*17, 14+(i%3)*10, 6, 0, 7); g.fill(); } g.fillStyle='#ffffff'; g.font='bold 40px "PingFang SC","Microsoft YaHei",sans-serif'; g.textAlign='center'; g.fillText('竹下通り', w/2, 66); }); }
@@ -298,11 +309,25 @@ people(g,8,-2.5,2.5,0.8,1.8,0.3); } },
  {id:'toudai', name:'东京大学', x:0, z:0, h:6, desc:'日本第一所国立大学，本乡校区的赤门、安田讲堂与银杏大道是东京最有书卷气的风景，校园可自由参观。', make:g=>{ g.add(box(11.5,0.3,10, std({color:0xd8d0bc,roughness:1}), 0,0.15,0));
 g.add(box(2,0.34,9.6,M.dark,0,0.17,0));
 const stone=texMat(facadeTex('#cfc4ae')); const ginkgo=std({color:0xd9a92e,roughness:0.9});
+const ydBrick=texMat(yasudaTex()); const ydWing=texMat(facadeTex('#7d4030')); const ydStone=std({color:0xcfc4ae,roughness:0.9});
 const yd=new THREE.Group(); yd.position.set(0,0.3,-3.2); g.add(yd);
-yd.add(box(4.8,1.8,1.7, stone, 0,0.9,0)); yd.add(box(1.15,3.9,1.4, stone, 0,1.95,0));
+yd.add(box(4.8,1.8,2.5, ydBrick, 0,0.9,-0.4));
+yd.add(cyl(1.3,1.3,1.8, ydBrick, 0,-1.6,20));
+yd.add(box(4.9,0.1,2.6, ydStone, 0,1.85,-0.4));
+yd.add(box(1.15,3.9,1.4, ydBrick, 0,1.95,0));
 yd.add(cone(0.98,1.1, M.roof, 0,0,4,4.45));
 yd.add(box(0.52,0.52,0.08, texMat(clockTex()), 0,3.3,0.74));
-[-2.9,2.9].forEach(x=>yd.add(box(1.6,1.25,1.5, stone, x,0.62,0)));
+yd.add(box(0.52,0.52,0.08, texMat(clockTex()), 0,3.3,-0.74));
+yd.add(box(0.08,0.52,0.52, texMat(clockTex()), 0.6,3.3,0));
+yd.add(box(0.08,0.52,0.52, texMat(clockTex()), -0.6,3.3,0));
+yd.add(box(0.34,1.05,0.05, M.glass, 0,2.35,0.72));
+[[-0.52,-0.62],[0.52,-0.62],[-0.52,0.62],[0.52,0.62]].forEach(([tx,tz])=>{ const tt=cyl(0.09,0.1,0.72, ydBrick, tx,tz,8); tt.position.y=3.86; yd.add(tt); yd.add(cone(0.14,0.32, M.roof, tx,tz,8,4.36)); });
+[-2.32,-1.55,-0.78,0.78,1.55,2.32].forEach(bx=>{ yd.add(box(0.16,2.0,0.14, ydBrick, bx,1.0,0.9)); yd.add(cone(0.1,0.36, ydStone, bx,0.9,4,2.16)); });
+[-0.42,0.42].forEach(px=>yd.add(box(0.14,0.95,0.14, ydStone, px,0.48,1.35)));
+yd.add(box(1.2,0.16,0.34, ydStone, 0,1.02,1.35));
+yd.add(box(1.5,0.09,0.3, ydStone, 0,0.045,1.3)); yd.add(box(1.8,0.06,0.3, ydStone, 0,0.03,1.55));
+yd.add(box(3.6,0.05,1.7, std({color:0xb9b2a2,roughness:1}), 0,0.025,1.9));
+[-2.9,2.9].forEach(x=>yd.add(box(1.6,1.25,1.5, ydWing, x,0.62,0)));
 const aka=new THREE.Group(); aka.position.set(0,0.3,4.3); g.add(aka);
 const redM=std({color:0x9e2b23,roughness:0.55});
 [-1.05,1.05].forEach(x=>aka.add(box(0.27,1.95,0.27, redM, x,0.98,0)));
