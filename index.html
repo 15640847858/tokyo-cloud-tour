@@ -680,6 +680,44 @@ function airportHND(x,z){
   g.userData.spot={id:'hnd', x:x, z:z, name:'羽田机场', desc:'位于东京湾边，距市中心约 15 公里。京急线或单轨电车 15 分钟左右就能进城，是离市区最近的机场。'};
   g.traverse(o=>{o.userData.spot=g.userData.spot;}); scene.add(g); pickables.push(g); return g;
 }
+function airportNRT(x,z){
+  const g=new THREE.Group(); g.position.set(x,0,z); g.scale.setScalar(0.85);
+  g.add(box(30,0.3,19, texMat(airportTex('16R'),{roughness:0.95}), 0,0.15,0));
+  const roofW=std({color:0xe8eaed,roughness:0.4,metalness:0.4});
+  const t1=new THREE.Group(); t1.position.set(-5.8,0.3,5.5); g.add(t1);
+  const t1g=glassTex('#aec6da'); t1g.repeat.set(6,2);
+  t1.add(box(10.5,2.8,3.4, texMat(t1g), 0,1.4,0));
+  const a1=box(11.0,0.09,2.4, roofW, 0,3.2,-1.05); a1.rotation.x=0.33; t1.add(a1);
+  const a2=box(11.0,0.09,2.4, roofW, 0,3.2,1.05); a2.rotation.x=-0.33; t1.add(a2);
+  [-6.9,6.9].forEach((wx,i)=>{ const w=box(4.0,2.1,2.5, texMat(facadeTex('#ccd3da')), wx,1.05,0.3); w.rotation.y=(i? -1:1)*0.32; t1.add(w); });
+  t1.add(box(3.6,0.62,0.14, glowMat(signTex('成田空港 NRT','#7c2d12','#ffffff',false)), 0,2.3,-1.78));
+  const pier1=box(1.8,1.8,4.6, texMat(glassTex('#b9d2e4')), -5.8,1.2,1.4); g.add(pier1);
+  const t2=new THREE.Group(); t2.position.set(7.6,0.3,5.5); g.add(t2);
+  t2.add(box(8.4,2.4,3.0, texMat(facadeTex('#d8dde3')), 0,1.2,0));
+  const b1=box(8.7,0.08,2.1, roofW, 0,2.72,-0.85); b1.rotation.x=0.24; t2.add(b1);
+  const b2=box(8.7,0.08,2.1, roofW, 0,2.72,0.85); b2.rotation.x=-0.24; t2.add(b2);
+  t2.add(box(2.8,0.55,0.14, glowMat(signTex('第2ターミナル','#1e3a5f','#ffffff',false)), 0,1.9,-1.57));
+  const pier2=box(1.7,1.7,4.4, texMat(glassTex('#b9d2e4')), 7.6,1.15,1.4); g.add(pier2);
+  const t3=new THREE.Group(); t3.position.set(13.2,0.3,5.6); g.add(t3);
+  t3.add(box(3.0,1.5,2.4, M.white, 0,0.75,0));
+  t3.add(box(3.1,0.34,2.5, std({color:0x2563eb,roughness:0.5}), 0,1.32,0));
+  t3.add(box(1.9,0.5,0.12, glowMat(signTex('第3ターミナル','#1d4ed8','#ffffff',false)), 0,0.85,-1.26));
+  const twr=new THREE.Group(); twr.position.set(3.2,0.3,3.4); g.add(twr);
+  twr.add(cyl(0.12,0.27,6.6, M.white, 0,0,10));
+  const cab=cyl(0.5,0.37,0.7, M.glass, 0,0,12); cab.position.y=6.9; twr.add(cab);
+  const tr2=cyl(0.56,0.56,0.12, M.dark, 0,0,12); tr2.position.y=7.3; twr.add(tr2);
+  const ant=cyl(0.02,0.02,1.1, M.dark, 0,0,6); ant.position.y=7.85; twr.add(ant);
+  const twr2=new THREE.Group(); twr2.position.set(-0.6,0.3,3.8); g.add(twr2);
+  twr2.add(cyl(0.14,0.26,3.4, M.white, 0,0,10));
+  const cab2=cyl(0.44,0.34,0.55, M.dark, 0,0,12); cab2.position.y=3.6; twr2.add(cab2);
+  const spotsP=[[-8.3,1.3,-Math.PI/2,0x2563eb,0x1e40af,1.1],[-3.3,1.3,Math.PI/2,0xdc2626,0xdc2626,1.05],[-8.6,4.1,-Math.PI/2,0x0ea5e9,0x0369a1,1.0],[5.2,1.3,-Math.PI/2,0x2563eb,0x1e40af,1.05],[10.2,1.5,Math.PI/2,0xdc2626,0xdc2626,1.0],[12.6,3.4,-Math.PI/2,0xf59e0b,0xec4899,0.85]];
+  spotsP.forEach(([px,pz,ry,stripe,tail,sc],i)=>{ const pl=makePlane2(stripe,tail); pl.position.set(px,0.3,pz); pl.rotation.y=ry; pl.scale.setScalar(sc); g.add(pl); });
+  [[-11.5,3.55],[1.2,3.55],[6.2,3.55],[9.6,3.55]].forEach(([gx],i)=>g.add(jetBridge(gx, 3.55, (i%2? -0.12:0.12))));
+  [[-12.6,2.2,0x2563eb],[-12.6,3.1,0xdc2626],[-11.7,2.65,0x0ea5e9]].forEach(([cx,cz,cc])=>g.add(box(1.1,0.55,0.5, std({color:cc,roughness:0.6}), cx,0.58,cz)));
+  const lb=label('成田 NRT', 1.15, '#7c2d12'); lb.position.y=9.6; g.add(lb);
+  g.userData.spot={id:'nrt', x:x, z:z, name:'成田机场', desc:'位于千叶县成田市，距市中心约 60 公里（地图已压缩）。进城首选 Skyliner、成田特快 NEX 或 Access 特快。'};
+  g.traverse(o=>{o.userData.spot=g.userData.spot;}); scene.add(g); pickables.push(g); return g;
+}
 function airport(x,z,name,code){
   const g=new THREE.Group(); g.position.set(x,0,z); g.scale.setScalar(0.85);
   g.add(box(14,0.35,5.4,M.dark,0,0.18,0));
@@ -697,7 +735,7 @@ function airport(x,z,name,code){
   g.traverse(o=>{o.userData.spot=g.userData.spot;}); scene.add(g); pickables.push(g); return g;
 }
 const HNDP=proj(139.780, 35.549); airportHND(HNDP[0], HNDP[1]);
-airport(58, -44, '成田', 'NRT');
+airportNRT(58, -44);
 
 // 路线数据（站点为真实经纬度，成田为示意起点）
 const NRTW=[58,-44];
