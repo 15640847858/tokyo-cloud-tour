@@ -87,6 +87,28 @@ function paveTex(){ const t=cnv(256,256,(g,w,h)=>{
   for(let y=0;y<=h;y+=64){ g.beginPath(); g.moveTo(0,y); g.lineTo(w,y); g.stroke(); }
   for(let y=0;y<h;y+=64) for(let x=(Math.floor(y/64)%2)*64;x<=w;x+=128){ g.beginPath(); g.moveTo(x,y); g.lineTo(x,y+64); g.stroke(); }
 }); t.wrapS=t.wrapT=THREE.RepeatWrapping; t.repeat.set(4,3); return t; }
+function shibuyaRoadTex(){ const t=cnv(1024,1024,(g,w,h)=>{
+  g.save(); g.scale(w/13.5, h/11.5); g.translate(6.75, 5.75);
+  g.fillStyle='#a8a49c'; g.fillRect(-6.75,-5.75,13.5,11.5);
+  for(let i=0;i<2600;i++){ g.fillStyle=HASH(i*1.37)>0.5?'rgba(255,255,255,0.05)':'rgba(50,48,44,0.06)'; g.fillRect(HASH(i*2.11)*13.5-6.75, HASH(i*3.17)*11.5-5.75, 0.09, 0.09); }
+  g.fillStyle='#33373b'; g.fillRect(-1.6,-5.75,3.2,11.5); g.fillRect(-6.75,-1.6,13.5,3.2);
+  for(let i=0;i<1500;i++){ g.fillStyle=HASH(i*1.91)>0.5?'rgba(255,255,255,0.045)':'rgba(0,0,0,0.16)'; g.fillRect(HASH(i*2.53)*3.2-1.6, HASH(i*3.71)*11.5-5.75, 0.06, 0.06); g.fillStyle=HASH(i*1.53)>0.5?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.14)'; g.fillRect(HASH(i*2.97)*13.5-6.75, HASH(i*3.31)*3.2-1.6, 0.06, 0.06); }
+  g.fillStyle='rgba(245,245,240,0.55)';
+  g.fillRect(-1.66,-5.75,0.09,4.05); g.fillRect(-1.66,1.7,0.09,4.05); g.fillRect(1.57,-5.75,0.09,4.05); g.fillRect(1.57,1.7,0.09,4.05);
+  g.fillRect(-5.75,-1.66,4.05,0.09); g.fillRect(1.7,-1.66,4.05,0.09); g.fillRect(-5.75,1.57,4.05,0.09); g.fillRect(1.7,1.57,4.05,0.09);
+  g.fillStyle='rgba(250,250,245,0.85)';
+  for(let z=-5.5;z<-2.1;z+=0.95) g.fillRect(-0.055,z,0.11,0.5);
+  for(let z=2.2;z<5.4;z+=0.95) g.fillRect(-0.055,z,0.11,0.5);
+  for(let x=-6.4;x<-2.1;x+=0.95) g.fillRect(x,-0.055,0.5,0.11);
+  for(let x=2.2;x<6.3;x+=0.95) g.fillRect(x,-0.055,0.5,0.11);
+  g.fillStyle='rgba(255,255,255,0.94)';
+  for(let x=-1.48;x<1.3;x+=0.55) g.fillRect(x,-3.15,0.34,1.15);
+  for(let x=-1.48;x<1.3;x+=0.55) g.fillRect(x,2.0,0.34,1.15);
+  for(let z=-1.48;z<1.3;z+=0.55) g.fillRect(-3.15,z,1.15,0.34);
+  for(let z=-1.48;z<1.3;z+=0.55) g.fillRect(2.0,z,1.15,0.34);
+  g.fillRect(-1.55,-3.5,1.5,0.22); g.fillRect(0.05,3.28,1.5,0.22); g.fillRect(-3.5,0.05,0.22,1.5); g.fillRect(3.28,-1.55,0.22,1.5);
+  g.restore();
+}); return t; }
 function yasudaTex(){ const t=cnv(512,256,(g,w,h)=>{
   g.fillStyle='#5f2a1e'; g.fillRect(0,0,w,h);
   for(let y=0;y<h;y+=12){ for(let x=-24;x<w+24;x+=48){ const bx=x+(Math.floor(y/12)%2)*24, v=HASH((y*3+x)*1.17); g.fillStyle=['#6d2f22','#63301f','#713626','#673223'][Math.floor(v*4)%4]; g.fillRect(bx+1,y+1,46,10); } }
@@ -233,34 +255,54 @@ g.add(tree(4.6,-4.6,1,pinkTree)); g.add(tree(-4.8,-1.4,0.9,pinkTree)); g.add(tre
   ANIM.push(t=>{ const on=Math.sin(t*2.4)>0; bc.material.color.setHex(on?0xff2222:0x551111); });
   window.NIGHT_FNS=window.NIGHT_FNS||[]; NIGHT_FNS.push(n=>{ tO.emissive.setHex(n?0xa84800:0x000000); tO.emissiveIntensity=n?1.3:1; tW.emissive.setHex(n?0x7a4a16:0x000000); deckGlass.emissive.setHex(n?0x8a5a1e:0x000000); });
  } },
- {id:'shibuya', name:'涩谷十字路口', x:-19, z:11, h:7, desc:'世界闻名的全向十字路口，一次绿灯上千人同时过马路。对面圆柱形的 SHIBUYA 109 和满墙大屏幕，就是日剧里最常见的东京画面。', make:g=>{ g.add(box(13.5,0.3,11.5,M.dark,0,0.15,0));
-for(let i=-2;i<=2;i++){ g.add(box(7.2,0.34,0.8,M.white,0,0.18,i*1.5)); g.add(box(0.8,0.34,7.2,M.white,i*1.5,0.18,0)); }
-const qf=box(3.6,6.6,3, texMat(glassTex('#7d99b4')), 3.7,3.3,-2.8); g.add(qf);
-g.add(box(3.1,2.7,0.16, glowMat(screenTex(['渋谷','SHIBUYA CROSSING'])), 3.7,4.7,-1.22));
-const curveScr=new THREE.Mesh(new THREE.CylinderGeometry(2.35,2.35,2.7,18,1,true,Math.PI*0.72,Math.PI*0.52), glowMat(screenTex(['LIVE','109前']))); curveScr.position.set(3.7,4.55,-2.8); g.add(curveScr);
-const sq=box(2.0,10.6,2.0, texMat(glassTex('#7fa8cc')), 6.4,5.3,-5.2); g.add(sq);
-g.add(box(2.1,1.1,2.1, M.dark, 6.4,10.9,-5.2));
-g.add(box(1.9,1.7,0.16, glowMat(screenTex(['Scramble','Square'])), 6.4,8.6,-4.12));
-g.add(box(3,5.6,2.4, texMat(facadeTex('#98a2ac')), -1.6,2.8,-4.8));
-g.add(box(0.18,3.4,1.1, glowMat(signTex('センター街','#dc2626')), 0.02,3,-4.8));
-const c109=cyl(1.55,1.55,5.8, texMat(facadeTex('#d8cfc0')), -4.9,-3.4, 20); g.add(c109);
-const c109c=cyl(1.18,1.52,0.55, std({color:0xb9c0c7,roughness:0.4,metalness:0.5}), -4.9,-3.4,20); c109c.position.y=6.05; g.add(c109c);
-g.add(box(2.4,0.95,0.2, glowMat(signTex('SHIBUYA109','#f472b6','#ffffff',false)), -4.9,6.2,-1.78));
-g.add(box(3.2,5,2.8, texMat(facadeTex('#a7b0ba')), -5,2.5,3.8));
-g.add(box(2.2,1.6,0.14, glowMat(screenTex(['MAGNET','MUSIC'])), -5,3.6,2.38));
-const hachi=new THREE.Group(); hachi.position.set(-3.3,0.3,-4.7); const bronze=std({color:0x7a5c33,roughness:0.55,metalness:0.5});
+ {id:'shibuya', name:'涩谷十字路口', x:-19, z:11, h:7, desc:'世界闻名的全向十字路口，一次绿灯上千人同时过马路。对面圆柱形的 SHIBUYA 109 和满墙大屏幕，就是日剧里最常见的东京画面。', make:g=>{ g.add(box(13.5,0.3,11.5, texMat(shibuyaRoadTex(),{roughness:0.96}), 0,0.15,0));
+const paveM=texMat(paveTex(),{roughness:1});
+[[-4.25,-3.75],[4.25,-3.75],[-4.25,3.75]].forEach(([cx,cz])=>g.add(box(5.0,0.1,4.0, paveM, cx,0.33,cz)));
+g.add(box(2.6,0.1,4.0, paveM, 3.05,0.33,3.75));
+const rimW=std({color:0xe8edf0,roughness:0.5,metalness:0.3});
+const qf=box(3.4,6.4,2.8, texMat(glassTex('#86a8c4')), 3.1,3.2,-3.1); g.add(qf);
+const curveScr=new THREE.Mesh(new THREE.CylinderGeometry(2.28,2.28,2.7,18,1,true,Math.PI*1.58,Math.PI*0.35), glowMat(screenTex(['渋谷','SHIBUYA CROSSING']))); curveScr.position.set(3.1,4.6,-3.1); g.add(curveScr);
+g.add(box(0.16,2.2,2.0, glowMat(screenTex(['LIVE','109前'])), 1.32,4.6,-3.1));
+g.add(box(2.2,0.7,0.16, glowMat(signTex('TSUTAYA','#1d4ed8','#ffffff',false)), 3.1,1.5,-1.62));
+const sq=box(2.3,11.5,2.3, texMat(glassTex('#7fa8cc')), 5.6,5.75,-3.5); g.add(sq);
+[1.7,3.35,5.0,6.65,8.3,9.95].forEach(y=>g.add(box(2.42,0.1,2.42, rimW, 5.6,y,-3.5)));
+g.add(box(2.5,0.35,2.5, M.dark, 5.6,11.68,-3.5));
+g.add(box(2.3,0.5,0.07, M.dark, 5.6,12.05,-4.68)); g.add(box(2.3,0.5,0.07, M.dark, 5.6,12.05,-2.32)); g.add(box(0.07,0.5,2.3, M.dark, 4.42,12.05,-3.5)); g.add(box(0.07,0.5,2.3, M.dark, 6.78,12.05,-3.5));
+g.add(box(1.8,0.85,0.16, glowMat(signTex('SHIBUYA SKY','#0ea5e9','#ffffff',false)), 5.6,10.6,-2.3));
+g.add(box(2.6,5.2,2.4, texMat(facadeTex('#a7b0ba')), -5.2,2.6,-3.9));
+g.add(box(0.18,3.4,1.1, glowMat(signTex('センター街','#dc2626')), -3.86,3,-3.9));
+g.add(box(2.2,4.2,2.2, texMat(glassTex('#8fb8d8')), -2.9,2.1,-4.4));
+g.add(box(1.9,1.5,0.16, glowMat(screenTex(['SALE','LIVE'])), -2.9,3.1,-3.26));
+const c109=cyl(1.55,1.55,5.8, texMat(facadeTex('#d8cfc0')), -4.7,3.3, 20); g.add(c109);
+const c109c=cyl(1.18,1.52,0.55, std({color:0xb9c0c7,roughness:0.4,metalness:0.5}), -4.7,3.3,20); c109c.position.y=6.05; g.add(c109c);
+const s109=box(2.4,0.95,0.2, glowMat(signTex('SHIBUYA109','#f472b6','#ffffff',false)), -3.55,6.2,2.15); s109.rotation.y=-Math.PI/4; g.add(s109);
+const can109=box(1.7,0.09,1.0, M.dark, -3.6,1.15,2.25); can109.rotation.y=-Math.PI/4; g.add(can109);
+g.add(box(2.0,3.2,2.0, texMat(facadeTex('#98a2ac')), -2.45,1.6,4.3));
+g.add(box(1.8,1.3,0.14, glowMat(screenTex(['MAGNET','MUSIC'])), -2.45,2.5,3.26));
+g.add(box(3.0,4.6,1.8, texMat(facadeTex('#b9c2cc')), 3.1,2.3,0.9));
+g.add(box(2.0,0.7,0.16, glowMat(signTex('MARK CITY','#334155','#ffffff',false)), 3.1,4.2,1.85));
+g.add(box(2.0,3.4,3.0, texMat(facadeTex('#c9cfd6')), 5.6,1.7,1.7));
+g.add(box(2.2,0.22,3.2, M.dark, 5.6,3.5,1.7));
+g.add(box(0.14,0.7,2.2, glowMat(signTex('渋谷駅','#16a34a','#ffffff',false)), 4.55,2.6,1.7));
+g.add(box(1.7,5.5,1.9, texMat(glassTex('#9cc0d8')), 5.85,2.75,4.65));
+g.add(box(1.5,0.7,0.14, glowMat(signTex('STREAM','#0284c7','#ffffff',false)), 5.85,4.9,5.66));
+const hachi=new THREE.Group(); hachi.position.set(2.75,0.38,2.75); hachi.rotation.y=-0.7; g.add(hachi);
+const bronze=std({color:0x7a5c33,roughness:0.55,metalness:0.5});
 hachi.add(box(0.55,0.42,0.55, std({color:0x8b8f94,roughness:1}), 0,0.21,0));
 hachi.add(box(0.36,0.2,0.17, bronze, 0,0.55,0)); const hd=box(0.15,0.17,0.15, bronze, 0.2,0.68,0); hd.rotation.z=-0.35; hachi.add(hd);
-hachi.add(box(0.05,0.22,0.05, bronze, -0.22,0.6,0)); g.add(hachi);
-g.add(box(0.22,3.6,1.2, glowMat(signTex('カラオケ','#7c3aed')), -3.32,3.2,3.8));
-g.add(box(3,4.4,2.6, texMat(glassTex('#8fb8d8')), 5.1,2.2,3.9));
-g.add(box(2.6,0.8,0.16, glowMat(screenTex(['109','SALE'])), 5.1,3.6,2.52));
-g.add(box(9,0.35,1.2,M.grey,2.8,3.05,4.9));
-[-0.5,2.8,6.1].forEach(x=>g.add(box(0.35,3,0.35,M.grey,x,1.5,4.9)));
-const tr=new THREE.Group(); [-1.7,0,1.7].forEach(ox=>{ tr.add(box(1.55,0.6,0.72,M.white,ox,0,0)); }); tr.add(box(5.2,0.18,0.74, std({color:0x84cc16,roughness:0.6}), 0,0.05,0)); tr.position.set(0,3.5,4.9); g.add(tr);
+hachi.add(box(0.05,0.22,0.05, bronze, -0.22,0.6,0));
+const tram=new THREE.Group(); tram.position.set(4.15,0.38,4.75); tram.rotation.y=0.5; g.add(tram);
+tram.add(box(1.9,0.8,0.8, std({color:0x3f7a4e,roughness:0.6}), 0,0.48,0)); tram.add(box(1.92,0.28,0.82, M.glass, 0,0.72,0)); tram.add(box(1.7,0.16,0.7, std({color:0xd8d3c3,roughness:0.7}), 0,0.98,0));
+[[-1.95,-1.95],[1.95,-1.95],[-1.95,1.95],[1.95,1.95]].forEach(([sx,sz])=>{ const sg=new THREE.Group(); sg.position.set(sx,0.3,sz); sg.add(cyl(0.045,0.045,1.7,M.dark,0,0,6)); const hd2=box(0.17,0.46,0.17, M.dark, 0,0,0); hd2.position.y=1.85; sg.add(hd2); [[0xff2222,2.0],[0xffaa00,1.85],[0x22cc55,1.7]].forEach(([cc,yy])=>{ const lm=sph(0.05, new THREE.MeshBasicMaterial({color:cc}), 0,yy,0); sg.add(lm); }); g.add(sg); });
+const car1=new THREE.Group(); car1.position.set(-0.8,0.3,-3.85); car1.add(box(0.62,0.3,1.35, std({color:0xd8d8d8,roughness:0.4,metalness:0.3}), 0,0.28,0)); car1.add(box(0.55,0.26,0.7, M.glass, 0,0.55,-0.05)); g.add(car1);
+const car2=new THREE.Group(); car2.position.set(-3.85,0.3,0.8); car2.rotation.y=Math.PI/2; car2.add(box(0.62,0.3,1.35, std({color:0x334155,roughness:0.4,metalness:0.3}), 0,0.28,0)); car2.add(box(0.55,0.26,0.7, M.glass, 0,0.55,-0.05)); g.add(car2);
+g.add(box(9.5,0.35,1.2,M.grey,1.8,3.05,5.3));
+[-0.5,2.8,6.1].forEach(x=>g.add(box(0.35,3,0.35,M.grey,x,1.5,5.3)));
+const tr=new THREE.Group(); [-1.7,0,1.7].forEach(ox=>{ tr.add(box(1.55,0.6,0.72,M.white,ox,0,0)); }); tr.add(box(5.2,0.18,0.74, std({color:0x84cc16,roughness:0.6}), 0,0.05,0)); tr.position.set(0,3.55,5.3); g.add(tr);
 ANIM.push(t=>{ tr.position.x=((t*1.1)%17)-8.5; });
-people(g,46,-3.2,3.2,-3.2,3.2,0.32);
-g.add(tree(-6,5,0.8)); } },
+g.add(tree(2.1,4.9,0.95)); g.add(tree(4.35,2.05,0.9));
+people(g,30,-1.5,1.5,-1.5,1.5,0.32);
+people(g,10,-4.6,4.4,2.0,5.2,0.4); } },
  {id:'shinjuku', name:'新宿', x:-17, z:-3, h:9, desc:'东京最大的交通枢纽。西口的蚕茧塔（Cocoon Tower）和双塔造型的东京都厅是这里最认得出的两栋楼，东口则是百货和居酒屋街。', make:g=>{ g.add(box(13,0.3,10.5, std({color:0xb9bec6,roughness:1}), 0,0.15,0));
 const cocoon=new THREE.Group(); cocoon.position.set(-3.6,0,-1.8); g.add(cocoon);
 const cocR=u=>1.2+Math.sin(u*Math.PI)*0.72-u*0.4;
