@@ -153,6 +153,25 @@ function blink(mat){ ANIM.push(t=>{ mat.color.setHex(Math.sin(t*2.4)>0?0xff3333:
 function inPoly(x,z,poly){ let inside=false; for(let i=0,j=poly.length-1;i<poly.length;j=i++){ const xi=poly[i][0],zi=poly[i][1],xj=poly[j][0],zj=poly[j][1]; if(((zi>z)!==(zj>z)) && (x < (xj-xi)*(z-zi)/(zj-zi)+xi)) inside=!inside; } return inside; }
 
 // 景点数据：x 向东，z 向南（北在 -z）
+function castleStoneTex(){ const t=cnv(256,256,(g)=>{ g.fillStyle='#c3cad4'; g.fillRect(0,0,256,256);
+  for(let y=0;y<8;y++) for(let x=0;x<4;x++){ const ox=(y%2)*32; g.fillStyle=['#bcc4cf','#c9d0da','#b4bdc9'][HASH(x*3.7+y*9.1)*3|0]; g.fillRect(x*64+ox-32, y*32, 62, 30); }
+  g.strokeStyle='rgba(90,100,115,0.5)'; g.lineWidth=2; for(let y=0;y<=8;y++){ g.beginPath(); g.moveTo(0,y*32); g.lineTo(256,y*32); g.stroke(); }
+  for(let i=0;i<500;i++){ g.fillStyle=Math.random()>0.5?'rgba(255,255,255,0.05)':'rgba(40,50,66,0.05)'; g.fillRect(Math.random()*256, Math.random()*256, 3, 3); } });
+  t.wrapS=t.wrapT=THREE.RepeatWrapping; t.colorSpace=THREE.SRGBColorSpace; return t; }
+function disneyTex(){ const t=cnv(1024,828,(g)=>{ const SX=1024/26, SZ=828/21; const X=v=>(v+13)*SX, Z=v=>(v+10.5)*SZ;
+  g.fillStyle='#5d7d4a'; g.fillRect(0,0,1024,828);
+  for(let i=0;i<70;i++){ g.fillStyle=i%2?'#54743f':'#678a50'; g.fillRect(0, i*12, 1024, 6); }
+  for(let i=0;i<2600;i++){ g.fillStyle=Math.random()>0.5?'rgba(255,255,255,0.04)':'rgba(20,40,16,0.07)'; g.fillRect(Math.random()*1024, Math.random()*828, 3, 3); }
+  g.fillStyle='rgba(214,186,140,0.5)'; g.beginPath(); g.ellipse(X(6.2), Z(-3.8), 200, 150, 0, 0, 7); g.fill();
+  g.fillStyle='rgba(168,175,182,0.9)'; g.beginPath(); g.ellipse(X(6.8), Z(3.2), 215, 165, 0, 0, 7); g.fill();
+  g.strokeStyle='#79a9cf'; g.lineWidth=54; g.lineCap='round'; g.beginPath(); g.moveTo(X(-10.6), Z(9.8)); g.bezierCurveTo(X(-11.2), Z(3), X(-10.8), Z(-1), X(-9.6), Z(-5.2)); g.bezierCurveTo(X(-8.6), Z(-8.6), X(-4), Z(-9.6), X(1), Z(-9.8)); g.stroke();
+  g.strokeStyle='#8fb9dc'; g.lineWidth=38; g.beginPath(); g.moveTo(X(-10.6), Z(9.8)); g.bezierCurveTo(X(-11.2), Z(3), X(-10.8), Z(-1), X(-9.6), Z(-5.2)); g.bezierCurveTo(X(-8.6), Z(-8.6), X(-4), Z(-9.6), X(1), Z(-9.8)); g.stroke();
+  g.strokeStyle='#d3bd93'; g.lineWidth=34; g.lineCap='round';
+  [[0,8.6,0,2.6],[0,1.8,-6.2,2.2],[0,1.8,6.8,3.4],[0,1.8,-6.6,-3.6],[0,1.8,6.4,-4.2]].forEach(([x0,z0,x1,z1])=>{ g.beginPath(); g.moveTo(X(x0),Z(z0)); g.lineTo(X(x1),Z(z1)); g.stroke(); });
+  g.fillStyle='#d3bd93'; g.beginPath(); g.arc(X(0), Z(1.8), 100, 0, 7); g.fill();
+  g.fillRect(X(-2.6), Z(8.2), X(2.6)-X(-2.6), Z(10.5)-Z(8.2));
+  g.strokeStyle='rgba(120,90,50,0.35)'; g.lineWidth=3; g.beginPath(); g.arc(X(0), Z(1.8), 100, 0, 7); g.stroke(); });
+  t.colorSpace=THREE.SRGBColorSpace; return t; }
 const spots=[
  {id:'skytree', name:'东京晴空塔', x:16, z:-14, h:22.5, desc:'高 634 米的电波塔，塔身从三角形底座向上逐渐变圆是它的标志，登上展望台可以俯瞰整个东京，天气好时能看到富士山。', make:g=>{
   const lod=new THREE.LOD();
@@ -671,215 +690,100 @@ g.add(box(1.7,0.55,0.12, glowMat(signTex('teamLab','#111827','#ffffff',false)), 
 g.add(box(2.8,2,2.6, texMat(facadeTex('#e3e7ec')), 5.2,1,2.9));
 g.add(box(2.4,0.7,0.14, glowMat(signTex('ららぽーと','#dc2626','#ffffff',false)), 5.2,1.75,4.25));
 g.add(tree(-6,-4.4,0.85)); g.add(tree(6.2,3.4,0.85)); people(g,6,-4,0.5,-0.2,0.8,0.3); } },
- {id:'disney', name:'东京迪士尼乐园', x:35, z:19, h:11, desc:'位于千叶浦安的迪士尼度假区。入口的灰姑娘城堡是粉色墙身配蓝色尖顶，从东京站坐京叶线到舞滨约 15 分钟。', make:g=>{ const rock=new THREE.MeshStandardMaterial({color:0x8a5a3b,roughness:1}); const cream=new THREE.MeshStandardMaterial({color:0xf3e5cf,roughness:0.9}); const teal=new THREE.MeshStandardMaterial({color:0x2e8f86,roughness:0.5,metalness:0.2}); const brick=new THREE.MeshStandardMaterial({color:0x9c6644,roughness:0.95});
-const stoneM=std({color:0xb9c0c7,roughness:0.95}); const tanM=std({color:0xe4d3ae,roughness:1});
-g.add(box(17,0.35,12,M.park,0,0.18,0));
-// ===== Cinderella Castle (upgraded) =====
-const cbase=cyl(3.1,3.4,0.5,stoneM,-2.6,-0.6,20); cbase.position.y=0.42; g.add(cbase);
-g.add(box(4.6,2.2,2.8,M.pink,-2.6,1.55,-0.6)); g.add(box(2,4.2,2,M.white,-2.6,2.55,-0.6)); g.add(cone(1.7,3.2,M.blue,-2.6,-0.6,12,6.25)); const tip=new THREE.Mesh(new THREE.SphereGeometry(0.28,10,10),M.gold); tip.position.set(-2.6,8.05,-0.6); g.add(tip);
-[-4.5,-0.7].forEach(x=>{ g.add(cyl(0.6,0.75,3.4,M.white,x,-0.6)); g.add(cone(0.85,2.1,M.blue,x,-0.6,12,4.45)); const tt=new THREE.Mesh(new THREE.SphereGeometry(0.13,8,8),M.gold); tt.position.set(x,6.65,-0.6); g.add(tt); });
-[-4.05,-1.15].forEach(x=>{ g.add(cyl(0.34,0.42,2.1,stoneM,x,0.35)); g.add(cone(0.5,1.3,M.blue,x,0.35,10,3.05)); });
-g.add(box(1.1,1.5,0.3,M.dark,-2.6,1.2,0.85));
-const clockD=cyl(0.42,0.42,0.1, texMat(clockTex()), -2.6,0.85, 20); clockD.rotation.x=Math.PI/2; clockD.position.set(-2.6,3.6,0.45); g.add(clockD);
-[-3.6,-1.6].forEach(x=>{ g.add(box(0.34,1.15,0.06,M.pink,x,2.2,0.83)); g.add(box(0.05,1.5,0.05,M.gold,x,2.4,0.83)); });
+ {id:'disney', name:'东京迪士尼乐园', x:35, z:19, h:11, desc:'位于千叶浦安的迪士尼度假区。灰姑娘城堡是浅灰石墙配深蓝尖顶，立在园区中央的高地上；从东京站坐京叶线到舞滨约 15 分钟。', make:g=>{ const rock=std({color:0x9c5a38,roughness:1}); const cream=std({color:0xf3e5cf,roughness:0.9}); const stoneM=texMat(castleStoneTex(),{roughness:0.92}); const blueM=std({color:0x2e4d7d,roughness:0.42,metalness:0.25}); const blue2=std({color:0x3a5f94,roughness:0.45,metalness:0.2}); const winGlow=new THREE.MeshBasicMaterial({color:0xffca7a});
+g.add(box(26.6,0.3,21.6, std({color:0x46603a,roughness:1}), 0,0.15,0.5));
+const gnd=new THREE.Mesh(new THREE.PlaneGeometry(26,21), texMat(disneyTex(),{roughness:1})); gnd.rotation.x=-Math.PI/2; gnd.position.set(0,0.32,0.5); g.add(gnd);
+// ===== Cinderella Castle =====
+const cas=new THREE.Group(); cas.position.set(0,0.32,-2.4); g.add(cas);
+cas.add(box(7.8,0.5,6.6, texMat(castleStoneTex(),{roughness:0.95}), 0,0.25,0));
+cas.add(box(6.9,1.5,0.5, stoneM, 0,1.25,-2.95));
+for(let k=0;k<8;k++) cas.add(box(0.42,0.34,0.3, stoneM, -3.0+k*0.86, 2.15, -2.95));
+cas.add(box(3.4,2.6,2.4, stoneM, 0,1.8,0));
+const keepRoof=cone(2.35,1.15, blue2, 0,0,4); keepRoof.rotation.y=Math.PI/4; keepRoof.position.y=3.68; cas.add(keepRoof);
+const mainTower=cyl(0.58,0.7,3.6, stoneM, 0,-0.25,14); mainTower.position.y=3.6; cas.add(mainTower);
+const spire=cone(0.8,2.7, blueM, 0,-0.25,14); spire.position.y=6.75; cas.add(spire);
+const trim=tor(0.6,0.05, M.gold, 0,5.42,-0.25); trim.rotation.x=Math.PI/2; cas.add(trim);
+const tipB=sph(0.1, M.gold, 0,0,0); tipB.position.set(0,8.2,-0.25); cas.add(tipB);
+cas.add(box(0.34,0.2,0.02, std({color:0xc8a24a,roughness:0.5,metalness:0.5}), 0.2,7.95,-0.25));
+[[-1.5,-1.05],[1.5,-1.05],[-1.5,1.05],[1.5,1.05]].forEach(([tx,tz])=>{ cas.add(cyl(0.3,0.37,2.3, stoneM, tx,tz,10)); const cn=cone(0.45,1.35, blueM, tx,tz,10); cn.position.y=3.32; cas.add(cn); const tb=sph(0.055, M.gold, 0,0,0); tb.position.set(tx,4.05,tz); cas.add(tb); });
+[[-1.0,1.5],[1.0,1.5]].forEach(([tx,tz])=>{ cas.add(cyl(0.35,0.42,3.0, stoneM, tx,tz,12)); const cn=cone(0.52,1.6, blueM, tx,tz,12); cn.position.y=4.3; cas.add(cn); });
+cas.add(box(1.05,1.5,0.18, M.dark, 0,1.25,1.28));
+const archTop=cyl(0.52,0.52,0.18, M.dark, 0,1.28,16); archTop.rotation.x=Math.PI/2; archTop.position.y=2.0; cas.add(archTop);
+const clockD=cyl(0.34,0.34,0.08, texMat(clockTex()), 0,-0.25,20); clockD.rotation.x=Math.PI/2; clockD.position.set(0,4.5,0.36); cas.add(clockD);
+[[-0.55,2.35],[0.55,2.35],[-1.5,3.1],[1.5,3.1]].forEach(([wx,wy])=>cas.add(box(0.17,0.36,0.05, winGlow, wx,wy,1.22)));
+[[-2.35,-0.7],[2.35,-0.7]].forEach(([wx,wz])=>{ cas.add(box(1.7,1.9,2.0, stoneM, wx,1.45,wz)); const rf=cone(1.45,0.8, blue2, wx,wz,4); rf.rotation.y=Math.PI/4; rf.position.y=2.8; cas.add(rf); });
 // hub plaza + partners statue + flower ring
-const hub=cyl(1.9,1.9,0.1,tanM,-2.6,1.9,24); hub.position.y=0.4; g.add(hub);
-for(let k=0;k<10;k++){ const a=k/10*Math.PI*2; const fb=sph(0.16, k%2?M.pink:std({color:0xe23b3b,roughness:0.8}), -2.6+Math.cos(a)*1.55, 0.52, 1.9+Math.sin(a)*1.55, 1,0.7,1); g.add(fb); }
-g.add(box(0.4,0.5,0.4,stoneM,-2.6,0.65,1.9)); const st1=cyl(0.05,0.07,0.52,M.gold,-2.72,1.9,6); st1.position.y=1.15; g.add(st1); const st2=cyl(0.04,0.06,0.4,std({color:0x8a6d2f,roughness:0.5,metalness:0.6}),-2.45,1.9,6); st2.position.y=1.1; g.add(st2);
-const path1=box(1.5,0.37,3.8,tanM,-1.05,0.19,3.6); path1.rotation.y=-0.68; g.add(path1);
-// ===== Tomorrowland: Space Mountain =====
-g.add(cyl(1.5,1.9,1.1,M.white,-6.4,2.4)); g.add(cone(1.5,2.6,M.white,-6.4,2.4,16,2.4)); [[-6.4,2.4,1.6],[-5.5,3.1,1],[-7.3,3,0.9],[-5.6,1.6,0.8],[-7.2,1.7,0.7]].forEach(q=>g.add(cone(0.14,q[2],M.grey,q[0],q[1],6,2.3+q[2]/2)));
-g.add(box(1.7,0.8,1.2, teal, -5.2,0.4,4.3)); g.add(box(0.16,1.6,0.9, glowMat(screenTex(['SPACE','MOUNTAIN'])), -4.32,1.15,4.3));
-const splash=new THREE.Group(); splash.position.set(-7.45,0.35,5.0); splash.rotation.y=0.55; g.add(splash);
-splash.add(box(2.3,0.5,1.7,rock,0,0.25,0)); splash.add(cone(1.45,2.7,rock,0,0,12,1.8));
-splash.add(sph(0.5,M.park,-0.7,2.2,0.3)); splash.add(sph(0.42,M.park,0.75,1.9,-0.2));
-const chute=box(0.42,0.1,2.1,M.water,0,1.35,0.95); chute.rotation.x=0.62; splash.add(chute);
-const spool=cyl(0.72,0.72,0.1,M.water,0,1.55,16); spool.position.y=0.12; splash.add(spool);
-const log=new THREE.Group(); const logBody=box(0.34,0.22,0.62,std({color:0x7a4a21,roughness:0.9}),0,0.05,0); log.add(logBody); log.add(sph(0.09,M.red,0,0.22,-0.12)); log.add(sph(0.09,M.blue,0,0.22,0.14)); splash.add(log);
-ANIM.push(t=>{ const u=(t*0.22)%1; if(u<0.55){ const v=u/0.55; log.position.set(0, 2.35-v*1.85, 0.25+v*1.35); log.rotation.x=0.62*v; } else { const v=(u-0.55)/0.45; log.position.set(0, 0.5, 1.6+v*0.001); log.rotation.x=0; log.position.y=0.42+Math.sin(v*Math.PI*2)*0.02; } });
-// ===== Westernland: Big Thunder + Mark Twain (docked, bobbing) =====
-const th1=box(3,1.1,2.2,rock,-6.2,0.55,-3.6); th1.rotation.y=0.4; g.add(th1); const th2=box(2.2,1,1.6,rock,-6.2,1.55,-3.6); th2.rotation.y=0.15; g.add(th2); g.add(box(1.3,0.9,1.1,rock,-6.1,2.45,-3.6));
-g.add(box(1.1,0.5,2.2,M.park,-6.35,0.3,-1.9)); g.add(tree(-6.3,-1.8,0.9));
-// Adventureland treehouse
-g.add(cyl(0.3,0.42,2.2,std({color:0x6b4423,roughness:1}),-4.7,-4.7,8)); g.add(sph(1.25,M.park,-4.7,3,-4.7)); g.add(sph(0.9,M.park,-3.9,2.6,-4.4)); g.add(box(0.9,0.6,0.9,cream,-4.7,2.2,-4.7)); g.add(cone(0.85,0.6,rock,-4.7,-4.7,4,2.8));
-const pir=new THREE.Group(); pir.position.set(-2.2,0.35,-5.25); g.add(pir);
-pir.add(box(2.7,1.6,1.1,cream,0,0.8,0)); pir.add(hipRoof(3.1,0.8,1.5,M.roof,0,1.6,0));
-pir.add(box(2.9,0.36,0.55,M.water,0,0.18,0.85));
-const pboat=new THREE.Group(); pboat.position.set(-0.5,0.42,0.85); pboat.add(box(0.85,0.2,0.3,M.dark,0,0.1,0)); const pmast=cyl(0.03,0.03,0.95,M.dark,0,0,6); pmast.position.y=0.6; pboat.add(pmast); const sail=box(0.04,0.55,0.42,M.white,0.03,0.62,0); pboat.add(sail); pir.add(pboat);
-pir.add(box(1.5,0.5,0.14, glowMat(signTex('加勒比海盗','#1e3a5f','#ffd9a0',false)), 0,1.05,0.6));
-// ===== Fantasyland: Small World + Carousel + Teacups =====
-g.add(box(3.2,1.5,0.7,M.white,-3.4,0.75,3.9)); [-4.6,-3.9,-3.2,-2.5].forEach((x,i)=>g.add(cone(0.32,0.9,[M.pink,M.gold,M.blue,teal][i],x,3.9,4,1.95)));
-const caro=new THREE.Group(); caro.position.set(-0.7,0.35,3.1); g.add(caro);
-caro.add(cyl(1.05,1.15,0.3,cream,0,0,18)); const caroSpin=new THREE.Group(); caro.add(caroSpin);
-for(let k=0;k<6;k++){ const a=k/6*Math.PI*2; const pole=cyl(0.03,0.03,0.85,M.gold,Math.cos(a)*0.72,Math.sin(a)*0.72,6); pole.position.y=0.55; caroSpin.add(pole); const horse=box(0.3,0.24,0.14, k%2?M.white:M.pink, Math.cos(a)*0.72, 0.55, Math.sin(a)*0.72); horse.rotation.y=-a; caroSpin.add(horse); }
-const caroPole=cyl(0.09,0.09,1.15,M.gold,0,0,8); caroPole.position.y=0.6; caro.add(caroPole);
-const caroTop=cone(1.35,0.75,M.pink,0,0,18,1.55); caro.add(caroTop);
+const hub=cyl(2.45,2.45,0.09, texMat(paveTex(),{roughness:1}), 0,1.8,26); hub.position.y=0.36; g.add(hub);
+g.add(box(0.42,0.52,0.42, texMat(castleStoneTex(),{roughness:0.95}), 0,0.62,1.8));
+const st1=cyl(0.05,0.07,0.55, M.gold, -0.08,1.8,6); st1.position.y=1.15; g.add(st1); const st2=sph(0.11, M.gold, -0.08,0,1.8); st2.position.y=1.52; g.add(st2);
+for(let k=0;k<10;k++){ const a=k/10*Math.PI*2; g.add(sph(0.15, k%2?std({color:0xd96a8a,roughness:0.8}):std({color:0xe23b3b,roughness:0.8}), Math.cos(a)*1.95, 0.5, 1.8+Math.sin(a)*1.95)); }
+// ===== World Bazaar =====
+const bazaarTones=['#e8dcc4','#d9c6a5','#c9d2d8','#e2cdb2'];
+for(let i=0;i<4;i++){ [-1,1].forEach(sd=>{ const bz=4.6+i*1.55, bh=1.9+HASH(i*2.3+sd)*0.7;
+  g.add(box(1.6,bh,1.35, texMat(facadeTex(bazaarTones[(i+(sd>0?1:0))%4])), sd*2.05,bh/2,bz));
+  g.add(hipRoof(1.75,0.55,1.5, M.roof, sd*2.05,bh,bz));
+  g.add(box(1.3,0.6,0.06, M.glass, sd*1.22,0.62,bz));
+}); }
+const canopy=box(2.7,0.07,6.6, M.glass, 0,2.95,7.0); g.add(canopy);
+[-1.25,1.25].forEach(cx=>{ [4.4,9.6].forEach(cz=>g.add(cyl(0.045,0.045,2.95, M.dark, cx,cz,6))); });
+const ent=new THREE.Group(); ent.position.set(0,0.32,9.9); g.add(ent);
+ent.add(box(5.6,1.7,0.9, texMat(facadeTex('#e8dcc4')), 0,0.85,0));
+ent.add(hipRoof(5.9,0.7,1.2, M.roof, 0,1.7,0));
+ent.add(box(4.4,0.66,0.14, glowMat(signTex('TOKYO DISNEYLAND','#7c2d12','#ffffff',false)), 0,1.15,0.5));
+// ===== Tomorrowland =====
+const sm=new THREE.Group(); sm.position.set(7.2,0.32,3.2); g.add(sm);
+sm.add(cyl(1.95,2.35,0.95, M.white, 0,0,20));
+const smCone=cone(1.85,2.9, M.white, 0,0,20); smCone.position.y=2.4; sm.add(smCone);
+const smRing=tor(1.5,0.06, M.grey, 0,0); smRing.rotation.x=Math.PI/2; smRing.position.y=1.15; sm.add(smRing);
+for(let k=0;k<5;k++){ const a=k/5*Math.PI*2+0.4; const sp=cone(0.09,0.85, M.white, Math.cos(a)*1.05, Math.sin(a)*1.05, 6); sp.position.y=3.6; sm.add(sp); }
+sm.add(box(1.9,0.55,0.14, glowMat(signTex('SPACE MOUNTAIN','#0c4a6e','#ffffff',false)), -1.2,0.75,1.6));
+const st2b=new THREE.Group(); st2b.position.set(4.9,0.32,5.6); g.add(st2b);
+st2b.add(box(1.9,1.1,1.5, texMat(glassTex('#9fc0d8')), 0,0.55,0));
+const dome2=sph(0.75, std({color:0xc7ccd4,roughness:0.3,metalness:0.6}), 0,0,0); dome2.scale.y=0.62; dome2.position.y=1.1; st2b.add(dome2);
+// ===== Fantasyland =====
+const sw=new THREE.Group(); sw.position.set(6.4,0.32,-4.6); g.add(sw);
+sw.add(box(3.7,1.7,0.8, M.white, 0,0.85,0));
+[-1.55,-0.9,-0.3,0.3,0.9,1.55].forEach((x,i)=>{ const cn=cone(0.3,0.85, [blue2,M.gold,blueM][i%3], x,0,4); cn.position.y=2.1; sw.add(cn); });
+const swClock=cyl(0.26,0.26,0.08, texMat(clockTex()), 0,0,20); swClock.rotation.x=Math.PI/2; swClock.position.set(0,1.05,0.44); sw.add(swClock);
+sw.add(box(2.6,0.5,0.12, glowMat(signTex("it's a small world",'#1d4ed8','#ffffff',false)), 0,0.32,0.44));
+const caro=new THREE.Group(); caro.position.set(4.1,0.32,-2.1); g.add(caro);
+caro.add(cyl(1.05,1.15,0.3, cream, 0,0,18));
+const caroSpin=new THREE.Group(); caro.add(caroSpin);
+for(let k=0;k<6;k++){ const a=k/6*Math.PI*2; const pole=cyl(0.03,0.03,0.85, M.gold, Math.cos(a)*0.72,Math.sin(a)*0.72,6); pole.position.y=0.55; caroSpin.add(pole); const horse=box(0.3,0.22,0.12, k%2?M.white:cream, Math.cos(a)*0.72, Math.sin(a)*0.72); horse.position.y=0.5; horse.rotation.y=-a; caroSpin.add(horse); }
+const caroPole=cyl(0.09,0.09,1.2, M.gold, 0,0,8); caroPole.position.y=0.62; caro.add(caroPole);
+const caroTop=cone(1.38,0.8, std({color:0x9e2b25,roughness:0.6}), 0,0,18); caroTop.position.y=1.6; caro.add(caroTop);
 ANIM.push(t=>{ caroSpin.rotation.y=t*0.55; });
-const cups=new THREE.Group(); cups.position.set(-3.1,0.35,5.35); g.add(cups);
-cups.add(cyl(0.95,0.95,0.12,cream,0,0,18)); const cupSpin=new THREE.Group(); cups.add(cupSpin);
-[-0.5,0.15,0.55].forEach((ox,i)=>{ const cp=cyl(0.2,0.14,0.24,[M.blue,M.pink,teal][i],ox,i===1?0.35:-0.3,10); cp.position.y=0.2; cupSpin.add(cp); });
-ANIM.push(t=>{ cupSpin.rotation.y=-t*0.8; });
-// Toontown
-[[-0.6,-4.85,M.pink],[0.55,-5.05,M.gold],[1.65,-4.8,teal]].forEach((q,i)=>{ g.add(box(0.95,0.75,0.85,q[2],q[0],0.72,q[1])); const rf=sph(0.62,[M.blue,M.red,M.pink][i],q[0],1.15,q[1],1,0.62,1); g.add(rf); const ch=box(0.16,0.4,0.16,brick,q[0]+0.25,1.35,q[1]); ch.rotation.z=0.18; g.add(ch); });
-// Beast's Castle
-const beast=new THREE.Group(); beast.position.set(-6.0,0.35,-5.25); g.add(beast);
-beast.add(cone(1.15,0.85,rock,0,0,12,0.42));
-const bwall=std({color:0xb59aa0,roughness:0.9}); const bcopper=std({color:0x4f8a7a,roughness:0.45,metalness:0.35});
-beast.add(box(1.35,1.45,1.05,bwall,0,1.35,0)); beast.add(cone(0.95,0.8,bcopper,0,0,4,2.45));
-[-0.62,0.62].forEach(x=>{ beast.add(cyl(0.2,0.24,1.7,bwall,x,0,10)); beast.add(cone(0.3,0.62,bcopper,x,0,10,2.15)); });
-beast.add(box(0.4,0.6,0.12,M.dark,0,0.95,0.55));
-// ===== World Bazaar with glass canopy =====
-g.add(box(4.4,0.75,0.18, glowMat(signTex('TOKYO DISNEYLAND','#1e3a5f','#ffd9a0',false)), 0.6,2.5,5.82));
-[-1.2,2.4].forEach(x=>g.add(cyl(0.07,0.09,2.2,M.gold,x,5.82,8)));
-g.add(box(4.6,1.1,1.4,cream,0.6,0.55,4.9)); const dome=new THREE.Mesh(new THREE.SphereGeometry(1.05,14,10,0,Math.PI*2,0,Math.PI/2),M.blue); dome.scale.set(1.6,0.7,0.8); dome.position.set(0.6,1.1,4.9); g.add(dome);
-const canopy=new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.5,4.4,14,1,true,0,Math.PI), std({color:0xbfe3ea,roughness:0.15,metalness:0.1,transparent:true,opacity:0.35,side:THREE.DoubleSide})); canopy.rotation.z=Math.PI/2; canopy.rotation.y=Math.PI/2; canopy.position.set(0.6,1.15,4.9); g.add(canopy);
-// ===== DisneySea: Mediterranean Harbor =====
-const hb=cyl(2.5,2.5,0.1,M.water,3.4,2.4,24); hb.position.y=0.4; g.add(hb); [[1.2,M.pink,1.5],[2.2,cream,1.9],[3.3,M.orange,1.4],[4.5,cream,1.8],[5.6,M.pink,1.5]].forEach(b=>g.add(box(0.95,b[2],0.8,b[1],b[0],b[2]/2+0.3,5.3)));
-const fort=cyl(0.62,0.75,2.6,stoneM,5.75,0.15,12); fort.position.y=1.3; g.add(fort); g.add(cone(0.85,0.9,M.roof,5.75,0.15,12,3.05));
-const lh=new THREE.Group(); lh.position.set(1.35,0.35,4.35); g.add(lh);
-lh.add(cyl(0.16,0.22,0.55,M.red,0,0,10)); const lh2=cyl(0.16,0.22,0.55,M.white,0,0,10); lh2.position.y=0.55; lh.add(lh2); const lh3=cyl(0.16,0.22,0.5,M.red,0,0,10); lh3.position.y=1.1; lh.add(lh3);
-const lhTop=sph(0.13, std({color:0xffe9a8,roughness:0.3,emissive:0xffca7a,emissiveIntensity:0.8}), 0,1.5,0); lh.add(lhTop);
-[[2.6,1.6],[4.3,3.1]].forEach((q,i)=>{ const gon=new THREE.Group(); gon.position.set(q[0],0.48,q[1]); gon.rotation.y=i?2.4:0.7; gon.add(box(0.24,0.14,0.85,M.dark,0,0.07,0)); gon.add(box(0.2,0.12,0.5,cream,0,0.2,0)); g.add(gon); ANIM.push(t=>{ gon.position.y=0.48+Math.sin(t*1.1+i*2)*0.03; }); });
-// Mount Prometheus (pulsing lava)
-g.add(cone(2.5,4.6,rock,3.2,-2.8,18,2.65)); const crater=cyl(0.55,0.75,0.5,M.dark,3.2,-2.8,12); crater.position.y=4.85; g.add(crater); const lava=new THREE.Mesh(new THREE.SphereGeometry(0.3,8,8), new THREE.MeshStandardMaterial({color:0xff6a00, emissive:0xff4400, emissiveIntensity:0.9})); lava.position.set(3.2,5.05,-2.8); g.add(lava);
-ANIM.push(t=>{ lava.material.emissiveIntensity=0.75+Math.sin(t*2.2)*0.35; const sc=1+Math.sin(t*2.2)*0.12; lava.scale.set(sc,sc,sc); });
-// Fortress + Mermaid Lagoon
-g.add(box(1.9,1.3,1.9,cream,0.9,0.65,-3.9)); const onion=new THREE.Mesh(new THREE.SphereGeometry(0.95,14,12),teal); onion.scale.set(1,1.25,1); onion.position.set(0.9,2,-3.9); g.add(onion); g.add(cone(0.12,0.9,M.gold,0.9,-3.9,6,3.6));
-const lagoon=new THREE.Group(); lagoon.position.set(4.35,0.35,-4.75); g.add(lagoon);
-const shell=new THREE.Mesh(new THREE.SphereGeometry(1.05,16,10,0,Math.PI*2,0,Math.PI/2), std({color:0xf6c9d4,roughness:0.5})); shell.scale.set(1.25,0.8,0.7); lagoon.add(shell);
-[-0.75,0,0.75].forEach((ox,i)=>{ lagoon.add(cone(0.16,0.8+i*0.25,teal,ox,0.1,8,0.85+i*0.12)); });
-lagoon.add(box(0.08,0.85,0.08,M.gold,0,0.95,0)); lagoon.add(cone(0.14,0.4,M.gold,0,0,6,1.5));
-// Tower of Terror + Indiana pyramid
-g.add(box(1.7,4.6,1.7,brick,6.6,2.3,-0.6)); g.add(box(1.2,1.2,1.2,brick,6.6,5.2,-0.6)); g.add(cone(0.95,1.6,M.roof,6.6,-0.6,4,6.6)); g.add(box(0.7,0.5,0.2,M.gold,6.6,3.4,0.32));
-const pyr=new THREE.Group(); pyr.position.set(7.55,0.35,1.85); pyr.rotation.y=-0.3; g.add(pyr);
-pyr.add(box(1.7,0.5,1.7,stoneM,0,0.25,0)); pyr.add(box(1.25,0.5,1.25,stoneM,0,0.75,0)); pyr.add(box(0.8,0.5,0.8,stoneM,0,1.25,0)); pyr.add(box(0.4,0.55,0.2,M.dark,0,0.5,0.8)); pyr.add(sph(0.14,M.gold,0,1.62,0));
-g.add(tree(6.9,2.9,0.85)); g.add(tree(8,-0.9,0.8));
-// SS Columbia
-const ship=new THREE.Group(); ship.position.set(6.2,0.35,3.6); ship.rotation.y=-0.6; ship.add(box(3.2,0.8,1.05,M.dark,0,0.4,0)); ship.add(box(2.6,0.7,0.9,M.white,0,1.15,0)); ship.add(box(1.8,0.6,0.8,M.white,-0.2,1.8,0)); [-0.7,0.5].forEach(x=>{ const f=cyl(0.22,0.26,1.1,M.red,x,0); f.position.set(x,2.65,0); ship.add(f); const cap=cyl(0.23,0.23,0.3,M.dark,x,0); cap.position.set(x,3.3,0); ship.add(cap); }); g.add(ship);
-// Port Discovery + Aquatopia
-const pd=new THREE.Mesh(new THREE.SphereGeometry(1.05,14,10,0,Math.PI*2,0,Math.PI/2),M.blue); pd.position.set(7.3,0.35,-3.6); g.add(pd); g.add(cyl(1.15,1.25,0.5,M.grey,7.3,-3.6,16));
-const aq=new THREE.Group(); aq.position.set(6.15,0.42,-2.5); g.add(aq);
-aq.add(cyl(0.85,0.85,0.08,M.water,0,0,18));
-for(let k=0;k<3;k++){ const a=k/3*Math.PI*2; const bt2=box(0.34,0.16,0.24, [M.pink,cream,teal][k], Math.cos(a)*0.5, 0.1, Math.sin(a)*0.5); bt2.rotation.y=-a; aq.add(bt2); }
-ANIM.push(t=>{ aq.rotation.y=t*0.45; });
-// Electric railway (waterfront <-> port discovery)
-g.add(box(0.18,0.14,5.6,M.grey,7.95,1.85,-0.9)); [-3.2,-0.9,1.4].forEach(z=>g.add(box(0.16,1.85,0.16,M.grey,7.95,0.92,z)));
-const ert=new THREE.Group(); const erCar=box(1.5,0.5,0.55,M.red,0,0,0); ert.add(erCar); ert.add(box(1.5,0.14,0.57,M.white,0,0.32,0)); g.add(ert);
-ANIM.push(t=>{ const u=(Math.sin(t*0.16)+1)/2; ert.position.set(7.95, 2.2, -3.1+u*4.4); });
-// ===== Resort monorail =====
-const mono=new THREE.Group(); g.add(mono);
-const mring=tor(8.6,0.09,M.grey,0,2.6,0.4,Math.PI/2); mring.scale.set(1,0.68,1); mono.add(mring);
-for(let k=0;k<10;k++){ const a=k/10*Math.PI*2; mono.add(cyl(0.09,0.13,2.6,M.grey,Math.cos(a)*8.6,0.4+Math.sin(a)*5.85,8)); }
-const mtrain=new THREE.Group(); [-1.25,0,1.25].forEach((ox,i)=>{ const car=box(1.15,0.52,0.6, i===1?M.pink:M.white, ox,0,0); mtrain.add(car); }); mtrain.add(box(3.6,0.16,0.62,M.pink,0,0.34,0)); mono.add(mtrain);
-ANIM.push((t)=>{ const a=t*0.1+1; mtrain.position.set(Math.cos(a)*8.6, 2.98, 0.4+Math.sin(a)*5.85); mtrain.rotation.y=-a; });
-// ===== Fireworks over the castle (night only) =====
-const fwGroup=new THREE.Group(); fwGroup.visible=false; g.add(fwGroup);
-function burst(x,y,z,col,ph){ const n=42, pos=new Float32Array(n*3); for(let i2=0;i2<n;i2++){ const th=Math.random()*Math.PI*2, ph2=Math.acos(2*Math.random()-1), rr=1; pos[i2*3]=x+rr*Math.sin(ph2)*Math.cos(th); pos[i2*3+1]=y+rr*Math.cos(ph2); pos[i2*3+2]=z+rr*Math.sin(ph2)*Math.sin(th); } const geo=new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos,3)); const m=new THREE.PointsMaterial({color:col, size:0.14, transparent:true, opacity:0}); const pts2=new THREE.Points(geo,m); pts2.userData.ph=ph; fwGroup.add(pts2); return pts2; }
-const fw1=burst(-2.6,9.4,-0.6,0xffd166,0), fw2=burst(-4.4,10.3,-1.6,0xf472b6,2.1);
-ANIM.push(t=>{ if(!fwGroup.visible) return; [fw1,fw2].forEach(f=>{ const u=((t+f.userData.ph)%4.2)/4.2; const sc=0.25+u*1.7; f.scale.set(sc,sc,sc); f.material.opacity=u<0.12? u/0.12 : Math.max(0, 1-(u-0.12)/0.7); f.position.y=-u*0.7; }); });
-window.NIGHT_FNS=window.NIGHT_FNS||[]; NIGHT_FNS.push(n=>{ fwGroup.visible=n; });
-g.add(tree(2.2,-5.2,0.9)); g.add(tree(-5.9,5.3,0.85)); g.add(tree(1.8,5.6,0.8,pinkTree)); g.add(tree(-7.9,-5.2,0.9,pinkTree));
-} }, {id:'kamakura', name:'镰仓高校前', x:0, z:0, h:5, desc:'《灌篮高手》片头那个面朝大海的铁路道口——县立镰仓高校门前、江之岛电铁镰仓高校前站旁。位于东京西南约 55 公里处，地图上为示意位置。', make:g=>{
-  g.add(box(22,0.35,14, std({color:0x8a9a72,roughness:1}), 0,0.17,0));
-  g.add(box(22,0.5,3.6, std({color:0x2f6db0,roughness:0.25,metalness:0.15}), 0,0.28,5.2));
-  g.add(box(22,0.14,0.5, std({color:0xf4f1e4,roughness:0.6}), 0,0.5,3.3));
-  g.add(box(22,0.4,1.4, std({color:0xdcc79c,roughness:1}), 0,0.2,2.6));
-  g.add(box(22,0.07,2.2, std({color:0x3c4148,roughness:0.9}), 0,0.4,0.8));
-  g.add(box(22,0.02,0.14, std({color:0xf5f5f5}), 0,0.45,0.8));
-  g.add(box(22,0.12,1.7, std({color:0x8d8d84,roughness:1}), 0,0.41,-1.1));
-  for(let x=-10.5;x<=10.5;x+=1.05) g.add(box(0.32,0.05,1.3, std({color:0x4a3a28,roughness:1}), x,0.49,-1.1));
-  const railM=std({color:0xb9c0c7,roughness:0.35,metalness:0.8});
-  g.add(box(22,0.09,0.07, railM, 0,0.55,-1.45)); g.add(box(22,0.09,0.07, railM, 0,0.55,-0.75));
-  const poleM=std({color:0x3a3f45,roughness:0.7,metalness:0.4});
-  [-8,-2.5,3,8.5].forEach(x=>{ const p=cyl(0.05,0.06,2.6, poleM, x,-1.95); p.position.y=0.35+1.3; g.add(p); });
-  g.add(beam(-8,3.3,-1.95, 8.5,3.3,-1.95, poleM, 0.015));
-  const sg=new THREE.Group(); sg.position.set(0,1.06,-4.35); sg.rotation.x=0.21; g.add(sg);
-  sg.add(box(3.0,0.1,5.6, std({color:0x42464e,roughness:0.95}), 0,0,0));
-  sg.add(box(0.16,0.11,5.6, std({color:0xf5f5f5}), -1.32,0,0)); sg.add(box(0.16,0.11,5.6, std({color:0xf5f5f5}), 1.32,0,0));
-  const wallM=std({color:0x7b7568,roughness:1});
-  sg.add(box(0.45,1.0,5.6, wallM, -1.95,-0.25,0)); sg.add(box(0.45,1.0,5.6, wallM, 1.95,-0.25,0));
-  g.add(box(3.0,0.1,2.3, std({color:0x42464e,roughness:0.95}), 0,0.47,-0.8));
-  const yelM=std({color:0xf7c948,roughness:0.6});
-  function xsignal(x,z){
-    const p=cyl(0.045,0.05,1.9, poleM, x,z); p.position.y=0.45+0.95; g.add(p);
-    const b1=box(0.62,0.11,0.04, yelM, x,2.55,z); b1.rotation.z=0.7; g.add(b1);
-    const b2=box(0.62,0.11,0.04, yelM, x,2.55,z); b2.rotation.z=-0.7; g.add(b2);
-    const m1=std({color:0xff3333, emissive:0xff2222, emissiveIntensity:1.2, roughness:0.4}); blink(m1);
-    g.add(sph(0.075, m1, x,2.2,z+0.06));
-    const m2=std({color:0x551111, emissive:0xff2222, emissiveIntensity:0.15, roughness:0.4});
-    ANIM.push(t=>{ const on=Math.sin(t*2.4)<=0; m2.color.setHex(on?0xff3333:0x551111); m2.emissiveIntensity=on?1.2:0.15; });
-    g.add(sph(0.075, m2, x,2.2,z-0.14));
-  }
-  xsignal(1.95,-1.8); xsignal(-1.95,-0.35);
-  g.add(beam(2.1,1.2,-0.5, 0.7,2.0,-0.5, std({color:0xf0f0f0,roughness:0.5}), 0.05));
-  g.add(beam(0.7,2.0,-0.5, 0.35,2.14,-0.5, std({color:0xd23b2e,roughness:0.5}), 0.05));
-  g.add(beam(-2.1,1.2,-1.7, -0.7,2.0,-1.7, std({color:0xf0f0f0,roughness:0.5}), 0.05));
-  g.add(beam(-0.7,2.0,-1.7, -0.35,2.14,-1.7, std({color:0xd23b2e,roughness:0.5}), 0.05));
-  g.add(box(6.5,0.8,4.5, wallM, 6.3,0.4,-4.2));
-  g.add(box(5.6,2.4,2.4, std({color:0xf2f0e8,roughness:0.85}), 6.3,2.0,-4.4));
-  g.add(box(5.9,0.18,2.7, std({color:0x5b7186,roughness:0.7}), 6.3,3.3,-4.4));
-  const winM=std({color:0x33506b,roughness:0.3,metalness:0.3});
-  g.add(box(5.0,0.5,0.06, winM, 6.3,1.7,-3.17)); g.add(box(5.0,0.5,0.06, winM, 6.3,2.6,-3.17));
-  const gateS=texMat(signTex('鎌倉高校','#1f3a93','#ffffff',false));
-  const gp1=cyl(0.05,0.05,1.7, poleM, 2.3,-6.3); gp1.position.y=0.35+0.85; g.add(gp1);
-  const gp2=cyl(0.05,0.05,1.7, poleM, 4.1,-6.3); gp2.position.y=0.35+0.85; g.add(gp2);
-  const gsign=new THREE.Mesh(new THREE.BoxGeometry(1.9,0.55,0.08), gateS); gsign.position.set(3.2,1.95,-6.3); g.add(gsign);
-  g.add(box(5.2,0.45,1.7, std({color:0x9aa0a3,roughness:0.9}), -6.2,0.57,-1.1));
-  g.add(box(1.7,1.5,1.5, std({color:0xefe6cf,roughness:0.9}), -8.6,1.1,-1.1));
-  g.add(hipRoof(2.0,0.55,1.8, texMat(kawaraTex()), -8.6, 1.85, -1.1));
-  [-7.6,-6.2,-4.8].forEach(x=>{ const p=cyl(0.04,0.04,1.6, poleM, x,-1.75); p.position.y=0.8+0.8; g.add(p); });
-  g.add(box(3.6,0.1,1.6, std({color:0x5b7186,roughness:0.7}), -6.2,2.45,-1.4));
-  const staS=texMat(signTex('鎌倉高校前','#0d7a4f','#ffffff',false));
-  const ssign=new THREE.Mesh(new THREE.BoxGeometry(1.6,0.5,0.07), staS); ssign.position.set(-6.2,1.95,-0.35); g.add(ssign);
-  const eno=new THREE.Group(); g.add(eno);
-  [-1.85,1.85].forEach(cx=>{
-    const car=new THREE.Group(); car.position.set(cx,0,-1.1); eno.add(car);
-    car.add(box(0.9,0.3,1.1, std({color:0x22262a}), -1.1,0.68,0)); car.add(box(0.9,0.3,1.1, std({color:0x22262a}), 1.1,0.68,0));
-    car.add(box(3.52,0.5,1.47, std({color:0x2e7d4f,roughness:0.5}), 0,0.85,0));
-    car.add(box(3.5,0.95,1.45, std({color:0xe9e2c4,roughness:0.5}), 0,1.55,0));
-    car.add(box(3.54,0.42,1.49, std({color:0x2c4256,roughness:0.25,metalness:0.4}), 0,1.66,0));
-    car.add(box(3.3,0.14,1.3, std({color:0x8f979e,roughness:0.6}), 0,2.12,0));
-  });
-  ANIM.push(t=>{ eno.position.x=-15+((t*0.85)%32); });
-  const carW=new THREE.Group(); carW.position.set(0,0,0.45); g.add(carW);
-  carW.add(box(1.5,0.42,0.75, std({color:0xf5f5f5,roughness:0.4}), 0,0.68,0));
-  carW.add(box(0.85,0.34,0.7, std({color:0xdfe9f2,roughness:0.3}), -0.05,1.05,0));
-  ANIM.push(t=>{ carW.position.x=12.5-((t*0.7)%27); });
-  const isl=cone(1.7,0.9, std({color:0x5d7d4a,roughness:1}), -7.6,5.4, 12, 0.95); g.add(isl);
-  const tw=cyl(0.05,0.09,1.5, std({color:0xf0f0f0,roughness:0.5}), -7.6,5.4); tw.position.y=1.35; g.add(tw);
-  g.add(sph(0.15, std({color:0xfff2c8, emissive:0xffdf8a, emissiveIntensity:0.7}), -7.6,2.2,5.4));
-  people(g,5, 1.7,2.7, -0.1,0.6, 0.5);
-  people(g,3, -2.7,-1.9, -0.1,0.5, 0.5);
-  people(g,2, 0.7,1.3, -3.6,-2.8, 1.25);
-  g.add(tree(9.4,-6.3,1.1)); g.add(tree(-9.8,-5.4,1.0)); g.add(tree(-4.6,-6.5,0.9));
- } },
- {id:'fuji', name:'富士山', x:0, z:0, h:8, desc:'日本最高峰（3,776 米），位于东京西南约 100 公里处，地图上为示意位置。山脚下是河口湖与新仓山五重塔——看富士山最经典的角度都在这一带。', make:g=>{ g.add(box(26,0.35,17, std({color:0x7d8f66,roughness:1}), 0,0.17,0));
-const prof=[[9.2,0],[8.6,0.9],[7.4,2.0],[6.0,3.2],[4.6,4.4],[3.3,5.5],[2.2,6.4],[1.25,7.1],[0.72,7.5],[0.6,7.62]];
-const fgeo=new THREE.LatheGeometry(prof.map(q=>new THREE.Vector2(q[0],q[1])), 56);
-{ const pa=fgeo.attributes.position; const cols=[]; const cL=new THREE.Color(0x7787a0), cH=new THREE.Color(0x4d6182), cS=new THREE.Color(0xf5f8fb), tc=new THREE.Color();
-for(let i=0;i<pa.count;i++){ const x=pa.getX(i), y=pa.getY(i), z=pa.getZ(i); const ang=Math.atan2(z,x); const line=5.05+Math.sin(ang*7)*0.2+Math.sin(ang*13+1.7)*0.13; if(y>line) tc.copy(cS); else tc.copy(cL).lerp(cH, Math.min(1,y/5)); cols.push(tc.r,tc.g,tc.b); }
-fgeo.setAttribute('color', new THREE.Float32BufferAttribute(cols,3)); }
-const fm=new THREE.Mesh(fgeo, std({vertexColors:true, roughness:0.95})); fm.castShadow=true; fm.position.set(0,0.3,-2.8); g.add(fm);
-const cr=cyl(0.5,0.62,0.22, M.dark, 0,-2.8, 16); cr.position.y=7.95; g.add(cr);
-g.add(box(0.55,0.3,0.4, M.white, 0.62,8.05,-2.8)); g.add(sph(0.14, M.white, 0.62,8.28,-2.8));
-const go=new THREE.Group(); go.position.set(0.4,3.3,3.1); go.rotation.x=-0.42; g.add(go);
-go.add(box(1.5,0.5,0.9, M.white, 0,0.25,0)); go.add(box(1.1,0.45,0.7, texMat(facadeTex('#c8b393')), -0.1,0.72,0)); go.add(box(0.9,0.3,0.1, glowMat(signTex('五合目','#374151','#ffffff',false)), 0,0.3,0.47));
-[[-9.5,-5.5,3.6,1.6],[-10.5,1.5,3,1.3],[10,-6,4,1.8],[11,2,3.2,1.4],[-6,-7.5,2.6,1.1]].forEach(q=>g.add(cone(q[2],q[3], std({color:0x55703f,roughness:1}), q[0],q[1],10,q[3]/2+0.3)));
-const lake=cyl(1,1,0.1, M.water, 3.4,6.6, 24); lake.scale.set(5.4,1,2.3); lake.position.y=0.36; g.add(lake);
-const pg=new THREE.Group(); pg.position.set(-7.6,0.3,5.4); g.add(pg);
-pg.add(cone(2.3,1.1, std({color:0x55703f,roughness:1}), 0,0,12,0.85));
-for(let i=0;i<5;i++){ const w=1.08-i*0.13, y=1.35+i*0.52; pg.add(box(w,0.4,w, std({color:0xa52a21,roughness:0.6}), 0,y,0)); pg.add(box(w+0.34,0.13,w+0.34, M.dark, 0,y+0.26,0)); }
-const sp2=cyl(0.03,0.05,0.8, M.gold, 0,0, 6); sp2.position.y=4.35; pg.add(sp2);
-pg.add(tree(1.6,0.8,0.95,pinkTree)); pg.add(tree(-1.7,0.5,0.85,pinkTree)); pg.add(tree(0.9,-1.2,0.8,pinkTree));
-[[-4.5,4.6],[-3.2,5.6],[-5.6,6.2],[-2.2,4.2]].forEach(q=>{ g.add(box(0.95,0.55,0.8, M.white, q[0],0.6,q[1])); g.add(hipRoof(1.15,0.4,1, M.roof, q[0],0.88,q[1])); });
-g.add(box(17,0.07,0.75, M.dark, -0.5,0.36,7.7));
-const ft=new THREE.Group(); ft.add(box(1.5,0.58,0.6, M.red, -0.8,0.3,0)); ft.add(box(1.5,0.58,0.6, std({color:0xf3e5cf,roughness:0.5}), 0.8,0.3,0)); ft.add(box(3.1,0.16,0.5, M.grey, 0,0.66,0)); ft.position.set(0,0.4,7.7); g.add(ft);
-ANIM.push(t=>{ ft.position.x=Math.sin(t*0.14)*6.2; });
-const cl1=new THREE.Group(); [[0,0,0],[0.85,0.15,0.2],[1.7,-0.05,0]].forEach(q=>cl1.add(sph(0.55, M.white, q[0],q[1],q[2]))); cl1.children.forEach(c=>c.scale.y=0.55); cl1.position.set(-4,9.6,-3); g.add(cl1);
-const cl2=cl1.clone(); cl2.position.set(5.5,10.4,-5); cl2.scale.setScalar(1.3); g.add(cl2);
-ANIM.push(t=>{ cl1.position.x=-4+Math.sin(t*0.05)*1.2; cl2.position.x=5.5+Math.sin(t*0.04+2)*1.4; });
-people(g,6,-5.5,-1.5,3.5,6.5,0.35); } },
-
+[[8.6,-1.9,'#e8dcc4',0x7a4a8c],[3.3,-5.6,'#d9e2ec',0x2e4d7d],[8.8,-5.9,'#f0e0c8',0x9e2b25]].forEach(([hx,hz,tone,rc])=>{ g.add(box(1.15,1.0,1.0, texMat(facadeTex(tone)), hx,0.82,hz)); const rf=cone(0.95,0.85, std({color:rc,roughness:0.6}), hx,hz,4); rf.rotation.y=Math.PI/4; rf.position.y=1.75; g.add(rf); });
+// ===== Adventureland =====
+const pir=new THREE.Group(); pir.position.set(-6.6,0.32,3.4); pir.rotation.y=0.25; g.add(pir);
+pir.add(box(2.9,1.7,1.2, cream, 0,0.85,0)); pir.add(hipRoof(3.3,0.85,1.6, M.roof, 0,1.7,0));
+pir.add(box(2.2,0.55,0.14, glowMat(signTex('加勒比海盗','#1e3a5f','#ffd9a0',false)), 0,1.1,0.65));
+const thut=new THREE.Group(); thut.position.set(-7.6,0.32,0.6); g.add(thut);
+thut.add(cyl(0.32,0.46,2.3, std({color:0x6b4423,roughness:1}), 0,0,8));
+const can1=sph(1.3, std({color:0x3f6b35,roughness:1}), 0,0,0); can1.position.y=2.9; thut.add(can1);
+const can2=sph(0.9, std({color:0x4a7a3e,roughness:1}), 0,0,0); can2.position.set(0.8,2.5,0.3); thut.add(can2);
+thut.add(box(0.9,0.6,0.8, std({color:0x8a6844,roughness:1}), 0.5,2.15,0));
+const temple=new THREE.Group(); temple.position.set(-4.9,0.32,5.4); g.add(temple);
+temple.add(box(1.7,0.7,1.7, texMat(castleStoneTex(),{roughness:1}), 0,0.35,0));
+temple.add(box(1.2,0.6,1.2, texMat(castleStoneTex(),{roughness:1}), 0,1.0,0));
+temple.add(box(0.7,0.55,0.7, texMat(castleStoneTex(),{roughness:1}), 0,1.55,0));
+// ===== Westernland =====
+const th=new THREE.Group(); th.position.set(-6.4,0.32,-4.2); th.rotation.y=0.4; g.add(th);
+th.add(box(3.2,1.1,2.3, rock, 0,0.55,0)); const thB=box(2.3,1.05,1.7, rock, 0,1.6,0); thB.rotation.y=0.35; th.add(thB);
+const thC=cone(1.15,1.5, rock, 0.2,0,8); thC.position.y=2.85; th.add(thC);
+const track=tor(1.85,0.055, M.dark, 0,0); track.rotation.x=Math.PI/2; track.position.y=0.75; th.add(track);
+const train=new THREE.Group(); train.add(box(0.5,0.3,0.28, std({color:0x7c2d12,roughness:0.7}), 0,0.15,0)); train.add(box(0.42,0.22,0.24, std({color:0xc8a24a,roughness:0.6}), 0.55,0.11,0)); th.add(train);
+ANIM.push(t=>{ const a=t*0.5; train.position.set(Math.cos(a)*1.85, 0.78, Math.sin(a)*1.85); train.rotation.y=-a; });
+[[-3.9,-2.2],[-3.9,-3.5],[-3.9,-4.8]].forEach(([fx,fz],i)=>{ const fh=1.15+HASH(i*3.3)*0.5; g.add(box(0.85,fh,1.05, texMat(facadeTex(['#a9805a','#96714e','#b08a5e'][i])), fx,fh/2+0.32,fz)); g.add(box(1.0,0.07,0.5, std({color:0x6b4423,roughness:1}), fx+0.25,0.95,fz)); });
+const tw=new THREE.Group(); tw.position.set(-10.6,0.32,-3.2); tw.rotation.y=0.12; g.add(tw);
+tw.add(box(0.95,0.32,2.6, M.white, 0,0.3,0));
+tw.add(box(0.8,0.5,2.2, M.white, 0,0.72,0)); tw.add(box(0.66,0.45,1.7, M.white, 0,1.2,0));
+const stk1=cyl(0.09,0.09,0.75, M.dark, 0,-0.6,8); stk1.position.y=1.75; tw.add(stk1);
+const stk2=cyl(0.09,0.09,0.75, M.dark, 0,0.55,8); stk2.position.y=1.75; tw.add(stk2);
+const wheel=box(0.16,0.85,0.85, std({color:0xb03a2e,roughness:0.7}), -0.52,0.45,-1.45); tw.add(wheel);
+ANIM.push(t=>{ tw.position.y=0.32+Math.sin(t*0.9)*0.03; });
+g.add(tree(-9.2,5.6,1.15, darkGreen)); g.add(tree(-4.3,0.9,1.0, darkGreen)); g.add(tree(9.9,-0.6,1.05)); g.add(tree(-2.9,-7.6,1.1)); g.add(tree(2.9,-7.8,1.0)); g.add(tree(10.1,6.3,1.1)); g.add(tree(-10.9,7.8,1.0, darkGreen));
+people(g,10,-0.8,0.8,4.2,8.6,0.35); } },
 {id:'dome', name:'东京巨蛋', x:0, z:0, h:6.6, desc:'日本第一座全天候巨蛋球场（1988 年），读卖巨人队主场，白色屋顶靠气压撑起，人称“BIG EGG”。旁边的东京巨蛋城里有无心摩天轮 Big O 与穿楼而过的过山车。', make:g=>{
 g.add(box(19,0.3,14.5, texMat(paveTex(),{roughness:1}), 0,0.15,0));
 const dmat=std({color:0xf3f1ec, roughness:0.5, metalness:0.05});
