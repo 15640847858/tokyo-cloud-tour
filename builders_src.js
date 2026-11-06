@@ -303,7 +303,7 @@ ANIM.push(t=>{ tr.position.x=((t*1.1)%17)-8.5; });
 g.add(tree(2.1,4.9,0.95)); g.add(tree(4.35,2.05,0.9));
 people(g,30,-1.5,1.5,-1.5,1.5,0.32);
 people(g,10,-4.6,4.4,2.0,5.2,0.4); } },
- {id:'shinjuku', name:'新宿', x:-17, z:-3, h:9, desc:'东京最大的交通枢纽。西口的蚕茧塔（Cocoon Tower）和双塔造型的东京都厅是这里最认得出的两栋楼，东口则是百货和居酒屋街。', make:g=>{ g.add(box(13,0.3,10.5, std({color:0xb9bec6,roughness:1}), 0,0.15,0));
+ {id:'shinjuku', name:'新宿', x:-17, z:-3, h:9, desc:'东京最大的交通枢纽。西口的蚕茧塔（Cocoon Tower）和双塔造型的东京都厅是这里最认得出的两栋楼，东口则是百货和居酒屋街。', make:g=>{ g.add(box(13,0.3,10.5, texMat(paveTex(),{roughness:1}), 0,0.15,0));
 const cocoon=new THREE.Group(); cocoon.position.set(-3.6,0,-1.8); g.add(cocoon);
 const cocR=u=>1.2+Math.sin(u*Math.PI)*0.72-u*0.4;
 const lpts=[]; for(let i=0;i<=10;i++){ const u=i/10; lpts.push(new THREE.Vector2(cocR(u), u*7.6)); }
@@ -327,7 +327,7 @@ g.add(box(8.6,1.3,2.6, texMat(facadeTex('#9aa7b4')), -0.6,0.65,4.3));
 g.add(box(2.2,0.7,0.16, glowMat(signTex('新宿駅','#0ea5e9','#ffffff',false)), -0.6,1.15,5.68));
 const plaza=cyl(2.1,2.1,0.12, std({color:0xd8cfb8,roughness:1}), 3,3.6, 24); plaza.position.y=0.36; g.add(plaza);
 g.add(tree(0.6,3.4,0.9)); g.add(tree(5.4,3.2,0.9)); g.add(tree(-5.8,-3.6,1)); people(g,8,-2.5,1,-0.5,2.5,0.3); } },
- {id:'akiba', name:'秋叶原', x:8, z:-11, h:7, desc:'电器、动漫和游戏文化的中心，中央大街两边全是挂满彩色招牌的高楼、电玩店和扭蛋机，周日下午会变成步行街。', make:g=>{ g.add(box(11.5,0.3,12, std({color:0xcac2b4,roughness:1}), 0,0.15,0));
+ {id:'akiba', name:'秋叶原', x:8, z:-11, h:7, desc:'电器、动漫和游戏文化的中心，中央大街两边全是挂满彩色招牌的高楼、电玩店和扭蛋机，周日下午会变成步行街。', make:g=>{ g.add(box(11.5,0.3,12, texMat(paveTex(),{roughness:1}), 0,0.15,0));
 g.add(box(3.2,0.34,11.5,M.dark,0,0.17,0));
 const cols=['#e11d48','#2563eb','#ec4899','#f59e0b','#059669','#7c3aed'];
 const words=['ゲーム','アニメ','メイド','電気','ホビー','パソコン'];
@@ -445,7 +445,7 @@ for(let i=0;i<7;i++) g.add(tree(-5.6+i*0.4, -4.4+((i*37)%3)*0.5, 1.25, darkGreen
 [[-5.4,-1.5],[-5.6,1.8],[5.5,-1.8],[5.7,1.6],[-4.6,4.4],[4.7,4.5]].forEach(q=>g.add(tree(q[0],q[1],1.3,darkGreen)));
 [[-2.8,-4.6],[3,-4.7],[0,-5]].forEach(q=>{ const c=sph(1.5, darkGreen, q[0],1.6,q[1], 1.3,0.8,1.1); g.add(c); });
 people(g,6,-0.9,0.9,-1,2.6,0.32); } },
- {id:'odaiba', name:'台场', x:13, z:22, h:7, desc:'东京湾人工岛：富士电视台大楼中间的大圆球、1:1 高达立像，还有横跨东京湾的彩虹大桥，夜景尤其漂亮。', make:g=>{ g.add(box(13.5,0.3,10.5, std({color:0xb9c2c9,roughness:1}), 0,0.15,0));
+ {id:'odaiba', name:'台场', x:13, z:22, h:7, desc:'东京湾人工岛：富士电视台大楼中间的大圆球、1:1 高达立像，还有横跨东京湾的彩虹大桥，夜景尤其漂亮。', make:g=>{ g.add(box(13.5,0.3,10.5, texMat(paveTex(),{roughness:1}), 0,0.15,0));
 g.add(box(13.5,0.34,1.9,M.water,0,0.17,4.9));
 const fuji=new THREE.Group(); fuji.position.set(-3.8,0,-2.2); g.add(fuji);
 [-1.35,1.35].forEach(x=>fuji.add(box(1.05,5.2,1.05, texMat(glassTex('#b9d2e4')), x,2.6,0)));
@@ -470,8 +470,10 @@ g.add(beam(5.2,0.3,-3.1, 5.9,2.6,-3.1, M.grey, 0.09)); g.add(beam(6.6,0.3,-3.1, 
 ANIM.push((t,dt)=>{ wheel.rotation.z-=dt*0.35; });
 [[-5.9,2.9],[-4.7,2.9],[-5.9,4.1],[-4.7,4.1]].forEach(q=>{ const py=cone(1.05,1.7, texMat(glassTex('#c3d9ea')), q[0],q[1],4); py.rotation.x=Math.PI; py.position.y=1.9; g.add(py); g.add(box(0.5,0.9,0.5,M.grey,q[0],0.75,q[1])); });
 g.add(box(3.4,1.8,2.2, texMat(facadeTex('#d8cfc0')), 3.3,0.9,1.9));
+g.add(box(2.2,0.6,0.14, glowMat(signTex('DiverCity','#0ea5e9','#ffffff',false)), 3.3,1.5,3.02));
+g.add(box(1.8,0.5,0.12, glowMat(signTex('フジテレビ','#dc2626','#ffffff',false)), -3.8,5.5,-1.44));
 g.add(tree(-6,-4.2,0.85)); g.add(tree(0.5,-4.4,0.85)); g.add(tree(6.4,1.2,0.85)); people(g,7,-1.5,1.8,2.6,3.6,0.3); } },
- {id:'roppongi', name:'六本木', x:-8, z:6, h:9, desc:'美术馆、展望台和夜生活集中的区域。微微收分的森大厦是六本木之丘的主楼，顶层展望台可以远眺东京塔。', make:g=>{ g.add(box(12.5,0.3,10.5, std({color:0xbcc3cb,roughness:1}), 0,0.15,0));
+ {id:'roppongi', name:'六本木', x:-8, z:6, h:9, desc:'美术馆、展望台和夜生活集中的区域。微微收分的森大厦是六本木之丘的主楼，顶层展望台可以远眺东京塔。', make:g=>{ g.add(box(12.5,0.3,10.5, texMat(paveTex(),{roughness:1}), 0,0.15,0));
 const mori=new THREE.Group(); mori.position.set(-1.6,0,-1.6); g.add(mori);
 const moriTex=glassTex('#7ea6c8'); moriTex.repeat.set(2,3);
 [[2.55,0,3.0],[2.32,3.0,3.0],[2.08,6.0,2.6]].forEach(t=>{ const sg=new THREE.Mesh(new THREE.CylinderGeometry(t[0]*0.92,t[0],t[2],4), texMat(moriTex)); sg.rotation.y=Math.PI/4; sg.position.y=t[1]+t[2]/2; sg.castShadow=true; mori.add(sg); });
@@ -487,7 +489,7 @@ const spider=new THREE.Group(); spider.position.set(3.4,0.3,1.6); const sm=std({
 g.add(box(2.6,3.4,2.2, texMat(facadeTex('#b7bfc9')), -5.4,1.7,1.6));
 g.add(box(1.8,0.75,0.16, glowMat(signTex('六本木ヒルズ','#111827','#fbbf24',false)), -1.4,1.5,4.1));
 people(g,7,-3,2.5,3.4,4.6,0.3); } },
- {id:'ikebukuro', name:'池袋', x:-14, z:-16, h:8, desc:'性价比高的住宿和购物区，东口的阳光城（Sunshine City）高塔是地标，里面有水族馆和展望台。', make:g=>{ g.add(box(12.5,0.3,10, std({color:0xcac2b4,roughness:1}), 0,0.15,0));
+ {id:'ikebukuro', name:'池袋', x:-14, z:-16, h:8, desc:'性价比高的住宿和购物区，东口的阳光城（Sunshine City）高塔是地标，里面有水族馆和展望台。', make:g=>{ g.add(box(12.5,0.3,10, texMat(paveTex(),{roughness:1}), 0,0.15,0));
 g.add(box(7.2,1.6,2.6, texMat(facadeTex('#c9cfd6')), 0,0.8,-0.6));
 g.add(box(7.4,0.18,2.8, M.dark, 0,1.7,-0.6));
 g.add(box(2.6,0.8,0.16, glowMat(signTex('池袋駅','#16a34a','#ffffff',false)), 0,1.15,0.78));
@@ -538,7 +540,7 @@ g.add(box(11,0.08,0.85, M.dark, 0,0.34,4.5));
 const tram=new THREE.Group(); tram.add(box(1.55,0.62,0.62, std({color:0xf3e5cf,roughness:0.5}), 0,0.32,0)); tram.add(box(1.57,0.2,0.64, M.red, 0,0.2,0)); tram.add(box(1.3,0.14,0.5, M.grey, 0,0.7,0)); tram.position.set(0,0.36,4.5); g.add(tram);
 ANIM.push(t=>{ tram.position.x=Math.sin(t*0.16)*4.4; tram.rotation.y=Math.cos(t*0.16)>0?0:Math.PI; });
 people(g,8,-1.5,3.5,-0.8,1.6,0.32); } },
- {id:'shinagawa', name:'品川', x:-9, z:19, h:6, desc:'京急线从羽田进城的第一大站，站前是成排的玻璃高楼酒店，换乘山手线和新干线都很方便。', make:g=>{ g.add(box(12.5,0.3,10, std({color:0xcac2b4,roughness:1}), 0,0.15,0));
+ {id:'shinagawa', name:'品川', x:-9, z:19, h:6, desc:'京急线从羽田进城的第一大站，站前是成排的玻璃高楼酒店，换乘山手线和新干线都很方便。', make:g=>{ g.add(box(12.5,0.3,10, texMat(paveTex(),{roughness:1}), 0,0.15,0));
 g.add(box(7.6,2.7,3.2, texMat(glassTex('#bcd6ea')), 0,1.35,-1.2));
 const sroof=box(7.8,0.22,3.8, texMat(glassTex('#8fb8d8')), 0,3.1,-1.2); sroof.rotation.x=-0.16; g.add(sroof);
 g.add(box(3,0.85,0.16, glowMat(signTex('品川駅','#0f766e','#ffffff',false)), 0,1.8,0.5));
@@ -555,7 +557,7 @@ const aqua=cyl(1.45,1.45,2.4, texMat(glassTex('#7fb6d9')), -4.75,1.05, 18); g.ad
 g.add(box(1.9,0.7,0.16, glowMat(signTex('アクアパーク','#0369a1','#ffffff',false)), -4.75,1.7,2.42));
 g.add(box(2.7,0.55,1.7, M.park, -4.55,0.3,3.6)); g.add(tree(-5.2,3.5,0.8)); g.add(tree(-3.9,3.8,0.75)); g.add(tree(-4.6,2.9,0.7,pinkTree));
 people(g,8,-3,3,1,2.2,0.3); } },
- {id:'ginza', name:'银座', x:6, z:5, h:7, desc:'东京最高档的购物区。四丁目路口的和光百货钟楼是银座的象征，周末中央大街会变成步行街。', make:g=>{ g.add(box(13,0.3,10.5, std({color:0xd5cec0,roughness:1}), 0,0.15,0));
+ {id:'ginza', name:'银座', x:6, z:5, h:7, desc:'东京最高档的购物区。四丁目路口的和光百货钟楼是银座的象征，周末中央大街会变成步行街。', make:g=>{ g.add(box(13,0.3,10.5, texMat(paveTex(),{roughness:1}), 0,0.15,0));
 g.add(box(12.5,0.34,2.8,M.dark,0,0.17,3.4));
 const wako=new THREE.Group(); wako.position.set(-3.4,0,-1.4); g.add(wako);
 wako.add(box(2.3,4.2,2.3, texMat(facadeTex('#d9d2c4','#fff3cf')), 0,2.1,0));
@@ -580,7 +582,7 @@ g.add(box(2.2,0.8,0.16, glowMat(signTex('GINZA SIX','#111827','#fbbf24',false)),
 g.add(box(2.4,3.4,2.2, texMat(facadeTex('#e5e0d2')), -5.3,1.7,-3.6));
 for(let i=0;i<4;i++){ const lp=cyl(0.05,0.07,1.5,M.dark,-4.8+i*3.1,3.4,6); lp.position.y=1.05; g.add(lp); g.add(sph(0.12, std({color:0xfff2c0,roughness:0.4}), -4.8+i*3.1, 1.95, 3.4)); }
 people(g,16,-5.5,5.5,2.6,4.2,0.32); } },
- {id:'harajuku', name:'原宿', x:-12, z:7, h:5, desc:'竹下通满是年轻潮流小店和可丽饼摊，入口的彩色拱门一到周末就挤满人，和旁边的明治神宫一动一静。', make:g=>{ g.add(box(12,0.3,11, std({color:0xd9c9b8,roughness:1}), 0,0.15,0.5));
+ {id:'harajuku', name:'原宿', x:-12, z:7, h:5, desc:'竹下通满是年轻潮流小店和可丽饼摊，入口的彩色拱门一到周末就挤满人，和旁边的明治神宫一动一静。', make:g=>{ g.add(box(12,0.3,11, texMat(paveTex(),{roughness:1}), 0,0.15,0.5));
 g.add(box(2.3,0.34,9.5, std({color:0xe8dcc8,roughness:1}), 0,0.17,0.8));
 [-2.3,2.3].forEach(x=>{ const pl=cyl(0.14,0.18,3.1,M.pink,x,4.9,8); g.add(pl); });
 g.add(box(5.6,1.05,0.35, glowMat(archTex()), 0,3.35,4.9));
@@ -592,7 +594,7 @@ const slopeR=box(6.4,0.18,2.7, M.grey, 2.6,1.6,-4.4); slopeR.rotation.z=0.06; g.
 for(let i=0;i<5;i++) g.add(tree(-4.6+i*2.3, -2.6, 0.95));
 const crepe=new THREE.Group(); crepe.position.set(1.1,0.3,1.4); const cc=cone(0.16,0.5, std({color:0xe8c39a,roughness:0.8}), 0,0,8); cc.rotation.x=Math.PI; cc.position.y=0.45; crepe.add(cc); crepe.add(sph(0.17,M.pink,0,0.78,0)); g.add(crepe);
 people(g,20,-0.9,0.9,-2.6,4.2,0.32); } },
- {id:'toyosu', name:'丰洲市场', x:18, z:13, h:5, desc:'东京的厨房：白色大楼顶上有整片屋顶草坪是它的特点。清晨可以看金枪鱼拍卖、吃寿司早餐，注意休市日。', make:g=>{ g.add(box(13.5,0.3,10.5, std({color:0xb9c2c9,roughness:1}), 0,0.15,0));
+ {id:'toyosu', name:'丰洲市场', x:18, z:13, h:5, desc:'东京的厨房：白色大楼顶上有整片屋顶草坪是它的特点。清晨可以看金枪鱼拍卖、吃寿司早餐，注意休市日。', make:g=>{ g.add(box(13.5,0.3,10.5, texMat(paveTex(),{roughness:1}), 0,0.15,0));
 g.add(box(13.5,0.34,1.6,M.water,0,0.17,5));
 const roofM=std({color:0x7fa08a,roughness:0.7});
 function marketHall(x,z,w,d,h){ const t=new THREE.Group(); t.position.set(x,0,z); t.add(box(w,h,d, texMat(facadeTex('#dde3e8','#eaf6ff')), 0,h/2,0)); const rf=cyl(d*0.52,d*0.52,w, roofM, 0,0, 18); rf.rotation.z=Math.PI/2; rf.position.set(0,h+d*0.18,0); t.add(rf); return t; }
