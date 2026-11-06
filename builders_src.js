@@ -76,6 +76,10 @@ function stationTex(){ const t=cnv(1024,512,(g,w,h)=>{
   g.fillStyle='#f3e9dc'; g.fillRect(0,40,w,24); g.fillRect(0,h-60,w,24);
   for(let r=0;r<2;r++){ const y0=116+r*168; for(let x=52;x<w-40;x+=96){ g.fillStyle='#f3e9dc'; g.beginPath(); g.arc(x+28,y0+32,30,Math.PI,0); g.fill(); g.fillRect(x-2,y0+32,60,76); g.fillStyle='#2e3d4d'; g.beginPath(); g.arc(x+28,y0+32,22,Math.PI,0); g.fill(); g.fillRect(x+6,y0+32,44,68); g.fillStyle='rgba(255,255,255,0.25)'; g.fillRect(x+12,y0+40,10,52); } }
 }); t.wrapS=THREE.RepeatWrapping; return t; }
+function gravelTex(){ const t=cnv(256,256,(g,w,h)=>{
+  g.fillStyle='#c9bda3'; g.fillRect(0,0,w,h);
+  for(let i=0;i<5200;i++){ const v=HASH(i*1.71); g.fillStyle=v>0.66?'rgba(255,250,238,0.5)':(v>0.33?'rgba(120,105,80,0.4)':'rgba(80,70,52,0.35)'); g.fillRect(HASH(i*2.3)*w, HASH(i*3.1)*h, 2, 2); }
+}); t.wrapS=t.wrapT=THREE.RepeatWrapping; t.repeat.set(3,6); return t; }
 function paveTex(){ const t=cnv(256,256,(g,w,h)=>{
   g.fillStyle='#cfc8b8'; g.fillRect(0,0,w,h);
   for(let i=0;i<1600;i++){ g.fillStyle=HASH(i*2.9)>0.5?'rgba(255,255,255,0.05)':'rgba(60,55,45,0.05)'; g.fillRect(HASH(i*1.3)*w, HASH(i*1.9)*h, 2, 2); }
@@ -169,7 +173,7 @@ const spots=[
   const bc2=sph(0.12, new THREE.MeshBasicMaterial({color:0xff4444}), 0,15.4,0); g.add(bc2);
   ANIM.push(t=>{ const on=Math.sin(t*2.4)>0; bc1.material.color.setHex(on?0xff2222:0x551111); bc2.material.color.setHex(on?0x441111:0xff4444); });
   g.add(tree(3.4,4.4,0.9)); g.add(tree(-3.6,4.2,0.8)); g.add(tree(4.2,-3.4,0.85)); } },
- {id:'sensoji', name:'浅草寺', x:13, z:-19, h:8, desc:'东京最古老的寺庙：先穿过挂着大红灯笼的雷门，沿仲见世商店街走到本堂，旁边就是五重塔，适合穿和服慢慢逛。', make:g=>{ const roofT=texMat(kawaraTex()); const stone=std({color:0xcfc4a5,roughness:1}); g.add(box(11,0.3,13.5,stone,0,0.15,0.4));
+ {id:'sensoji', name:'浅草寺', x:13, z:-19, h:8, desc:'东京最古老的寺庙：先穿过挂着大红灯笼的雷门，沿仲见世商店街走到本堂，旁边就是五重塔，适合穿和服慢慢逛。', make:g=>{ const roofT=texMat(kawaraTex()); const stone=std({color:0xcfc4a5,roughness:1}); g.add(box(11,0.3,13.5,texMat(paveTex(),{roughness:1}),0,0.15,0.4));
 const wood=std({color:0x6b4423,roughness:0.9});
 function templeRoof(w,d,x,y,z){ g.add(hipRoof(w,0.85,d,roofT,x,y,z)); g.add(hipRoof(w*0.62,0.6,d*0.62,roofT,x,y+0.8,z)); }
 const gate=new THREE.Group(); gate.position.set(0,0,5.4); g.add(gate);
@@ -185,7 +189,7 @@ const hz=new THREE.Group(); hz.position.set(0,0,-2.7); g.add(hz);
 hz.add(box(5.9,1.5,2, M.red, 0,3.2,0)); hz.add(box(6.4,0.3,2.5,roofT,0,4.05,0)); const hr=hipRoof(6.2,1,2.9,roofT,0,4.15,0); hz.add(hr);
 const lan2=sph(0.7, std({color:0xd92323,roughness:0.55}), 0,1.5,0, 1,1.25,1); hz.add(lan2);
 const hall=new THREE.Group(); hall.position.set(0.6,0,-5.6); g.add(hall);
-hall.add(box(6.2,2.3,3.6, texMat(templeWallTex()), 0,1.15,0)); hall.add(box(6.2,0.8,3.6, M.red, 0,0.4,0));
+const twt=templeWallTex(); hall.add(box(6.2,2.3,3.6, texMat(twt,{bumpMap:twt,bumpScale:0.08}), 0,1.15,0)); hall.add(box(6.2,0.8,3.6, M.red, 0,0.4,0));
 const hr2=hipRoof(7.4,1.5,4.8,roofT,0,2.3,0); hall.add(hr2); const hr3=hipRoof(4.6,0.9,3,roofT,0,3.7,0); hall.add(hr3);
 hall.add(box(1.8,0.3,0.3,M.gold,0,4.75,0));
 const pg=new THREE.Group(); pg.position.set(-3.7,0,-4.9); g.add(pg);
@@ -384,7 +388,7 @@ g.add(box(2.2,5.4,2.2, texMat(facadeTex('#e3e7ec')), 5.4,2.7,-5));
 g.add(box(3.2,0.9,0.18, glowMat(signTex('東京駅','#991b1b','#ffffff',false)), 0,1.7,0.05));
 people(g,10,-4,4,1.2,2.8,0.3); } },
  {id:'meiji', name:'明治神宫', x:-14, z:3, h:6, desc:'藏在市中心森林里的神社，入口的大鸟居是它的标志。紧邻原宿却安静庄严，常能碰到日式婚礼队伍。', make:g=>{ g.add(box(12.5,0.3,10.5, std({color:0x5d8a54,roughness:1}), 0,0.15,0));
-g.add(box(2.8,0.34,8.5, std({color:0xd8cfb8,roughness:1}), 0,0.17,0.6));
+g.add(box(2.8,0.34,8.5, texMat(gravelTex(),{roughness:1}), 0,0.17,0.6));
 const wood=std({color:0x8a5a2b,roughness:0.9});
 const torii=new THREE.Group(); torii.name='meijiTorii'; torii.position.set(0,0,3.9); g.add(torii);
 [-1.7,1.7].forEach(x=>{ const pl=cyl(0.3,0.38,3.9,wood,x,0,12); torii.add(pl); });
@@ -471,7 +475,7 @@ g.add(sph(0.16, std({color:0x8b8f94,roughness:0.9}), 2.9,0.62,-0.5, 1,1.15,1)); 
 const bus=new THREE.Group(); bus.add(box(1.7,0.62,0.7,M.red,0,0.1,0)); bus.add(box(1.5,0.3,0.72, M.white, 0,0.5,0)); bus.position.set(0,0.35,4.6); g.add(bus);
 ANIM.push(t=>{ const u=Math.sin(t*0.22)*4.4; bus.position.x=u; bus.rotation.y=Math.cos(t*0.22)>0?0:Math.PI; });
 people(g,10,-4.5,4.5,3.4,4.4,0.3); } },
- {id:'waseda', name:'早稻田大学', x:0, z:0, h:6, desc:'大隈重信创办的私立名校，大隈讲堂的钟塔、演剧博物馆与村上春树图书馆都在早稻田校区，校门外是热闹的学生街。', make:g=>{ g.add(box(11.5,0.3,10, std({color:0xd8d0bc,roughness:1}), 0,0.15,0));
+ {id:'waseda', name:'早稻田大学', x:0, z:0, h:6, desc:'大隈重信创办的私立名校，大隈讲堂的钟塔、演剧博物馆与村上春树图书馆都在早稻田校区，校门外是热闹的学生街。', make:g=>{ g.add(box(11.5,0.3,10, texMat(paveTex(),{roughness:1}), 0,0.15,0));
 g.add(box(4.6,0.34,3.8, M.park, -3.1,0.17,-0.4));
 const creamF=texMat(facadeTex('#e6dcc4')); const roofB=std({color:0x7a4a3a,roughness:0.8});
 const ok=new THREE.Group(); ok.position.set(1,0.3,-2.4); g.add(ok);
