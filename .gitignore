@@ -1,0 +1,10 @@
+# 大文件与生成物（不入库）
+data/buildings_raw.json
+*.bin
+map.jpg
+tokyo_tower.fbx
+tower_texture.png
+data/*.jpg
+data/*.png
+data/fetch.log
+__pycache__/

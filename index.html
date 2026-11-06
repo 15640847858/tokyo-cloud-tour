@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>云游东京 · 3D 景点与机场路线</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0c1626">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:#0b1220;color:#eef2f7;overflow:hidden}
+  #scene{position:fixed;inset:0}
+  header{position:fixed;top:0;left:0;right:0;padding:14px 18px;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;z-index:10}
+  header h1{font-size:22px;letter-spacing:1px;text-shadow:0 2px 10px rgba(0,0,0,.5)}
+  header p{font-size:12px;opacity:.85;margin-top:4px}
+.btns{display:flex;gap:8px;align-items:center;flex-wrap:nowrap}
+.btns button{white-space:nowrap;flex:none;min-height:36px}
+.btns select{flex:none}
+  .btns{pointer-events:auto;display:flex;gap:8px}
+  button{cursor:pointer;border:1px solid rgba(255,255,255,.25);background:rgba(15,23,42,.72);color:#fff;padding:7px 12px;border-radius:999px;font-size:13px;backdrop-filter:blur(6px)}
+  button.active{background:#e6c887;border-color:#e6c887;color:#231a04;font-weight:600}
+  #panel{position:fixed;left:14px;top:86px;width:276px;max-height:calc(100% - 168px);overflow:hidden;display:flex;flex-direction:column;background:rgba(8,13,24,.78);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:14px;z-index:10;backdrop-filter:blur(14px) saturate(1.25)}
+  #panel h2{font-size:14px;margin:10px 0 8px;color:#e6c887;letter-spacing:.5px}
+  #panel h2:first-child{margin-top:0}
+  .route{width:100%;text-align:left;margin-bottom:8px;border-radius:12px;padding:9px 11px;line-height:1.45}
+  .route small{display:block;opacity:.8;font-size:12px}
+  .mod{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:10px 11px;margin-bottom:10px}
+  .mod h2{margin:0 0 8px}
+  .mod .about{font-size:11px;opacity:.7;line-height:1.7;margin:0}
+  .areaBtns{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .areaBtn{padding:8px 6px;border-radius:9px;font-size:12.5px}
+  .wxNow{display:flex;align-items:center;gap:10px}
+  #wxHomeLine{margin-top:8px;font-size:12.5px;color:#e6c887;font-style:italic;line-height:1.5}
+  .wxIcon{font-size:34px;line-height:1}
+  .wxTemp{font-size:25px;font-weight:700;line-height:1.1}
+  .wxMeta{font-size:12px;opacity:.8;line-height:1.55}
+  .wxDays{display:flex;gap:6px;margin-top:9px}
+  .wxDay{flex:1;text-align:center;background:rgba(255,255,255,.06);border-radius:8px;padding:5px 2px;font-size:11px;line-height:1.55}
+  .wxLine{margin-top:6px;font-size:12.5px;color:#a5d8ff}
+  .meta a.stlink{color:#ffd166;font-weight:600;text-decoration:underline;text-underline-offset:2px}
+  .meta a.stlink::after{content:' ›'}
+  #panel .mod:last-child{margin-bottom:0}
+  .mod #search{margin-bottom:0}
+  .car{position:relative;margin:-16px -16px 10px;border-radius:16px 16px 0 0;overflow:hidden;background:#0b1526}
+  .car img{width:100%;height:190px;object-fit:cover;display:block}
+  .carBtn{position:absolute;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;background:transparent;color:#e6c887;font-size:25px;font-weight:700;text-shadow:0 1px 8px rgba(0,0,0,.9),0 0 3px rgba(0,0,0,.65);line-height:1;padding:0;border:none;cursor:pointer}
+  .carBtn.prev{left:8px}.carBtn.next{right:8px}
+  .carCnt{position:absolute;right:10px;bottom:8px;background:rgba(6,12,24,.6);padding:2px 8px;border-radius:999px;font-size:11px;color:#fff}
+  .carDots{position:absolute;left:10px;bottom:10px;display:flex;gap:5px}
+  .carDots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.45)}
+  .carDots i.on{background:#fff}
+  .actions{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px}
+  .actbtn{flex:1 1 30%;white-space:nowrap;display:flex;align-items:center;justify-content:center;text-align:center;text-decoration:none;background:#e6c887;color:#231a04;font-weight:600;font-size:12px;padding:6px;border-radius:999px;border:none;cursor:pointer;line-height:1.35}
+  .actbtn.ghost{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25)}
+  .spot{display:inline-block;margin:0 6px 6px 0;padding:6px 10px;font-size:12px}
+  #info{position:fixed;right:14px;bottom:14px;width:348px;max-width:calc(100vw - 28px);max-height:74vh;overflow:hidden;display:flex;flex-direction:column;background:rgba(8,13,24,.86);border:1px solid rgba(255,255,255,.13);border-radius:16px;padding:16px;z-index:10;backdrop-filter:blur(14px) saturate(1.25)}
+  #info img.hero{width:100%;height:158px;object-fit:cover;border-radius:11px;margin-bottom:10px;display:block;background:#1e293b}
+  #info h4{font-size:13px;color:#e6c887;margin:11px 0 4px}
+  #info .facts{font-size:12px;color:#fcd34d;line-height:1.6;margin-top:2px}
+  .bestTag{display:inline-block;margin-top:5px;padding:2px 9px;border:1px solid rgba(230,200,135,.55);border-radius:999px;font-size:11.5px;color:#e6c887;background:rgba(230,200,135,.10)}
+  #info .credit{font-size:10.5px;opacity:.55;margin-top:9px;line-height:1.5}
+.gtabs{display:flex;gap:6px;margin:14px 0 4px}
+.gtab{flex:1;padding:8px 2px;border-radius:9px;font-size:13px;background:#0f3460;color:#dbe7f5;border:1px solid rgba(255,255,255,.15);cursor:pointer;font-weight:600}
+.gtab.on{background:#e6c887;color:#231a04;border-color:#e6c887}
+.nearRow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:10px;margin:7px 0;font-size:13px}
+.nearBtn{flex:none;padding:6px 13px;border-radius:999px;background:#e9b949;color:#12233a;font-weight:700;font-size:12px;border:none;cursor:pointer}
+  #info h3{font-size:17px;margin-bottom:6px}
+  #info p{font-size:13px;line-height:1.65;opacity:.92}
+  #info .meta{margin-top:8px;font-size:12px;color:#93c5fd;line-height:1.6}
+  #infoClose{position:absolute;top:8px;right:8px;z-index:20;border:none;background:transparent;color:#e6c887;font-size:19px;font-weight:700;width:30px;height:30px;border-radius:50%;line-height:1;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center;text-shadow:0 1px 6px rgba(0,0,0,.85)}
+#infoBody{overflow-y:auto;flex:1;min-height:0}
+  #panel.hidden{display:none}
+  #panelClose{position:absolute;top:8px;right:8px;z-index:5;border:none;background:transparent;color:#e6c887;font-size:19px;font-weight:700;text-shadow:0 1px 6px rgba(0,0,0,.85);width:30px;height:30px;border-radius:50%;line-height:1;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.pScroll{overflow-y:auto;flex:1;min-height:0}
+  #panel .mod:first-child h2{padding-right:36px}
+  #search{width:100%;padding:8px 11px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:#fff;font-size:13px;margin-bottom:10px;outline:none}
+  #search::placeholder{color:rgba(255,255,255,.55)}
+  #bldgStatus{position:fixed;left:50%;transform:translateX(-50%);bottom:36px;font-size:12px;background:rgba(10,17,32,.75);padding:5px 12px;border-radius:999px;z-index:9}
+  #hint{position:fixed;left:50%;transform:translateX(-50%);bottom:12px;font-size:12px;opacity:.75;z-index:9;white-space:nowrap}
+  #loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#070d18;z-index:50;transition:opacity .5s}
+.ldBox{text-align:center;width:min(300px,74vw)}
+.ldLogo{font-size:24px;letter-spacing:6px;color:#e6c887;margin-bottom:18px}
+.ldBar{height:4px;background:rgba(255,255,255,.14);border-radius:99px;overflow:hidden}
+.ldBar i{display:block;height:100%;width:8%;background:#e6c887;border-radius:99px;transition:width .45s ease}
+.ldTxt{margin-top:12px;font-size:12px;opacity:.75;letter-spacing:1px}
+#statusbar{position:fixed;left:14px;bottom:12px;z-index:9;display:flex;gap:12px;align-items:center;background:rgba(8,13,24,.66);border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:6px 14px;font-size:12px;color:#dbe7f5;backdrop-filter:blur(10px)}
+#statusbar span{white-space:nowrap}
+#sbMode{color:#e6c887}
+.chip{padding:4px 10px;font-size:11.5px;border-radius:999px;margin-bottom:8px}
+.chip.on{background:#e6c887;color:#231a04;border-color:#e6c887;font-weight:700}
+.spot.fav{border-color:rgba(230,200,135,.65)}
+#sheetHandle{display:none}
+#sheetToggle{display:none}
+#sheetPeek{display:none}
+#tourbar{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;z-index:11;display:none;width:min(520px,calc(100vw - 20px));background:rgba(8,13,24,.88);border:1px solid rgba(230,200,135,.4);border-radius:14px;padding:10px 12px;backdrop-filter:blur(12px)}
+#tourbar .tbTop{display:flex;justify-content:space-between;align-items:center;gap:8px}
+#tourbar .tbName{font-size:13.5px;font-weight:700;color:#e6c887}
+#tourbar .tbStop{font-size:12.5px;opacity:.9;margin-top:3px}
+#tourbar .tbBtns{display:flex;gap:6px}
+#tourbar .tbBtns button{padding:6px 11px;font-size:13px}
+#tourbar .tbProg{height:3px;background:rgba(255,255,255,.15);border-radius:99px;margin-top:9px;overflow:hidden}
+#tourbar .tbProg i{display:block;height:100%;background:#e6c887;width:0;transition:width .4s}
+  @media(max-width:760px){
+    header{flex-direction:row;align-items:center;gap:8px;padding:10px 12px}
+    header h1{font-size:17px}
+    #setMod{display:block}
+    header p{display:none}
+    .btns{gap:6px;flex-wrap:nowrap;overflow-x:auto;max-width:calc(100vw - 20px);padding-bottom:2px}
+    .btns button{padding:7px 10px;font-size:12px;white-space:nowrap;min-height:36px}
+    #panel{left:8px;right:8px;width:auto;top:62px;max-height:56vh;padding:12px;border-radius:14px}
+    #info{left:8px;right:8px;width:auto;bottom:calc(8px + env(safe-area-inset-bottom));max-height:46vh;overflow:hidden;padding:13px 14px}
+    #info img.hero{height:128px}
+    #hint{display:none}
+    #search{font-size:16px}
+    .car{margin:-13px -14px 10px}
+    .car img{height:150px}
+    #statusbar{left:8px;bottom:calc(8px + env(safe-area-inset-bottom));font-size:11px;padding:5px 10px;gap:8px}
+    #tourbar{bottom:calc(64px + env(safe-area-inset-bottom));transition:bottom .38s ease}
+    #sheetHandle{display:flex;flex-direction:column;align-items:center;gap:2px;position:sticky;top:0;z-index:8;margin:-13px -14px 0;padding:8px 0 3px;background:transparent;cursor:grab;touch-action:none}
+    #sheetHandle i{width:44px;height:5px;border-radius:99px;background:rgba(255,255,255,.65);box-shadow:0 1px 5px rgba(0,0,0,.5)}
+    #sheetLbl{font-size:10.5px;color:#e6c887;letter-spacing:1px;text-shadow:0 1px 5px rgba(0,0,0,.85)}
+    #info.st-peek #sheetLbl{display:none}
+    #info{transition:max-height .38s ease,transform .38s ease}
+    #info.st-hide{transform:translateY(calc(100% + 24px))}
+    #info.st-peek{max-height:92px;overflow:hidden}
+    #info.st-half{max-height:54vh}
+    #info.st-full{max-height:calc(100dvh - 108px)}
+    #info.st-peek #infoBody{display:none}
+    #info.st-peek #sheetPeek{display:flex;gap:10px;align-items:center;padding:2px 2px 4px}
+    #sheetPeek img{width:56px;height:56px;object-fit:cover;border-radius:10px;flex:none;background:#1e293b}
+    #sheetPeek .pkName{font-size:15px;font-weight:700}
+    #sheetPeek .pkMeta{font-size:11.5px;opacity:.8;margin-top:2px;line-height:1.45}
+    #sheetPeek .pkHint{margin-left:auto;font-size:11px;color:#e6c887;flex:none}
+    #sheetToggle{display:none}
+    .spot{min-height:34px}
+    .route{min-height:44px}
+  }
+#langSel{background:rgba(8,13,24,.88);color:#fff;border:1px solid rgba(230,200,135,.7);border-radius:9px;padding:7px 6px;font-size:12.5px;font-weight:600;max-width:96px;color-scheme:dark;box-shadow:0 2px 10px rgba(0,0,0,.35)}
+#langSel option{background:#0e1a2e;color:#f2f6fc}
+.setGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.setGrid button,.setGrid select{width:100%;padding:9px 6px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.setGrid #langSel{grid-column:1/-1;max-width:none}
+#flashFx{position:fixed;inset:0;background:#e8efff;opacity:0;pointer-events:none;z-index:5;transition:opacity .08s}
+#pcModal{position:fixed;inset:0;background:rgba(5,10,20,.74);display:none;align-items:center;justify-content:center;z-index:60;padding:18px}
+.pcBox{width:min(92vw,620px);text-align:center}
+#pcImg{width:100%;border-radius:10px;box-shadow:0 18px 50px rgba(0,0,0,.55);display:block}
+.pcRow{margin-top:12px;display:flex;gap:10px;justify-content:center;align-items:center}
+#pcSave{background:#e6c887;color:#20304d;padding:10px 24px;border-radius:10px;font-weight:700;text-decoration:none;font-size:14.5px}
+#pcClose{width:40px;height:40px;border-radius:50%;font-size:18px;line-height:1}
+#pcHint{color:#cfd8ea;font-size:12px;margin-top:9px}
+#stampFx{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:15;opacity:0}
+#stampFx.play{animation:stampIn 1.7s ease forwards}
+@keyframes stampIn{0%{opacity:0}10%{opacity:1}72%{opacity:1}100%{opacity:0}}
+.gsCard{--r:0deg;transform:rotate(var(--r));width:150px;height:192px;background:#fdf8ee;border:1.5px solid #b08d4f;border-radius:6px;box-shadow:0 0 0 3px #fdf8ee,0 0 0 4.5px rgba(176,141,79,.55),0 12px 26px rgba(0,0,0,.35);display:flex;flex-direction:column;overflow:hidden;position:relative;box-sizing:border-box}
+.gsArt{position:relative;flex:1;min-height:0;background:linear-gradient(160deg,#aecfe8,#e9f2e2 55%,#f7e3bd);overflow:hidden}
+.gsArt img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.18) contrast(1.06) brightness(1.03)}
+.gsArt::after{content:'';position:absolute;inset:5px;border:1px solid rgba(253,248,238,.8);pointer-events:none}
+.gsMotifBig{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:46px}
+.gsVert{position:absolute;top:9px;right:8px;writing-mode:vertical-rl;font-family:'Ma Shan Zheng','Caveat',cursive;font-size:17px;letter-spacing:2px;color:#c73e2c;text-shadow:0 0 7px rgba(253,248,238,.95),0 0 3px rgba(253,248,238,.95);max-height:80%;overflow:hidden;z-index:2}
+.gsCap{display:flex;align-items:center;gap:6px;padding:6px 8px 7px;background:#fdf8ee}
+.gsCapMain{flex:1;min-width:0}
+.gsCName{display:block;font-family:'Ma Shan Zheng','Caveat',cursive;font-size:19px;color:#33405c;line-height:1.12;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gsCDate{display:block;font-size:9px;color:#9a8a68;letter-spacing:1.2px;margin-top:1px;font-family:sans-serif}
+.gsCNote{display:block;font-size:10.5px;color:#8a6d3b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.gsSeal{flex:none;width:22px;height:22px;background:#c73e2c;color:#fdf6e9;font-family:"Hiragino Mincho ProN","YuMincho",serif;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;border-radius:3px;transform:rotate(3deg);opacity:.94}
+.gsCard.big{width:212px;height:268px}
+.gsCard.big .gsCName{font-size:26px}
+.gsCard.big .gsVert{font-size:23px}
+.gsCard.big .gsCDate{font-size:11px}
+.gsCard.big .gsCNote{font-size:13px}
+.gsCard.big .gsSeal{width:30px;height:30px;font-size:19px}
+.gsCard.big .gsMotifBig{font-size:64px}
+#stampFx .gsCard{animation:slam .5s cubic-bezier(.2,2.4,.4,1)}
+@keyframes slam{0%{transform:scale(2.7) rotate(var(--r));opacity:0}55%{opacity:1}100%{transform:scale(1) rotate(var(--r));opacity:1}}
+#gsEdit{position:fixed;inset:0;background:rgba(5,10,20,.76);display:none;align-items:center;justify-content:center;z-index:61;padding:16px}
+.geBox{width:min(92vw,320px);background:rgba(15,25,45,.96);border:1px solid rgba(230,200,135,.35);border-radius:16px;padding:16px;text-align:center;box-sizing:border-box;position:relative}
+.geBox .gsCard{margin:2px auto 0}
+#gsNoteIn{width:100%;margin-top:12px;background:rgba(255,255,255,.08);border:1px solid rgba(230,200,135,.35);border-radius:9px;color:#fff;padding:9px 11px;font-size:16px;box-sizing:border-box}
+.geRow{display:flex;gap:8px;margin-top:12px}
+.geRow button{flex:1;padding:9px 4px;font-size:13.5px}
+#gsDelBtn{color:#ff9a8a;border-color:rgba(255,154,138,.45)}
+#gsEditClose{position:absolute;top:8px;right:8px;width:32px;height:32px;border-radius:50%;font-size:14px}
+#gsModal{position:fixed;inset:0;background:rgba(5,10,20,.74);display:none;align-items:center;justify-content:center;z-index:60;padding:10px}
+.gsBox{width:min(96vw,560px);height:min(93dvh,780px);display:flex;flex-direction:column;background:rgba(15,25,45,.96);border:1px solid rgba(230,200,135,.35);border-radius:16px;padding:12px;backdrop-filter:blur(14px);box-sizing:border-box}
+.gsHead{display:flex;justify-content:space-between;align-items:center;flex:none}
+.gsBox h3{color:#e6c887;margin:0;font-size:16.5px}
+#gsClose{width:34px;height:34px;border-radius:50%;font-size:16px;flex:none}
+.gsSub{display:none}
+.gsGrid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(4,1fr);gap:8px;margin-top:10px}
+.gsCell{background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.22);border-radius:8px;display:flex;align-items:center;justify-content:center;padding:4px;box-sizing:border-box;min-width:0;min-height:0;overflow:hidden}
+.gsCell.got{background:#f3ead2;border:1px solid #d8c9a3;padding:3px}
+.gsCell .gsCard{width:100%;height:100%;box-shadow:0 0 0 2px #fdf8ee,0 0 0 3px rgba(176,141,79,.5)}
+.gsCell .gsCap{padding:3px 5px 4px;gap:4px}
+.gsCell .gsCName{font-size:12.5px}
+.gsCell .gsCDate{font-size:7px;margin-top:0}
+.gsCell .gsCNote{display:none}
+.gsCell .gsVert{font-size:10.5px;top:5px;right:4px}
+.gsCell .gsSeal{width:15px;height:15px;font-size:10px}
+.gsCell .gsArt::after{inset:3px}
+.gsCell.got{cursor:pointer}
+.gsTodo{display:block;text-align:center;color:rgba(255,255,255,.55);font-size:11px;line-height:1.35;padding:2px}
+.gsTodoM{display:block;font-size:14px;opacity:.55;margin-bottom:2px}
+@media(max-width:760px){.gsGrid{grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(6,1fr);gap:6px}}
+@media(min-width:761px){#setMod{display:block}}
+#wToast{position:fixed;left:50%;bottom:calc(52px + env(safe-area-inset-bottom));transform:translate(-50%,18px);width:min(92vw,430px);background:rgba(10,17,30,.84);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(230,200,135,.45);border-radius:16px;padding:13px 38px 16px 16px;color:#f3ead2;z-index:44;opacity:0;pointer-events:none;transition:opacity .45s ease,transform .45s ease;box-shadow:0 10px 34px rgba(0,0,0,.42)}
+#wToast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+#wToast .wtT{font-size:16.5px;font-weight:700;letter-spacing:.04em;color:#e6c887;margin-bottom:3px}
+#wToast .wtB{font-size:13px;line-height:1.55;color:rgba(255,255,255,.88)}
+#wtClose{position:absolute;top:6px;right:8px;border:none;background:none;color:rgba(255,255,255,.65);font-size:17px;width:28px;height:28px;cursor:pointer;line-height:1;padding:0}
+#wToast .wtBar{position:absolute;left:16px;right:16px;bottom:7px;height:2px;border-radius:2px;background:rgba(230,200,135,.18);overflow:hidden;display:block}
+#wtFill{display:block;height:100%;width:0;background:#e6c887}
+#wToast.show #wtFill{width:100%;transition:width 5.4s linear}
+@media(max-width:760px){ #wToast{bottom:calc(46px + env(safe-area-inset-bottom))} }
+
+@media(min-width:761px){.setGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.setGrid button{width:100%;padding:9px 6px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+.pScroll,#infoBody{scrollbar-width:thin;scrollbar-color:rgba(230,200,135,.4) transparent}
+.pScroll::-webkit-scrollbar,#infoBody::-webkit-scrollbar{width:8px}
+.pScroll::-webkit-scrollbar-track,#infoBody::-webkit-scrollbar-track{background:transparent}
+.pScroll::-webkit-scrollbar-thumb,#infoBody::-webkit-scrollbar-thumb{background:rgba(230,200,135,.35);border-radius:99px;border:2px solid transparent;background-clip:content-box}
+.pScroll::-webkit-scrollbar-thumb:hover,#infoBody::-webkit-scrollbar-thumb:hover{background-color:rgba(230,200,135,.6)}
+
+@media(max-width:760px){#sheetChev{color:#e6c887;font-size:13px;line-height:1;font-weight:700;text-shadow:0 1px 5px rgba(0,0,0,.85);margin-bottom:1px}}
+
+/* ==== UI upgrade pack: Uiverse/Galaxy-inspired patterns, rethemed ==== */
+::selection{background:rgba(230,200,135,.38)}
+header h1{background:linear-gradient(100deg,#f7e7bd 20%,#e6c887 42%,#fff6da 50%,#e6c887 58%,#f7e7bd 80%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;animation:brandShine 7s linear infinite}
+@keyframes brandShine{to{background-position:-220% 0}}
+.btns button,.setGrid button,.actbtn{position:relative;overflow:hidden}
+.btns button::after,.setGrid button::after,.actbtn::after{content:'';position:absolute;top:0;left:-80%;width:55%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.32),transparent);transform:skewX(-20deg);transition:left .55s ease;pointer-events:none}
+@media(hover:hover){.btns button:hover::after,.setGrid button:hover::after,.actbtn:hover::after{left:135%}}
+button:not(.carBtn):active{transform:scale(.97)}
+button.active{box-shadow:0 0 0 1px rgba(230,200,135,.6),0 4px 18px rgba(230,200,135,.35)}
+@media(hover:hover){
+.mod{position:relative}
+.mod::before{content:'';position:absolute;inset:0;border-radius:inherit;background:radial-gradient(340px circle at var(--mx,50%) var(--my,50%),rgba(230,200,135,.10),transparent 65%);opacity:0;transition:opacity .35s;pointer-events:none}
+.mod:hover::before{opacity:1}
+.spot:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.35);border-color:rgba(230,200,135,.55)}
+.route:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.35);border-color:rgba(230,200,135,.5)}
+.gsCard:hover{transform:rotate(var(--r)) translateY(-4px) scale(1.03);box-shadow:0 0 0 3px #fdf8ee,0 0 0 4.5px rgba(176,141,79,.55),0 20px 34px rgba(0,0,0,.45)}
+}
+.spot,.route{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.gsCard{transition:transform .25s ease,box-shadow .25s ease}
+.mod h2{position:relative;padding-bottom:5px}
+.mod h2::after{content:'';position:absolute;left:0;bottom:0;width:42px;height:2px;border-radius:2px;background:linear-gradient(90deg,#e6c887,rgba(230,200,135,0))}
+.ldLogo{font-size:34px;font-weight:800;letter-spacing:.14em;text-align:center;background:linear-gradient(100deg,#f7e7bd 20%,#e6c887 42%,#fff6da 50%,#e6c887 58%,#f7e7bd 80%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:brandShine 2.6s linear infinite}
+.ldRing{width:52px;height:52px;margin:16px auto 6px;border-radius:50%;border:2px solid rgba(230,200,135,.16);border-top-color:#e6c887;animation:ldSpin 1s linear infinite;position:relative}
+.ldRing::after{content:'';position:absolute;top:-4px;left:50%;width:7px;height:7px;margin-left:-3.5px;border-radius:50%;background:#ffe9b0;box-shadow:0 0 10px #e6c887}
+@keyframes ldSpin{to{transform:rotate(360deg)}}
+.ldBar{height:6px;border-radius:99px;background:rgba(255,255,255,.10);overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.5)}
+#ldFill{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#b08d4f,#e6c887,#ffe9b0);background-size:160% 100%;animation:ldShimmer 1.4s linear infinite;transition:width .3s ease}
+@keyframes ldShimmer{to{background-position:-160% 0}}
+.car img.kb{animation:kbZoom 6.5s ease-out forwards}
+@keyframes kbZoom{from{transform:scale(1.09)}to{transform:scale(1)}}
+#info.popIn{animation:popIn .38s cubic-bezier(.2,1.4,.4,1)}
+@keyframes popIn{from{opacity:.35;transform:translateY(16px) scale(.985)}to{opacity:1;transform:none}}
+#statusbar{overflow:hidden}
+#statusbar::after{content:'';position:absolute;top:0;left:-70%;width:45%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.13),transparent);transform:skewX(-20deg);animation:sbSheen 5.5s ease-in-out infinite;pointer-events:none}
+@keyframes sbSheen{0%,55%{left:-70%}85%,100%{left:135%}}
+
+/* ==== UI pack 2: card redesign + sheet backdrop ==== */
+#sheetShade{position:fixed;inset:0;background:rgba(3,6,12,.48);opacity:0;pointer-events:none;transition:opacity .4s ease;z-index:9}
+#sheetShade.on{opacity:1;pointer-events:auto}
+#info.draging{transition:none!important}
+#info{border:1px solid rgba(230,200,135,.30);box-shadow:0 24px 60px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.08)}
+.car::after{content:'';position:absolute;left:0;right:0;bottom:0;height:66px;background:linear-gradient(transparent,rgba(4,8,16,.55));pointer-events:none;z-index:1}
+.carBtn,.carDots{z-index:2}
+.carDots i{transition:width .25s ease,background .25s ease}
+.carDots i.on{width:16px;border-radius:99px;background:#e6c887}
+.gtab{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.10);color:#e8eef7}
+.gtab.on{background:linear-gradient(135deg,#f0d79a,#dfba6f);color:#23180a;border-color:rgba(230,200,135,.8);box-shadow:0 2px 10px rgba(230,200,135,.35)}
+.actions .actbtn:first-child{background:linear-gradient(135deg,#f0d79a,#dfba6f);color:#23180a;border-color:rgba(230,200,135,.85);font-weight:700}
+#infoBody h3{font-size:20px;letter-spacing:.02em}
+.facts{font-size:12.5px;color:rgba(255,255,255,.78);line-height:1.6}
+
+/* ==== UI pack 3: card redesign — hero title, info chips, frosted controls ==== */
+#info{background:linear-gradient(165deg,rgba(17,25,42,.93),rgba(8,13,24,.96));border:1px solid rgba(230,200,135,.25);border-radius:20px;box-shadow:0 26px 64px rgba(0,0,0,.58),inset 0 1px 0 rgba(255,255,255,.09)}
+.car{border-radius:20px 20px 0 0}
+.car::after{height:104px;background:linear-gradient(transparent,rgba(4,8,16,.38) 55%,rgba(4,8,16,.72))}
+.carTitle{position:absolute;left:14px;bottom:25px;z-index:3;max-width:74%;pointer-events:none}
+.carTitle h3{margin:0;font-size:22px;font-weight:800;letter-spacing:.02em;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.65);line-height:1.25}
+.carDots{left:14px;bottom:10px}
+.carCnt{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);background:rgba(6,12,24,.5);border:1px solid rgba(255,255,255,.14)}
+#infoClose{top:10px;right:10px;width:32px;height:32px;background:rgba(7,11,20,.45);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.16);color:#fff;font-size:15px;text-shadow:none;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+.facts.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.chip{padding:3px 9px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);font-size:11.5px;color:rgba(255,255,255,.88);line-height:1.5}
+.bestTag{margin-top:9px}
+.wxLine{margin-top:8px}
+.car img{height:204px}
+#sheetHandle i{width:36px;height:4px;background:rgba(255,255,255,.32);box-shadow:none}
+#sheetChev{font-size:11px}
+#sheetPeek{gap:12px}
+#sheetPeek img{width:54px;height:54px;border-radius:12px;border:1px solid rgba(230,200,135,.35);box-shadow:0 4px 12px rgba(0,0,0,.4)}
+.pkName{font-size:16.5px;letter-spacing:.01em}
+.pkHint{align-self:center;padding:4px 9px;border-radius:999px;background:rgba(230,200,135,.10);border:1px solid rgba(230,200,135,.28);font-size:11px;white-space:nowrap}
+@media(max-width:760px){.car img{height:164px}.carTitle h3{font-size:20px}}
+
+/* ==== pack 3b: stronger spotlight + brand gradient (smoke-test feedback) ==== */
+@media(hover:hover){.mod::before{background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%),rgba(230,200,135,.17),transparent 65%)}}
+header h1{background:linear-gradient(100deg,#e9cf8f 15%,#caa25e 38%,#fff3cf 50%,#caa25e 62%,#e9cf8f 85%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text}
+
+/* ==== pack 4: sheet spring + drag zones ==== */
+#info{transition:max-height .5s cubic-bezier(.30,1.04,.30,1),transform .5s cubic-bezier(.30,1.04,.30,1)}
+#sheetPeek{touch-action:none}
+.car{touch-action:none}
+#infoBody{overscroll-behavior:contain}
+
+/* ==== pack 5: add/remove — peek actions, segments, less clutter ==== */
+#sheetLbl{display:none}
+.pkTx{flex:1;min-width:0}
+.pkActs{display:flex;gap:8px;margin-left:auto;align-items:center;flex:none}
+.pkBtn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:#e6c887;font-size:16px;text-decoration:none;cursor:pointer;padding:0}
+.pkBtn.on{color:#ffd76a;border-color:rgba(230,200,135,.65);background:rgba(230,200,135,.12)}
+.carDots i{width:16px;height:3px;border-radius:99px;background:rgba(255,255,255,.35)}
+.carDots i.on{width:22px;background:#e6c887}
+.carCnt{display:none}
+
+/* day-sky legibility for floating texts */
+header .sub, #hint{ text-shadow:0 1px 3px rgba(5,10,20,.65), 0 0 10px rgba(5,10,20,.45); }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+</head>
+<body>
+<div id="loading"><div class="ldBox"><div class="ldLogo" id="ldLogo">云游东京</div><div class="ldRing"></div><div class="ldBar"><i id="ldFill"></i></div><div class="ldTxt" id="ldTxt">正在加载 3D 东京…</div></div></div>
+<div id="wToast"><div class="wtT" id="wtTitle"></div><div class="wtB" id="wtBody"></div><button id="wtClose" aria-label="关闭">×</button><i class="wtBar"><i id="wtFill"></i></i></div>
+<div id="scene"></div>
+<header>
+  <div><h1 id="brandEl">云游东京</h1><p id="subEl">东京轮廓地图 · 相似造型的立体景点 · 成田 / 羽田机场路线（距离为示意压缩，时间与票价为参考值）</p></div>
+  <div class="btns"><select id="langSel" aria-label="Language"><option value="zh">中文</option><option value="ja">日本語</option><option value="en">English</option><option value="ko">한국어</option><option value="hi">हिन्दी</option></select><button id="menuBtn">菜单</button><button id="homeBtn">全景</button><button id="rotateBtn" class="active">自动旋转</button><button id="nightBtn">环境：白天</button><button id="wxModeBtn">天气：实时</button><button id="groundBtn">地面：地图</button><button id="cardBtn">📮 明信片</button><button id="bgmBtn">🎵 音乐：关</button></div>
+</header>
+<aside id="panel"><button id="panelClose" aria-label="关闭菜单">×</button>
+  <div class="pScroll"><section class="mod" id="setMod"><h2 id="hSetT">设置</h2><div class="setGrid" id="setGrid"></div></section>
+  <section class="mod"><h2 id="hWxT">实时天气 · 东京</h2><div id="wxBody">正在获取天气…</div><div id="wxHomeLine"></div></section>
+  <section class="mod"><h2 id="hSearchT">搜索</h2><input id="search" type="text" placeholder="搜索景点，如：迪士尼 / 银座"></section>
+  <section class="mod"><h2 id="hSpotsT">景点介绍</h2><button id="favOnly" class="chip">只看收藏 ★</button><div id="spots"></div></section>
+  <section class="mod"><h2 id="hToursT">精选玩法</h2><button id="daytripBtn" class="route"><b>东京经典一日游</b>：浅草 → 晴空塔 → 上野 → 秋叶原 → 东京站 → 银座 → 东京塔 → 涩谷<small>开始播放：镜头逐站飞行导览</small></button><button class="route" data-tour="trendy"><b>东京潮流之旅</b>：原宿 → 涩谷 → 六本木 → 台场 → 丰洲<small>开始播放</small></button><button class="route" data-tour="night"><b>东京夜景之旅</b>：东京站 → 银座 → 东京塔 → 六本木 → 涩谷<small>开始播放（自动切换夜晚）</small></button><button class="route" data-tour="culture"><b>东京文化之旅</b>：浅草 → 上野 → 东京大学 → 皇居 → 明治神宫<small>开始播放</small></button><p class="about" id="discEl">路线与机场线路均为示意：地图距离经过压缩，仅用于可视化，不能作为实际导航距离；时间与票价为参考值。</p></section>
+  <section class="mod"><h2 id="hGsT">御朱印护照</h2><p class="about" id="gsProg">已收集 0/24</p><button id="gsOpen" class="route"><b id="gsOpenB">打开护照</b><small id="gsOpenS">打开景点卡点「盖御朱印」，集齐 24 处朱印</small></button></section>
+  <section class="mod"><h2 id="hAreasT">区域聚焦</h2><div class="areaBtns" id="areaBtns"></div></section>
+  <section class="mod"><h2 id="hAboutT">关于云游东京</h2><p class="about" id="visitLine"></p><p class="about" id="aboutEl">真实地图与建筑数据来自 OpenStreetMap：市中心 14,000 栋建筑按真实轮廓生成，景点周边只保留高楼地标。景点照片来自 Wikimedia Commons，作者与授权标注在介绍卡内。<br>地图 © OpenStreetMap contributors<br>卫星影像 © Esri, Maxar, Earthstar Geographics<br>天空：three.js 官网示例 Sky</p></section></div></aside>
+<div id="flashFx"></div>
+<div id="statusbar"><span id="sbClock">东京 --:--</span><span id="sbWx"></span><span id="sbMode">白天</span></div><div id="tourbar"></div>
+<div id="pcModal"><div class="pcBox"><img id="pcImg" alt="postcard"><div class="pcRow"><a id="pcSave" download="tokyo-postcard.png">保存图片</a><button id="pcClose" aria-label="close">×</button></div><p id="pcHint">也可以长按图片保存到相册</p></div></div>
+<div id="gsModal"><div class="gsBox"><div class="gsHead"><h3 id="gsTitle">御朱印护照</h3><button id="gsClose" aria-label="close">×</button></div><p class="gsSub" id="gsSub"></p><div class="gsGrid" id="gsGrid"></div></div></div>
+<div id="gsEdit"><div class="geBox"><div id="gsEditStamp"></div><input id="gsNoteIn" maxlength="24" autocomplete="off"><div class="geRow"><button id="gsSaveBtn">保存</button><button id="gsDelBtn">删除这枚章</button></div><button id="gsEditClose" aria-label="close">✕</button></div></div>
+<div id="sheetShade"></div><section id="info"><div id="sheetHandle"><span id="sheetChev">⌃</span><i></i><span id="sheetLbl"></span></div><div id="sheetPeek"></div><button id="sheetToggle" aria-label="收起或展开详情">⌄ 收起</button><button id="infoClose" aria-label="关闭">×</button><div id="stampFx"></div><div id="infoBody"><h3>欢迎云游东京</h3><p>拖动旋转、滚轮缩放。点击地图上的立体景点查看介绍，地图上彩色的发光线路是机场进城的推荐走法，线路上的光点是列车前进的方向。</p><div class="meta">成田机场距离已压缩显示，否则市中心景点会小得看不清。</div></div></section>
+<div id="bldgStatus">正在加载真实建筑数据…</div>
+<div id="hint">拖动旋转 · 滚轮缩放 · 点击景点查看介绍</div>
+
+<script src="i18n_ui.js"></script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { Sky } from 'three/addons/objects/Sky.js';
+import { Water } from 'three/addons/objects/Water.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js';
+
+const container = document.getElementById('scene');
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0xcfe5ef, 240, 640);
+const camera = new THREE.PerspectiveCamera(48, innerWidth/innerHeight, 2, 2000);
+camera.position.set(0, 86, 132);
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, matchMedia('(pointer:coarse)').matches ? 1.6 : 1.75));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.80;
+container.appendChild(renderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.maxPolarAngle = Math.PI*0.46; controls.minDistance = 18; controls.maxDistance = 330; controls.autoRotate = true; controls.autoRotateSpeed = 0.5;
+
+const hemi = new THREE.HemisphereLight(0xcfe4f7, 0xe8d9c0, 0.68); scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xffd9a8, 2.5);
+sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.camera.left=-118; sun.shadow.camera.right=118; sun.shadow.camera.top=118; sun.shadow.camera.bottom=-118; sun.shadow.camera.far=320; sun.shadow.bias=-0.0004;
+scene.add(sun);
+
+// 经纬度投影（Web Mercator，与地图纹理一致）
+const LAT0=35.632, LON0=139.776, PR=20000;
+function merc(lat){ const r=lat*Math.PI/180; return Math.log(Math.tan(r)+1/Math.cos(r)); }
+function proj(lon,lat){ return [ (lon-LON0)*Math.PI/180*PR*Math.cos(LAT0*Math.PI/180), -(merc(lat)-merc(LAT0))*PR ]; }
+function LL(lon,lat){ const a=proj(lon,lat); return [a[0],a[1]]; }
+
+// 官网示例：Sky 天空
+const sky = new Sky(); sky.scale.setScalar(3000); scene.add(sky);
+sky.material.uniforms.turbidity.value=6; sky.material.uniforms.rayleigh.value=1.6;
+sky.material.uniforms.mieCoefficient.value=0.004; sky.material.uniforms.mieDirectionalG.value=0.85;
+const sunVec = new THREE.Vector3();
+let bayWater=null;
+function setSun(elev, azim){
+  const phi=THREE.MathUtils.degToRad(90-elev), theta=THREE.MathUtils.degToRad(azim);
+  sunVec.setFromSphericalCoords(1, phi, theta);
+  sky.material.uniforms.sunPosition.value.copy(sunVec);
+  sun.position.copy(sunVec).multiplyScalar(160);
+  if(bayWater) bayWater.material.uniforms.sunDirection.value.copy(sunVec).normalize();
+}
+setSun(30, 124);
+// 环境反射：天空渐变环境贴图（按时段切换），让玻璃与金属拥有真实光泽
+function makeEnvTexture(kind){
+  const cv=document.createElement('canvas'); cv.width=1024; cv.height=512; const g=cv.getContext('2d');
+  const STOPS={ day:[[0,'#2e5a88'],[0.40,'#7fa8c8'],[0.51,'#d7ecf7'],[0.56,'#93a1a8'],[1,'#4a545c']],
+    dusk:[[0,'#1c2a4d'],[0.38,'#565d8c'],[0.49,'#e8894f'],[0.54,'#8a6252'],[1,'#2c2724']],
+    night:[[0,'#020409'],[0.42,'#0a1526'],[0.51,'#1c2c47'],[0.56,'#0a0e14'],[1,'#03050a']] }[kind];
+  const gr=g.createLinearGradient(0,0,0,512); STOPS.forEach(p=>gr.addColorStop(p[0],p[1])); g.fillStyle=gr; g.fillRect(0,0,1024,512);
+  const bx=350, by=(kind==='day'?214:(kind==='dusk'?246:196)), br=(kind==='day'?150:120);
+  const sg=g.createRadialGradient(bx,by,4,bx,by,br);
+  sg.addColorStop(0, kind==='night'?'rgba(185,205,255,0.5)':(kind==='dusk'?'rgba(255,166,88,0.95)':'rgba(255,243,210,0.95)'));
+  sg.addColorStop(1,'rgba(255,243,210,0)');
+  g.fillStyle=sg; g.fillRect(0,0,1024,512);
+  const t=new THREE.CanvasTexture(cv); t.mapping=THREE.EquirectangularReflectionMapping; t.colorSpace=THREE.SRGBColorSpace; return t;
+}
+const ENV_TEX={day:makeEnvTexture('day'), dusk:makeEnvTexture('dusk'), night:makeEnvTexture('night')};
+scene.environment=ENV_TEX.day;
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const outlinePass = new OutlinePass(new THREE.Vector2(innerWidth, innerHeight), scene, camera);
+outlinePass.edgeStrength = 3.2; outlinePass.edgeGlow = 0.45; outlinePass.edgeThickness = 1.2;
+outlinePass.visibleEdgeColor.set(0xffd166); outlinePass.hiddenEdgeColor.set(0x8a6d1f); outlinePass.pulsePeriod = 2.4;
+composer.addPass(outlinePass);
+const bloomPass = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.25, 0.7, 0.82);
+composer.addPass(bloomPass);
+composer.addPass(new OutputPass());
+if(matchMedia('(pointer:coarse)').matches) bloomPass.enabled=false;
+
+// 基础材质
+import { M, ANIM, RND, label, spots, box, cyl, cone, sph, beam, ring, tor, cnv, std, texMat, glowMat, facadeTex, signTex, hipRoof, tree, pinkTree, treeMat, people, blink , buildCity } from './builders.js';
+
+// 地面：真实 OpenStreetMap 地图纹理（东京真实街区/海岸线）
+// 运行时加载 OpenStreetMap 瓦片拼成真实地图纹理（zoom 13）；瓦片范围与地面边缘严格对齐
+const TZ=13, TN=Math.pow(2,TZ);
+const _lon2x=lon=>(lon+180)/360*TN;
+const _lat2y=lat=>{ const r=lat*Math.PI/180; return (1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*TN; };
+const _x2lon=x=>x/TN*360-180;
+const _y2lat=y=>Math.atan(Math.sinh(Math.PI*(1-2*y/TN)))*180/Math.PI;
+const TX0=Math.floor(_lon2x(139.44)), TX1=Math.floor(_lon2x(140.06));
+const TY0=Math.floor(_lat2y(35.83)), TY1=Math.floor(_lat2y(35.40));
+const MAP_W=_x2lon(TX0), MAP_E=_x2lon(TX1+1), MAP_N=_y2lat(TY0), MAP_S=_y2lat(TY1+1);
+const mapCanvas = document.createElement('canvas');
+mapCanvas.width=(TX1-TX0+1)*256; mapCanvas.height=(TY1-TY0+1)*256;
+let groundMode='map'; try{ const v=localStorage.getItem('tt_ground_v2'); if(v==='map'||v==='sat') groundMode=v; }catch(e){}
+function groundTileUrl(xi, yi){ return groundMode==='sat' ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/'+TZ+'/'+yi+'/'+xi : 'https://tile.openstreetmap.org/'+TZ+'/'+xi+'/'+yi+'.png'; }
+function loadGroundTiles(){
+  const ctx=mapCanvas.getContext('2d');
+  try{ ctx.filter = groundMode==='sat' ? 'saturate(1.24) contrast(1.03) brightness(1.24)' : 'none'; }catch(e){}
+  ctx.fillStyle = groundMode==='sat' ? '#46584a' : '#e8e4d8'; ctx.fillRect(0,0,mapCanvas.width,mapCanvas.height);
+  const totalTiles=(TX1-TX0+1)*(TY1-TY0+1); let loadedTiles=0, lastUp=0; const myMode=groundMode;
+  for(let xi=TX0;xi<=TX1;xi++) for(let yi=TY0;yi<=TY1;yi++){
+    const im=new Image(); im.crossOrigin='anonymous';
+    im.onload=()=>{ if(myMode!==groundMode) return; ctx.drawImage(im,(xi-TX0)*256,(yi-TY0)*256); loadedTiles++; const now=performance.now(); if(now-lastUp>300||loadedTiles>=totalTiles){ lastUp=now; mapTex.needsUpdate=true; } };
+    im.src=groundTileUrl(xi, yi);
+  }
+  mapTex.needsUpdate=true;
+}
+const mapTex = new THREE.CanvasTexture(mapCanvas);
+mapTex.colorSpace = THREE.SRGBColorSpace; mapTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+loadGroundTiles();
+const NW = proj(MAP_W, MAP_N), SE = proj(MAP_E, MAP_S);
+const groundMat = new THREE.MeshStandardMaterial({map:mapTex, roughness:1, vertexColors:true, polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2, envMapIntensity:0.25, emissive:0xffffff, emissiveMap:mapTex, emissiveIntensity:0});
+const groundGeo = new THREE.PlaneGeometry(SE[0]-NW[0], SE[1]-NW[1], 30, 30);
+{ const gp=groundGeo.attributes.position, gc=[]; const gw=SE[0]-NW[0], gd=SE[1]-NW[1]; const ec=new THREE.Color(0x8fb6c9), wc=new THREE.Color(0xffffff), tc=new THREE.Color();
+  for(let i=0;i<gp.count;i++){ const u=gp.getX(i)/gw+0.5, v=gp.getY(i)/gd+0.5; const de=Math.min(u,1-u,v,1-v); let t=de/0.10; t=t<0?0:(t>1?1:t); t=t*t*(3-2*t); tc.copy(ec).lerp(wc,t); gc.push(tc.r,tc.g,tc.b); }
+  groundGeo.setAttribute('color', new THREE.Float32BufferAttribute(gc,3)); }
+const ground = new THREE.Mesh(groundGeo, groundMat);
+ground.rotation.x = -Math.PI/2; ground.position.set((NW[0]+SE[0])/2, 0, (NW[1]+SE[1])/2); ground.receiveShadow = true; scene.add(ground);
+
+// 大地图外围：整片海面底（径向渐变，远处融进雾与天空）
+const seaCnv=document.createElement('canvas'); seaCnv.width=seaCnv.height=512;
+{ const c2=seaCnv.getContext('2d'); const gr=c2.createRadialGradient(256,256,40,256,256,256); gr.addColorStop(0,'#9dc2d4'); gr.addColorStop(0.55,'#7ba7c0'); gr.addColorStop(1,'#4d7594'); c2.fillStyle=gr; c2.fillRect(0,0,512,512); }
+const seaTex=new THREE.CanvasTexture(seaCnv); seaTex.colorSpace=THREE.SRGBColorSpace;
+const seaMat=new THREE.MeshBasicMaterial({map:seaTex, depthWrite:false});
+const sea=new THREE.Mesh(new THREE.CircleGeometry(780, 48), seaMat);
+sea.rotation.x=-Math.PI/2; sea.position.set((NW[0]+SE[0])/2, -0.4, (NW[1]+SE[1])/2); sea.renderOrder=-1; scene.add(sea);
+
+// 东京湾水面已按用户要求移除（原为一块矩形动态水面，与地图贴图的水域颜色不一致）
+setSun(30, 124);
+const bayLabelPos = proj(139.885, 35.565);
+
+// 文字标签
+const LANGS=['zh','ja','en','ko','hi'];
+let LANG='zh'; try{ const _l=localStorage.getItem('tt_lang'); if(_l&&LANGS.indexOf(_l)>=0) LANG=_l; }catch(e){}
+const LOCALES={zh:'zh-CN',ja:'ja-JP',en:'en-GB',ko:'ko-KR',hi:'hi-IN'};
+function T(k){ const U=window.I18NUI; if(!U||!U.str) return k; const d=U.str[LANG]||U.str.zh; return (k in d)?d[k]:(U.str.zh[k]!==undefined?U.str.zh[k]:k); }
+function sName(s){ const U=window.I18NUI; if(!U||LANG==='zh'||!s) return s?s.name:''; return (U.names[LANG]&&U.names[LANG][s.id])||s.name; }
+function namesOf(s){ const U=window.I18NUI; const arr=[s.name, s.id]; if(U&&U.names) LANGS.forEach(l=>{ if(U.names[l]&&U.names[l][s.id]) arr.push(U.names[l][s.id]); }); return arr.join(' '); }
+let CONTENT={};
+function locInf(id){ const b=INFO[id]; if(!b) return null; if(LANG==='zh') return b; const c=CONTENT[id]; if(!c) return b; return Object.assign({}, b, {facts:c.facts||b.facts, hist:c.hist||b.hist, now:c.now||b.now, details:(c.details&&c.details.length?c.details:b.details)}); }
+function locMeta(id){ if(LANG!=='zh'&&CONTENT[id]&&CONTENT[id].meta) return CONTENT[id].meta; return META[id]; }
+function locDesc(s){ if(LANG!=='zh'&&CONTENT[s.id]&&CONTENT[s.id].desc) return CONTENT[s.id].desc; return s.desc; }
+async function ensureContent(){ if(LANG==='zh'){ CONTENT={}; return; } if(CONTENT.__lang===LANG) return; try{ const files=(LANG==='hi')?['info_hi_1.json','info_hi_2.json']:['info_'+LANG+'.json']; const j={}; for(const f of files){ const r=await fetch(f); Object.assign(j, await r.json()); } j.__lang=LANG; CONTENT=j; }catch(e){ CONTENT={__lang:LANG}; } }
+const GEO={dome:[139.7516,35.7056],stadium:[139.7145,35.6777],skytree:[139.811,35.710], sensoji:[139.797,35.715], tower:[139.745,35.659], shibuya:[139.701,35.659], shinjuku:[139.700,35.690], akiba:[139.771,35.698], ueno:[139.774,35.714], palace:[139.753,35.686], tokyost:[139.767,35.681], meiji:[139.699,35.676], odaiba:[139.774,35.627], roppongi:[139.729,35.660], ikebukuro:[139.711,35.729], shinagawa:[139.739,35.628], ginza:[139.764,35.672], harajuku:[139.703,35.671], toyosu:[139.790,35.646], disney:[139.880,35.632], toudai:[139.762,35.7128], waseda:[139.7192,35.709], fuji:[138.7274,35.3608], kamakura:[139.5033,35.3071]};
+const OFF={ginza:[1.8,2.8], tokyost:[2.4,-0.8], palace:[-3,-1.4], tower:[-1.4,2.6], sensoji:[1.2,1.6], ueno:[-1.6,0.6], akiba:[1,2], harajuku:[2,1.8], meiji:[-1.2,0], odaiba:[0,1.6], toyosu:[1.2,1.2], skytree:[1.6,0], toudai:[-6.5,0], waseda:[-6.5,0], fuji:[226,-82], kamakura:[21.4,-85.3]};
+spots.forEach(sp=>{ const a=proj(GEO[sp.id][0], GEO[sp.id][1]); const o=OFF[sp.id]||[0,0]; sp.x=a[0]+o[0]; sp.z=a[1]+o[1]; });
+const pickables=[];
+const SPOT_GROUPS={};
+spots.forEach(s=>{
+  const g=new THREE.Group(); g.position.set(s.x,0,s.z); g.scale.setScalar((s.id==='disney'||s.id==='sensoji'||s.id==='fuji'||s.id==='kamakura')?0.68:0.59);
+  const inner=new THREE.Group(); s.make(inner); g.add(inner); g.userData.inner=inner;
+  const lb=label(sName(s), 0.95); lb.position.y=s.h+2; g.add(lb); g.userData.labelSprite=lb;
+  g.userData.spot=s; g.traverse(o=>{o.userData.spot=s;}); scene.add(g); pickables.push(g); SPOT_GROUPS[s.id]=g;
+});
+
+// 景点防重叠：按每个景点模型的实际包围盒做分离松弛——位置仍以真实坐标为锚点，
+// 互相让开（单点最大位移 14 个世界单位，2026-11-06 应用户要求拉开间距），富士山为示意点不参与
+(function(){
+  const items=[];
+  spots.forEach(sp=>{ if(sp.id==='fuji'||sp.id==='kamakura') return; const g=SPOT_GROUPS[sp.id]; if(!g) return;
+    g.updateMatrixWorld(true); const bb=new THREE.Box3();
+    g.traverse(o=>{ if(o.isMesh){ const mb=new THREE.Box3().setFromObject(o); if(!mb.isEmpty()) bb.union(mb); } });
+    if(bb.isEmpty()) return;
+    items.push({sp, g, ox:(bb.min.x+bb.max.x)/2-sp.x, oz:(bb.min.z+bb.max.z)/2-sp.z, hx:(bb.max.x-bb.min.x)/2, hz:(bb.max.z-bb.min.z)/2, x0:sp.x, z0:sp.z});
+  });
+  const MARGIN=2.4;
+  for(let it=0; it<260; it++){
+    for(let i=0;i<items.length;i++) for(let j=i+1;j<items.length;j++){
+      const A=items[i], B=items[j];
+      const dx=(B.sp.x+B.ox)-(A.sp.x+A.ox), dz=(B.sp.z+B.oz)-(A.sp.z+A.oz);
+      const px=(A.hx+B.hx)-Math.abs(dx), pz=(A.hz+B.hz)-Math.abs(dz);
+      if(px>0 && pz>0){
+        if(px<pz){ const mv=(px+MARGIN)/2, sg=dx>=0?1:-1; A.sp.x-=mv*sg; B.sp.x+=mv*sg; }
+        else { const mv=(pz+MARGIN)/2, sg=dz>=0?1:-1; A.sp.z-=mv*sg; B.sp.z+=mv*sg; }
+      }
+    }
+    items.forEach(A=>{ A.sp.x+=(A.x0-A.sp.x)*0.009; A.sp.z+=(A.z0-A.sp.z)*0.009;
+      const dx=A.sp.x-A.x0, dz=A.sp.z-A.z0, L=Math.hypot(dx,dz); if(L>14){ A.sp.x=A.x0+dx/L*14; A.sp.z=A.z0+dz/L*14; } });
+  }
+  items.forEach(A=>{ A.g.position.set(A.sp.x, 0, A.sp.z); });
+})();
+
+// 东京塔：程序化镂空钢塔（builders_src.js 自建格构；早期的 cbaus FBX 模型渲染效果不佳，已于 2026-11-05 移除）
+const TOWER_MATS=[];
+function applyTowerNight(){ TOWER_MATS.forEach(m=>{ if(m.emissive){ m.emissive.setHex(night?0xa84800:0x000000); if('emissiveIntensity' in m) m.emissiveIntensity = night?1.15:1.0; } }); if(window.towerLight) towerLight.intensity = night?340:0; }
+if(!window.towerLight){ const pl=new THREE.PointLight(0xff7a26, 0, 62, 1.6); pl.position.set(0,9.5,0); SPOT_GROUPS['tower'].add(pl); window.towerLight=pl; }
+// 东京塔周边环境（芝公园绿化 + 增上寺 + 附属楼）：挂在景点组上，不随 FBX 换入被清除
+(function(){ const tg=SPOT_GROUPS['tower']; if(!tg) return; const env=new THREE.Group();
+  env.add(box(12.5,0.07,10.5, std({color:0x77a75c,roughness:1}), 0.4,0.035,0.8));
+  env.add(tree(4.6,3.6,1.0)); env.add(tree(-4.8,3.2,0.9)); env.add(tree(-5.2,-2.6,1.05)); env.add(tree(5.4,-1.8,0.85)); env.add(tree(-3.4,5.2,0.8)); env.add(tree(3.2,5.6,0.9,pinkTree)); env.add(tree(6.1,2.2,0.8));
+  const zj=new THREE.Group(); zj.position.set(6.4,0,-4.6); zj.rotation.y=-0.5; env.add(zj);
+  [-1.5,1.5].forEach(x=>zj.add(cyl(0.26,0.3,2.6,M.red,x,0,10)));
+  zj.add(box(4.6,0.9,1.6, std({color:0x8a4a34,roughness:0.9}), 0,2.2,0));
+  zj.add(hipRoof(5.2,0.9,2.4, std({color:0x4a4f55,roughness:0.9}), 0,2.62,0));
+  zj.add(box(1.1,0.9,0.12, glowMat(signTex('増上寺','#1f2937','#fbbf24',false)), 0,1.7,0.86));
+  env.add(box(3.6,1.3,2.6, std({color:0xddd6c6,roughness:0.95}), -5.6,0.65,4.6));
+  env.add(box(3.7,0.4,0.08, new THREE.MeshBasicMaterial({color:0x9fc6dd}), -5.6,0.85,5.92));
+  people(env, 6, -2.5, 2.5, 2.8, 4.4, 0.07);
+  env.traverse(o=>{ o.userData.spot=tg.userData.spot; });
+  tg.add(env);
+})();
+
+// 机场
+function makePlane(){
+  const g=new THREE.Group();
+  const fus=new THREE.Mesh(new THREE.CylinderGeometry(0.34,0.34,3.6,12), M.white); fus.rotation.z=Math.PI/2; fus.position.y=0.75; g.add(fus);
+  const nose=cone(0.34,0.9,M.white,2.2,0,12); nose.rotation.z=-Math.PI/2; nose.position.set(2.2,0.75,0); g.add(nose);
+  g.add(box(1,0.09,3.1,M.blue,0,0.72,0));
+  g.add(box(0.7,0.85,0.12,M.blue,-1.7,1.25,0));
+  g.add(box(0.55,0.09,1.3,M.blue,-1.75,0.8,0));
+  return g;
+}
+function airport(x,z,name,code){
+  const g=new THREE.Group(); g.position.set(x,0,z); g.scale.setScalar(0.85);
+  g.add(box(14,0.35,5.4,M.dark,0,0.18,0));
+  for(let i=-2;i<=2;i++) g.add(box(0.7,0.38,4.6,M.white,i*2.5,0.2,0));
+  g.add(box(6.4,2.1,3,M.white,-4.6,1.05,5)); g.add(box(6.5,0.9,0.25,new THREE.MeshBasicMaterial({color:0x7dd3fc}),-4.6,1.35,6.55));
+  g.add(box(3.4,1.6,2.4,M.grey,3.6,0.8,5.1));
+  const tw=cyl(0.42,0.62,4.6,M.white,6,4.8); g.add(tw);
+  const cab=cyl(0.85,0.7,0.8,M.dark,6,4.8); cab.position.y=4.9; g.add(cab);
+  const plane=makePlane(); plane.position.set(0.6,0.25,-0.1); plane.rotation.y=0.06; g.add(plane);
+  const plane2=makePlane(); plane2.position.set(-3.6,0.25,-0.7); plane2.rotation.y=-0.55; plane2.scale.setScalar(0.78); g.add(plane2);
+  g.add(box(2.4,1,0.5,M.grey,-3.1,0.95,3.2)); g.add(box(0.5,0.8,1.8,M.grey,-2,0.75,4.1));
+  g.add(box(4.6,1.5,2.2,M.white,4.6,0.75,5.2)); g.add(box(4.7,0.7,0.22,new THREE.MeshBasicMaterial({color:0x93c5fd}),4.6,1,6.35));
+  const lb=label(name+' '+code, 1.15, '#7c2d12'); lb.position.y=7.4; g.add(lb);
+  g.userData.spot={id:code.toLowerCase(), x:x, z:z, name:name+'机场', desc:code==='NRT'?'位于千叶县成田市，距市中心约 60 公里（地图已压缩）。进城首选 Skyliner、成田特快 NEX 或 Access 特快。':'位于东京湾边，距市中心约 15 公里。京急线或单轨电车 15 分钟左右就能进城，是离市区最近的机场。'};
+  g.traverse(o=>{o.userData.spot=g.userData.spot;}); scene.add(g); pickables.push(g); return g;
+}
+const HNDP=proj(139.780, 35.549); airport(HNDP[0], HNDP[1], '羽田', 'HND');
+airport(58, -44, '成田', 'NRT');
+
+// 路线数据（站点为真实经纬度，成田为示意起点）
+const NRTW=[58,-44];
+const routes=[
+ {name:'京成 Skyliner', from:'成田机场', to:'上野 · 日暮里', time:'到上野约 41 分钟', fare:'参考票价约 ¥2,520', color:0x2563eb, pts:[NRTW, LL(139.95,35.75), LL(139.858,35.745), LL(139.774,35.714)]},
+ {name:'成田特快 N’EX', from:'成田机场', to:'东京站 · 新宿 · 涩谷', time:'到东京站约 53 分钟，到新宿约 80 分钟', fare:'参考票价约 ¥3,070 起', color:0xdc2626, pts:[NRTW, LL(139.90,35.70), LL(139.767,35.681), LL(139.739,35.628), LL(139.701,35.659), LL(139.700,35.690)]},
+ {name:'Access 特快', from:'成田机场', to:'浅草 · 日本桥', time:'到浅草约 58 分钟', fare:'参考票价约 ¥1,270', color:0x059669, pts:[NRTW, LL(139.90,35.76), LL(139.813,35.710), LL(139.797,35.711)]},
+ {name:'京急线', from:'羽田机场', to:'品川 · 浅草', time:'到品川约 11 分钟，到浅草约 32 分钟', fare:'参考票价约 ¥300–¥560', color:0x7c3aed, pts:[LL(139.780,35.549), LL(139.739,35.628), LL(139.741,35.638), LL(139.767,35.664), LL(139.797,35.711)]},
+ {name:'东京单轨电车', from:'羽田机场', to:'滨松町 · 东京站', time:'到滨松町约 13 分钟，换山手线到东京站约 20 分钟', fare:'参考票价约 ¥500', color:0xea580c, pts:[LL(139.780,35.549), LL(139.757,35.655), LL(139.767,35.681)]},
+ {name:'机场巴士', from:'羽田机场', to:'新宿 · 池袋', time:'到新宿约 35–55 分钟（视路况）', fare:'参考票价约 ¥1,300', color:0x0891b2, pts:[LL(139.780,35.549), LL(139.72,35.60), LL(139.700,35.690), LL(139.711,35.729)]},
+ {name:'JR 山手线（环线）', from:'池袋', to:'新宿 · 涩谷 · 品川 · 东京 · 上野 一圈', time:'绕一圈约 60 分钟，班次约 3–4 分钟一班', fare:'参考票价约 ¥150 起（按距离计价）', color:0x65a30d, pts:[LL(139.711,35.729), LL(139.700,35.690), LL(139.701,35.659), LL(139.739,35.628), LL(139.757,35.655), LL(139.767,35.681), LL(139.771,35.698), LL(139.774,35.714), LL(139.711,35.729)]},
+];
+const routeObjs=[];
+routes.forEach((r,idx)=>{
+  const pts=r.pts.map(p=>new THREE.Vector3(p[0],0,p[1]));
+  const mid=[]; for(let i=0;i<pts.length-1;i++){ const a=pts[i],b=pts[i+1]; mid.push(a); mid.push(a.clone().lerp(b,0.5).setY(3.2)); } mid.push(pts[pts.length-1]);
+  const curve=new THREE.CatmullRomCurve3(mid);
+  const mat=new THREE.MeshBasicMaterial({color:r.color, transparent:true, opacity:0.28});
+  const tube=new THREE.Mesh(new THREE.TubeGeometry(curve,80,0.22,8), mat); scene.add(tube);
+  const dot=new THREE.Mesh(new THREE.SphereGeometry(0.85,16,16), new THREE.MeshBasicMaterial({color:r.color})); scene.add(dot);
+  r.pts.forEach(p=>{ const st=new THREE.Mesh(new THREE.SphereGeometry(0.38,10,10), new THREE.MeshBasicMaterial({color:r.color})); st.position.set(p[0],0.8,p[1]); scene.add(st); });
+  routeObjs.push({curve,mat,dot,offset:idx*0.17});
+});
+const spotsEl=document.getElementById('spots');
+spots.forEach(s=>{ const b=document.createElement('button'); b.className='spot'; b.dataset.sid=s.id; b.textContent=sName(s); b.dataset.names=namesOf(s); b.onclick=()=>{ selectGroup(SPOT_GROUPS[s.id]); showInfo(s); if(innerWidth<=760) document.getElementById('panel').classList.add('hidden'); }; spotsEl.appendChild(b); });
+
+const infoEl=document.getElementById('info');
+const infoBody=document.getElementById('infoBody');
+document.getElementById('infoClose').onclick=()=>{ infoEl.style.display='none'; const sh2=document.getElementById('sheetShade'); if(sh2) sh2.classList.remove('on'); clearStampFx(); stopCar(); ambSet('off'); clearSelection(); window.__cur={type:'welcome'}; const tb=document.getElementById('tourbar'); if(tb) tb.style.bottom=''; };
+let INFO={};
+Promise.all([fetch('info.json').then(r=>r.json()).catch(()=>({})), fetch('info2.json').then(r=>r.json()).catch(()=>({}))]).then(([ia,ib])=>{ INFO=Object.assign({}, ia, ib); if(typeof renderGoshuin==='function') renderGoshuin(); });const META={dome:['水道桥站 / 后乐园站','建议停留 2–3 小时'], stadium:['国立竞技场站 / 千駄ヶ谷站','建议停留 1.5 小时'], 
+ skytree:['押上站（晴空塔站）','建议停留 1.5–2 小时'], sensoji:['浅草站','建议停留 2–3 小时'], tower:['赤羽桥站 / 大门站','建议停留 1.5 小时'],
+ shibuya:['涩谷站','建议停留 2 小时'], shinjuku:['新宿站','建议停留半天'], akiba:['秋叶原站','建议停留 2–3 小时'],
+ ueno:['上野站','建议停留半天'], palace:['东京站 / 二重桥前站','建议停留 1.5 小时'], tokyost:['东京站','建议停留 1 小时'],
+ meiji:['原宿站 / 明治神宫前站','建议停留 1.5 小时'], odaiba:['台场站','建议停留半天'], roppongi:['六本木站','建议停留 2–3 小时'],
+ ikebukuro:['池袋站','建议停留 2–3 小时'], shinagawa:['品川站','建议停留 1 小时'], ginza:['银座站','建议停留 2–3 小时'],
+ harajuku:['原宿站','建议停留 2 小时'], toyosu:['丰洲站','建议停留 2 小时（注意休市日）'], disney:['舞滨站（京叶线）','建议停留一整天'],
+ toudai:['本乡三丁目站 / 东大前站','建议停留 1–1.5 小时'], waseda:['早稻田站（东西线）','建议停留 1–1.5 小时'], fuji:['河口湖站（富士急行线）','看山建议一整天 · 登山需 2 天'], kamakura:['镰仓高校前站（江之岛电铁）','打卡建议 0.5–1 小时 · 联游镰仓/江之岛一整天'],
+ hnd:['京急线 / 东京单轨电车','国际航班建议提前 2–3 小时到达'], nrt:['Skyliner / N’EX / Access 特快','国际航班建议提前 3 小时到达']};
+let camAnim=null;
+function flyTo(tx,tz,dist=30,h=22){ setAutoRotate(false); const toP=new THREE.Vector3(tx+dist*0.55,h,tz+dist*0.85), toT=new THREE.Vector3(tx,2,tz);
+  if(window.gsap){ camAnim=null; gsap.killTweensOf(camera.position); gsap.killTweensOf(controls.target);
+    gsap.to(camera.position,{x:toP.x,y:toP.y,z:toP.z,duration:1.6,ease:'power3.inOut'});
+    gsap.to(controls.target,{x:toT.x,y:toT.y,z:toT.z,duration:1.6,ease:'power3.inOut'}); }
+  else camAnim={t:0,fromP:camera.position.clone(),fromT:controls.target.clone(),toP:toP,toT:toT}; }
+function flyHome(){ setAutoRotate(false);
+  if(window.gsap){ camAnim=null; gsap.killTweensOf(camera.position); gsap.killTweensOf(controls.target);
+    gsap.to(camera.position,{x:0,y:86,z:132,duration:1.6,ease:'power3.inOut'});
+    gsap.to(controls.target,{x:0,y:0,z:0,duration:1.6,ease:'power3.inOut'}); }
+  else camAnim={ t:0, fromP:camera.position.clone(), fromT:controls.target.clone(), toP:new THREE.Vector3(0, 86, 132), toT:new THREE.Vector3(0, 0, 0) }; }
+function rootOf(o){ while(o && pickables.indexOf(o)<0) o=o.parent; return o; }
+function selectGroup(o){ const r=o?rootOf(o):null; outlinePass.selectedObjects = r?[r]:[]; }
+function clearSelection(){ outlinePass.selectedObjects=[]; }
+function setAutoRotate(v){ controls.autoRotate=v; document.getElementById('rotateBtn').classList.toggle('active', v); }
+const WXMAP={0:['☀️',0],1:['🌤️',1],2:['⛅',1],3:['☁️',2],45:['🌫️',3],48:['🌫️',3],51:['🌦️',4],53:['🌦️',4],55:['🌦️',4],56:['🌧️',5],57:['🌧️',5],61:['🌧️',6],63:['🌧️',7],65:['🌧️',8],66:['🌧️',5],67:['🌧️',5],71:['❄️',9],73:['❄️',10],75:['❄️',11],77:['❄️',12],80:['🌦️',13],81:['🌦️',13],82:['🌧️',14],85:['❄️',15],86:['❄️',15],95:['⛈️',16],96:['⛈️',16],99:['⛈️',16]};
+function wxOf(code){ const w=WXMAP[code]; if(!w) return ['🌡️','—']; const conds=T('wxCond'); return [w[0], (conds&&conds[w[1]])||'—']; }
+const WXGEO=Object.assign({}, GEO, {hnd:[139.780,35.549], nrt:[140.386,35.772]});
+const wxCache={};
+async function spotWx(s){ const el=document.getElementById('wxLine'); if(!el) return; const gpos=WXGEO[s.id]; if(!gpos){ el.textContent=''; return; } el.dataset.sid=s.id; el.textContent=T('spotWxLoading');
+  try{ if(!wxCache[s.id]){ const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+gpos[1]+'&longitude='+gpos[0]+'&current=temperature_2m,weather_code&timezone=Asia%2FTokyo'); wxCache[s.id]=await r.json(); }
+    const c=wxCache[s.id].current; const w=wxOf(c.weather_code); const cur=document.getElementById('wxLine'); if(cur&&cur.dataset.sid===s.id) cur.innerHTML=T('localWx')+w[0]+' '+w[1]+' · '+Math.round(c.temperature_2m)+'°C';
+  }catch(e){ const cur=document.getElementById('wxLine'); if(cur&&cur.dataset.sid===s.id) cur.textContent=''; } }
+let precip=null;
+function setSceneWeather(code){ liveWxCode=code; renderWeatherFx(); }
+async function loadWx(){ const el=document.getElementById('wxBody'); if(!el) return;
+  try{ const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude=35.681&longitude=139.767&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&forecast_days=4&timezone=Asia%2FTokyo'); const j=await r.json(); const c=j.current; const w=wxOf(c.weather_code); setSceneWeather(c.weather_code);
+    if(j.daily&&j.daily.sunrise&&j.daily.sunrise[0]&&j.daily.sunset&&j.daily.sunset[0]){ const pm=x=>{ const a=x.substring(11,16).split(':'); return (+a[0])*60+(+a[1]); }; sunTimes={sr:pm(j.daily.sunrise[0]), ss:pm(j.daily.sunset[0])}; if(dpMode==='auto') applyDpMode(); }
+    const days=T('relDays'); let dh=''; for(let i=0;i<4;i++){ const dw=wxOf(j.daily.weather_code[i]); dh+='<div class="wxDay">'+days[i]+'<br>'+dw[0]+'<br>'+Math.round(j.daily.temperature_2m_max[i])+'° / '+Math.round(j.daily.temperature_2m_min[i])+'°</div>'; }
+    const sbWxEl=document.getElementById('sbWx'); if(sbWxEl) sbWxEl.textContent=w[0]+' '+Math.round(c.temperature_2m)+'°C '+w[1];
+    homeWx={t:Math.round(c.temperature_2m), code:c.weather_code}; paintHomeLine();
+    el.innerHTML='<div class="wxNow"><div class="wxIcon">'+w[0]+'</div><div><div class="wxTemp">'+Math.round(c.temperature_2m)+'°C</div><div class="wxMeta">'+w[1]+' · '+T('feels')+' '+Math.round(c.apparent_temperature)+'° · '+T('humidity')+' '+c.relative_humidity_2m+'% · '+T('wind')+' '+Math.round(c.wind_speed_10m)+' km/h</div></div></div><div class="wxDays">'+dh+'</div>';
+  }catch(e){ el.textContent=T('wxFail'); } }
+let homeWx=null;
+function paintHomeLine(){ const el=document.getElementById('wxHomeLine'); if(!el) return; if(!homeWx){ el.textContent=''; return; } const w=wxOf(homeWx.code); const tkDay=new Date(Date.now()+9*3600*1000).getUTCDate(); el.textContent=T('wxLineFmt').replace('{t}',homeWx.t).replace('{c}',w[1]).replace('{col}', T(tkDay%2===0?'skyBlue':'skyPurple')); }
+loadWx();
+const BEST={dome:'night',stadium:'day',skytree:'night',tower:'night',sensoji:'morning',shibuya:'night',shinjuku:'night',akiba:'night',ueno:'day',palace:'day',tokyost:'night',meiji:'morning',odaiba:'sunset',roppongi:'night',ikebukuro:'night',shinagawa:'all',ginza:'night',harajuku:'day',toyosu:'morning',disney:'night',hnd:'all',nrt:'all',toudai:'day',waseda:'day',fuji:'sunset',kamakura:'sunset'};
+const BEST_ICON={night:'🌙',sunset:'🌇',morning:'🌅',day:'☀️',all:'🕐'};
+const GMAPS={dome:'Tokyo Dome',stadium:'Japan National Stadium',skytree:'Tokyo Skytree', sensoji:'Senso-ji Temple Asakusa', tower:'Tokyo Tower', shibuya:'Shibuya Crossing', shinjuku:'Shinjuku Tokyo', akiba:'Akihabara Tokyo', ueno:'Ueno Park Tokyo', palace:'Tokyo Imperial Palace', tokyost:'Tokyo Station', meiji:'Meiji Jingu Shrine', odaiba:'Odaiba Tokyo', roppongi:'Roppongi Hills', ikebukuro:'Sunshine City Ikebukuro', shinagawa:'Shinagawa Station', ginza:'Ginza Tokyo', harajuku:'Takeshita Street Harajuku', toyosu:'Toyosu Market', disney:'Tokyo Disneyland', toudai:'University of Tokyo Hongo Campus', waseda:'Waseda University', fuji:'Mount Fuji Kawaguchiko', kamakura:'Kamakurakokomae Station', hnd:'Haneda Airport', nrt:'Narita International Airport'};
+const STQ={dome:['水道橋駅','後楽園駅'], stadium:['国立競技場駅','千駄ヶ谷駅'], skytree:['押上駅'], sensoji:['浅草駅'], tower:['赤羽橋駅','大門駅'], shibuya:['渋谷駅'], shinjuku:['新宿駅'], akiba:['秋葉原駅'], ueno:['上野駅'], palace:['東京駅','二重橋前駅'], tokyost:['東京駅'], meiji:['原宿駅','明治神宮前駅'], odaiba:['台場駅'], roppongi:['六本木駅'], ikebukuro:['池袋駅'], shinagawa:['品川駅'], ginza:['銀座駅'], harajuku:['原宿駅'], toyosu:['豊洲駅'], disney:['舞浜駅'], toudai:['本郷三丁目駅','東大前駅'], waseda:['早稲田駅'], fuji:['河口湖駅'], kamakura:['鎌倉高校前駅']};
+function metaHtml(s){ const m=locMeta(s.id); if(!m) return '';
+  const wrap=(label,q)=>'<a class="stlink" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q)+'">'+label+'</a>';
+  let linked;
+  if(s.id==='hnd'||s.id==='nrt'){ linked=wrap(m[0], GMAPS[s.id]); }
+  else { const qs=STQ[s.id]||[]; linked=m[0].split(' / ').map((pt,i)=>wrap(pt, qs[i]||pt)).join(' / '); }
+  return '<div class="meta">'+T('nearestStation')+linked+'<br>'+m[1]+'</div>'; }
+let carTimer=null, carList=[], carIdx=0;
+function stopCar(){ if(carTimer){ clearInterval(carTimer); carTimer=null; } }
+function carRender(){ const im=document.getElementById('carImg'); if(!im||!carList.length) return; const it=carList[carIdx]; im.src=it.url; im.classList.remove('kb'); void im.offsetWidth; im.classList.add('kb'); const c=document.getElementById('carCredit'); if(c) c.textContent=T('photoCredit')+it.credit; const cnt=document.getElementById('carCnt'); if(cnt) cnt.textContent=(carIdx+1)+' / '+carList.length; document.querySelectorAll('.carDots i').forEach((d,j)=>d.classList.toggle('on', j===carIdx)); }
+function restartCar(){ stopCar(); if(carList.length>1) carTimer=setInterval(()=>{ carIdx=(carIdx+1)%carList.length; carRender(); }, 3500); }
+function carGo(d){ if(!carList.length) return; carIdx=(carIdx+d+carList.length)%carList.length; carRender(); restartCar(); }
+function allSpotsMap(){ const M2={}; spots.forEach(sp=>{ M2[sp.id]=sp; }); pickables.forEach(g=>{ const sp=g.userData.spot; if(sp&&sp.id&&!M2[sp.id]) M2[sp.id]=sp; }); return M2; }
+function havKm(a,b){ const R=6371, dLa=(b[1]-a[1])*Math.PI/180, dLo=(b[0]-a[0])*Math.PI/180; const h=Math.sin(dLa/2)*Math.sin(dLa/2)+Math.cos(a[1]*Math.PI/180)*Math.cos(b[1]*Math.PI/180)*Math.sin(dLo/2)*Math.sin(dLo/2); return 2*R*Math.asin(Math.sqrt(h)); }
+function detHtml(inf){ return (inf.details||[]).map(d=>'<h4>'+d[0]+'</h4><p>'+d[1]+'</p>').join(''); }
+function nearHtml(s){ const me=WXGEO[s.id]; if(!me) return ''; const AM=allSpotsMap(); const list=Object.keys(WXGEO).filter(id=>id!==s.id&&AM[id]).map(id=>({id, name:sName(AM[id]), km:havKm(me, WXGEO[id])})).sort((a,b)=>a.km-b.km).slice(0,4);
+  return '<h4>'+T('nearTitle')+'</h4>'+list.map(n=>'<div class="nearRow"><span>'+n.name+' · '+T('approx')+' '+(n.km<1?Math.round(n.km*1000)+' m':n.km.toFixed(1)+' km')+'</span><button class="nearBtn" data-sid="'+n.id+'">'+T('goTo')+'</button></div>').join('')+'<div class="credit">'+T('nearNote')+'</div>'; }
+function showInfo(s){ clearStampFx(); hideWelcomeToast(); infoEl.style.display=''; infoEl.classList.remove('popIn'); void infoEl.offsetWidth; infoEl.classList.add('popIn'); const m=locMeta(s.id); const inf=locInf(s.id); window.__cur={type:'spot', s}; stopCar();
+  const gq=encodeURIComponent(GMAPS[s.id]||s.name);
+  const actions='<div class="actions"><a class="actbtn" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination='+gq+'">'+T('directions')+'</a><a class="actbtn ghost" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+gq+'">'+T('gmaps')+'</a><button class="actbtn ghost" id="stampBtn">🖌 盖御朱印</button><button class="actbtn ghost" id="favBtn">☆ 收藏</button><button class="actbtn ghost" id="ambBtn">🔊 环境音</button><button class="actbtn ghost" id="shareBtn">🔗 分享</button></div>';
+  if(inf){
+    carList = (inf.imgs && inf.imgs.length) ? inf.imgs : (inf.img?[{url:inf.img, credit:inf.credit||''}]:[]);
+    carIdx=0;
+    const car = carList.length? '<div class="car"><img id="carImg" alt="'+s.name+'">'+(carList.length>1?'<button class="carBtn prev" id="carPrev" aria-label="'+T('prevImg')+'">‹</button><button class="carBtn next" id="carNext" aria-label="'+T('nextImg')+'">›</button><div class="carDots">'+carList.map(()=>'<i></i>').join('')+'</div>':'')+'</div>' : '';
+    infoBody.innerHTML=car+'<h3>'+sName(s)+'</h3><div class="facts">'+inf.facts+'</div>'+(BEST[s.id]?'<span class="bestTag">'+BEST_ICON[BEST[s.id]]+' '+T('bt_'+BEST[s.id])+'</span>':'')+'<div class="wxLine" id="wxLine"></div>'+actions+'<div class="gtabs"><button class="gtab on" data-p="ov">'+T('tabOverview')+'</button><button class="gtab" data-p="gd">'+T('tabGuide')+'</button><button class="gtab" data-p="nb">'+T('tabNearby')+'</button></div><div class="gpanel" data-p="ov"><h4>'+T('history')+'</h4><p>'+inf.hist+'</p>'+(m?metaHtml(s):'')+'</div><div class="gpanel" data-p="gd" style="display:none"><h4>'+T('guideQuick')+'</h4><p>'+inf.now+'</p>'+detHtml(inf)+'<div class="credit">'+T('priceNote')+'</div></div><div class="gpanel" data-p="nb" style="display:none">'+nearHtml(s)+'</div>'+(carList.length?'<div class="credit" id="carCredit"></div>':'');
+    infoBody.querySelectorAll('.gtab').forEach(btn=>{ btn.onclick=()=>{ infoBody.querySelectorAll('.gtab').forEach(b=>b.classList.toggle('on', b===btn)); infoBody.querySelectorAll('.gpanel').forEach(pn=>{ pn.style.display=(pn.dataset.p===btn.dataset.p)?'':'none'; }); }; });
+    infoBody.querySelectorAll('.nearBtn').forEach(btn=>{ btn.onclick=()=>{ const t=allSpotsMap()[btn.dataset.sid]; if(t){ selectGroup(t); showInfo(t); } }; });
+    if(carList.length){ carRender(); restartCar(); const pv=document.getElementById('carPrev'), nx=document.getElementById('carNext'); if(pv) pv.onclick=()=>carGo(-1); if(nx) nx.onclick=()=>carGo(1);
+      const carEl=infoBody.querySelector('.car'); let tx=null; carEl.addEventListener('touchstart',e=>{ tx=e.touches[0].clientX; stopCar(); },{passive:true}); carEl.addEventListener('touchend',e=>{ if(tx===null) return; const dx=e.changedTouches[0].clientX-tx; if(Math.abs(dx)>32) carGo(dx<0?1:-1); else restartCar(); tx=null; },{passive:true}); }
+  } else { carList=[]; infoBody.innerHTML='<h3>'+sName(s)+'</h3><p>'+locDesc(s)+'</p>'+actions+(m?metaHtml(s):''); }
+    const h3El=infoBody.querySelector('h3'), carEl3=infoBody.querySelector('.car');
+  if(h3El && carEl3){ const ov=document.createElement('div'); ov.className='carTitle'; ov.appendChild(h3El); carEl3.appendChild(ov); }
+  const fcEl=infoBody.querySelector('.facts');
+  if(fcEl){ const parts=fcEl.textContent.split('·').map(t=>t.trim()).filter(Boolean); if(parts.length>=2 && parts.length<=4 && parts.every(p=>p.length<=16)){ fcEl.innerHTML=parts.map(p=>'<span class="chip">'+p+'</span>').join(''); fcEl.classList.add('chips'); } }
+    const shb=document.getElementById('shareBtn');
+  if(shb){ shb.textContent='\u{1F517} '+T('share'); shb.onclick=async()=>{ const data={title:document.title, text:sName(s), url:'https://ibun.fun/'};
+    if(navigator.share){ try{ await navigator.share(data); }catch(_){ } return; }
+    try{ await navigator.clipboard.writeText(data.url); shb.textContent='\u2713 '+T('copied'); setTimeout(()=>{ shb.textContent='\u{1F517} '+T('share'); },1800); }catch(_){ } }; }
+  const fb=document.getElementById('favBtn');
+  if(fb){ const paint=()=>{ fb.textContent = FAVS.has(s.id) ? T('favOn') : T('fav'); }; paint();
+    fb.onclick=()=>{ if(FAVS.has(s.id)) FAVS.delete(s.id); else FAVS.add(s.id); try{ localStorage.setItem('tt_favs', JSON.stringify([...FAVS])); }catch(e){} paint(); paintFavs(); }; }
+  const stb=document.getElementById('stampBtn');
+  if(stb){ paintStampBtn(s.id); stb.onclick=()=>collectStamp(s.id); }
+  const ab=document.getElementById('ambBtn');
+  if(ab){ paintAmbBtn(); ab.onclick=()=>{ ambOn=!ambOn; try{ localStorage.setItem('tt_amb', ambOn?'on':'off'); }catch(e){} if(ambOn) ambSet(AMB_TYPE[s.id]||'city', true); else ambSet(AMB_TYPE[s.id]||'city'); }; }
+  ambSet(AMB_TYPE[s.id]||'city');
+  setPeek(sName(s), (m?m[0]+' · '+m[1]:(locDesc(s)||'')), (typeof carList!=='undefined'&&carList.length)?carList[0].url:null);
+  if(matchMedia('(pointer:coarse)').matches) setSheet('peek');
+  if(inf) spotWx(s);
+  if(typeof s.x==='number') flyTo(s.x, s.z, 30, 21); }
+let activeRoute=-1;
+function selectRoute(i){
+  ambSet('off'); infoEl.style.display=''; activeRoute=i;
+  document.querySelectorAll('.route').forEach((el,j)=>el.classList.toggle('active', j===i));
+  routeObjs.forEach((o,j)=>{ o.mat.opacity = (i===-1||j===i)? (j===i?1:0.28) : 0.07; });
+  const r=routes[i]; const lr=(LANG!=='zh'&&CONTENT._routes&&CONTENT._routes[i])?{name:CONTENT._routes[i][0],from:CONTENT._routes[i][1],to:CONTENT._routes[i][2],time:CONTENT._routes[i][3],fare:CONTENT._routes[i][4]}:r; window.__cur={type:'route', i};
+  const mx=r.pts.reduce((a,p)=>a+p[0],0)/r.pts.length, mz=r.pts.reduce((a,p)=>a+p[1],0)/r.pts.length; flyTo(mx, mz, 62, 44);
+  infoBody.innerHTML='<h3>'+lr.name+'</h3><p>'+lr.from+' → '+lr.to+'</p><div class="meta">'+lr.time+'<br>'+lr.fare+'<br>'+T('routeNote')+'</div>';
+}
+
+// 搜索、菜单、全景
+document.getElementById('search').addEventListener('input', e=>{ const q=e.target.value.trim(); document.querySelectorAll('.spot').forEach(b=>{ b.style.display=(!q||(b.dataset.names||b.textContent).toLowerCase().includes(q.toLowerCase()))?'':'none'; }); });
+document.getElementById('menuBtn').onclick=()=>document.getElementById('panel').classList.toggle('hidden');
+document.getElementById('panelClose').onclick=()=>document.getElementById('panel').classList.add('hidden');
+if(innerWidth<=760) document.getElementById('panel').classList.add('hidden');
+document.getElementById('homeBtn').onclick=()=>{ flyHome(); clearSelection(); };
+
+// 一日经典游金色线路
+const dayIds=['sensoji','skytree','ueno','akiba','tokyost','ginza','tower','shibuya'];
+const dayPts=dayIds.map(id=>{ const s=spots.find(v=>v&&v.id===id); return new THREE.Vector3(s.x,0,s.z); });
+const dayMid=[]; for(let i=0;i<dayPts.length-1;i++){ dayMid.push(dayPts[i]); dayMid.push(dayPts[i].clone().lerp(dayPts[i+1],0.5).setY(2.2)); } dayMid.push(dayPts[dayPts.length-1]);
+const dayCurve=new THREE.CatmullRomCurve3(dayMid);
+const dayTube=new THREE.Mesh(new THREE.TubeGeometry(dayCurve,120,0.3,8), new THREE.MeshBasicMaterial({color:0xf59e0b})); dayTube.visible=false; scene.add(dayTube);
+const dayDot=new THREE.Mesh(new THREE.SphereGeometry(0.95,16,16), new THREE.MeshBasicMaterial({color:0xf59e0b})); dayDot.visible=false; scene.add(dayDot);
+let dayOn=false;
+document.getElementById('daytripBtn').onclick=e=>{
+  dayOn=!dayOn; dayTube.visible=dayOn; dayDot.visible=dayOn; e.currentTarget.classList.toggle('active', dayOn);
+  if(dayOn){ infoBody.innerHTML='<h3>一日经典游</h3><p>浅草寺 → 晴空塔 → 上野公园 → 秋叶原 → 东京站 → 银座 → 东京塔 → 涩谷</p><div class="meta">金色线路是建议的游览顺序：上午逛老东京（浅草、上野），下午转到东京站和银座，傍晚在东京塔看日落，晚上到涩谷看十字路口夜景。</div>'; flyHome(); }
+};
+
+// 真实建筑层：OpenStreetMap 实际建筑轮廓 + 高度（分块加载）
+const BLDG_CHUNKS=8;
+async function loadBuildings(){
+  const st=document.getElementById('bldgStatus');
+  try{
+    const bufs=[]; let total=0;
+    for(let i=0;i<BLDG_CHUNKS;i++){ const r=await fetch('bldg'+i+'.bin'); if(!r.ok) throw new Error('chunk'); const b=await r.arrayBuffer(); bufs.push(b); total+=b.byteLength; }
+    const all=new Uint8Array(total); let off=0; bufs.forEach(b=>{ all.set(new Uint8Array(b), off); off+=b.byteLength; });
+    buildCity(scene, new Int16Array(all.buffer), sr, night);
+    st.style.display='none'; window.__bldgDone=true; if(window.finishLoad) window.finishLoad();
+  }catch(e){ st.textContent=T('bldgFail'); window.__bldgDone=true; if(window.finishLoad) window.finishLoad(); setTimeout(()=>st.style.display='none', 4000); }
+}
+function sr(n){ const x=Math.sin(n*127.1+311.7)*43758.5453; return x-Math.floor(x); }
+
+loadBuildings();
+
+// 点击景点
+const ray=new THREE.Raycaster(), mouse=new THREE.Vector2();
+let downPos=null;
+renderer.domElement.addEventListener('pointerdown', e=>{ downPos=[e.clientX,e.clientY]; if(window.gsap){ gsap.killTweensOf(camera.position); gsap.killTweensOf(controls.target); } camAnim=null; });
+renderer.domElement.addEventListener('pointerup', e=>{
+  if(!downPos || Math.hypot(e.clientX-downPos[0], e.clientY-downPos[1])>6) return;
+  mouse.set((e.clientX/innerWidth)*2-1, -(e.clientY/innerHeight)*2+1);
+  ray.setFromCamera(mouse, camera);
+  const hits=ray.intersectObjects(pickables, true);
+  if(hits.length && hits[0].object.userData.spot){ selectGroup(hits[0].object); showInfo(hits[0].object.userData.spot); }
+  else clearSelection();
+});
+
+// 区域聚焦
+const AREAS=[['新宿 · 原宿','shinjuku',54],['涩谷','shibuya',46],['浅草 · 上野 · 东大','sensoji',52],['东京站 · 银座','tokyost',48],['六本木 · 东京塔','roppongi',48],['台场 · 丰洲','odaiba',54],['池袋 · 早稻田','ikebukuro',46],['迪士尼度假区','disney',58],['富士山','fuji',66],['镰仓高校前','kamakura',62]];
+const areaEl=document.getElementById('areaBtns');
+AREAS.forEach((a,ai)=>{ const b=document.createElement('button'); b.className='areaBtn'; b.textContent=(window.I18NUI&&I18NUI.areas[LANG]&&I18NUI.areas[LANG][ai])||a[0];
+  b.onclick=()=>{ const sp=spots.find(x=>x&&x.id===a[1]); if(sp){ flyTo(sp.x, sp.z, a[2], a[2]*0.6); } if(innerWidth<=760) document.getElementById('panel').classList.add('hidden'); };
+  areaEl.appendChild(b); });
+
+// 昼夜与旋转
+let night=false;
+const ENVP={
+ day:{el:30,az:124,sunI:2.5,hemiI:0.68,bloom:0.25,city:0.0,sunCol:new THREE.Color(0xffd9a8),gnd:new THREE.Color(0xffffff),sea:new THREE.Color(0xffffff),gem:0.42,expo:0.80,label:'白天'},
+ dusk:{el:2.4,az:99,sunI:1.9,hemiI:0.5,bloom:0.62,city:0.55,sunCol:new THREE.Color(0xff9a5c),gnd:new THREE.Color(0xd8c2ae),sea:new THREE.Color(0xd8bda6),gem:0.16,expo:0.74,label:'黄昏'},
+ night:{el:-2.5,az:150,sunI:0.3,hemiI:0.22,bloom:1.15,city:0.9,sunCol:new THREE.Color(0xa8c4ff),gnd:new THREE.Color(0x5f7396),sea:new THREE.Color(0x546a86),gem:0.03,expo:0.58,label:'夜晚'}};
+const envCur={el:30,az:124,sunI:2.5,hemiI:0.68,bloom:0.25,city:0.0,expo:0.80,sunCol:new THREE.Color(0xffd9a8),gnd:new THREE.Color(0xffffff),sea:new THREE.Color(0xffffff),gem:0.42};
+let envTarget=ENVP.day, daypartState='day';
+function setDaypart(st){ daypartState=st; envTarget=ENVP[st]; scene.environment=ENV_TEX[st]; night=(st!=='day'); applyTowerNight(); if(window.NIGHT_FNS) NIGHT_FNS.forEach(f=>f(night));
+  const nb=document.getElementById('nightBtn'); nb.textContent=T('envPrefix')+T('dp_'+st); nb.classList.toggle('active', night);
+  const sm=document.getElementById('sbMode'); if(sm) sm.textContent=T('dp_'+st); }
+let dpMode='auto'; try{ const v=localStorage.getItem('tt_dp'); if(v&&['auto','day','dusk','night'].indexOf(v)>=0) dpMode=v; }catch(e){}
+let sunTimes=null;
+function tokyoMinutes(){ try{ const p=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Tokyo',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date()); const a=p.split(':'); return (+a[0]%24)*60+(+a[1]); }catch(e){ const d=new Date(); return d.getHours()*60+d.getMinutes(); } }
+function autoDaypart(){ const t=tokyoMinutes();
+  if(sunTimes){ if(t<sunTimes.sr-40||t>=sunTimes.ss+40) return 'night'; if(t<sunTimes.sr+35||t>=sunTimes.ss-55) return 'dusk'; return 'day'; }
+  if(t>=390&&t<990) return 'day'; if((t>=330&&t<390)||(t>=990&&t<1110)) return 'dusk'; return 'night'; }
+function paintDpBtn(){ const nb=document.getElementById('nightBtn'); if(!nb) return; const eff=dpMode==='auto'?autoDaypart():dpMode; nb.textContent=T('envPrefix')+(dpMode==='auto'?(T('dpAuto')+'·'+T('dp_'+eff)):T('dp_'+dpMode)); nb.classList.toggle('active', eff!=='day'); }
+function applyDpMode(){ setDaypart(dpMode==='auto'?autoDaypart():dpMode); paintDpBtn(); }
+document.getElementById('nightBtn').onclick=()=>{ const order=['auto','day','dusk','night']; dpMode=order[(order.indexOf(dpMode)+1)%order.length]; try{ localStorage.setItem('tt_dp',dpMode); }catch(e){} applyDpMode(); };
+applyDpMode();
+setInterval(()=>{ if(dpMode!=='auto') return; const tb=document.getElementById('tourbar'); if(tb&&tb.style.display==='block') return; if(autoDaypart()!==daypartState) applyDpMode(); else paintDpBtn(); }, 60000);
+document.addEventListener('visibilitychange', ()=>{ if(document.hidden||dpMode!=='auto') return; const tb=document.getElementById('tourbar'); if(tb&&tb.style.display==='block') return; if(autoDaypart()!==daypartState) applyDpMode(); });
+function tickEnv(dt){ const k=1-Math.exp(-dt*2.4); let moving=false;
+  ['el','az','sunI','hemiI','bloom','city','gem','expo'].forEach(f=>{ const d=envTarget[f]-envCur[f]; if(Math.abs(d)>0.002){ envCur[f]+=d*k; moving=true; } });
+  if(envCur.sunCol.getHex()!==envTarget.sunCol.getHex()){ envCur.sunCol.lerp(envTarget.sunCol,k); envCur.gnd.lerp(envTarget.gnd,k); envCur.sea.lerp(envTarget.sea,k); moving=true; }
+  if(moving){ setSun(envCur.el, envCur.az); sun.intensity=envCur.sunI; sun.color.copy(envCur.sunCol); hemi.intensity=envCur.hemiI; bloomPass.strength=envCur.bloom; renderer.toneMappingExposure=envCur.expo; groundMat.color.copy(envCur.gnd); groundMat.emissiveIntensity = groundMode==='sat' ? envCur.gem : 0; seaMat.color.copy(envCur.sea); if(window.cityMats) cityMats.forEach(m=>{ m.emissiveIntensity=envCur.city; }); } }
+groundMat.emissiveIntensity = groundMode==='sat' ? envCur.gem : 0;
+document.getElementById('rotateBtn').onclick=()=>setAutoRotate(!controls.autoRotate);
+
+const clock=new THREE.Clock();
+function animate(){
+  requestAnimationFrame(animate);
+  const dt=Math.min(clock.getDelta(), 0.05); const t=clock.elapsedTime; tickEnv(dt); if(window.tickTour) tickTour(dt);
+  ANIM.forEach(f=>f(t, dt));
+  routeObjs.forEach((o,i)=>{ const p=o.curve.getPointAt((t*0.045+o.offset)%1); o.dot.position.copy(p); o.dot.visible=(activeRoute===-1||activeRoute===i); });
+  if(dayOn) dayDot.position.copy(dayCurve.getPointAt((t*0.03)%1));
+  if(camAnim){ camAnim.t+=dt/1.3; const k=camAnim.t>=1?1:(1-Math.pow(1-camAnim.t,3)); camera.position.lerpVectors(camAnim.fromP, camAnim.toP, k); controls.target.lerpVectors(camAnim.fromT, camAnim.toT, k); if(camAnim.t>=1) camAnim=null; }
+  if(bayWater) bayWater.material.uniforms.time.value += dt*0.7;
+  controls.update(); composer.render();
+}
+
+// ===== 2.0 系统：加载进度 / 状态栏 / 收藏 / 底部抽屉 / 路线播放 =====
+window.setLoad=(pct,txt)=>{ const f=document.getElementById('ldFill'), t=document.getElementById('ldTxt'); if(f) f.style.width=pct+'%'; if(t&&txt) t.textContent=txt; };
+let loadDone=false;
+window.finishLoad=()=>{ if(loadDone) return; loadDone=true; window.setLoad(100,T('loadDone')); const l=document.getElementById('loading'); if(l){ l.style.opacity='0'; setTimeout(()=>{ l.style.display='none'; }, 520); } setTimeout(showWelcomeToast, 700); };
+window.setLoad(45,T('sbReady'));
+(function(){ const tick=()=>{ const el=document.getElementById('sbClock'); if(el){ try{ el.textContent=T('tokyo')+' '+new Intl.DateTimeFormat(LOCALES[LANG],{timeZone:'Asia/Tokyo',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date()); }catch(e){} } }; window.__tickClock=tick; tick(); setInterval(tick, 30000); })();
+
+const FAVS=new Set((()=>{ try{ return JSON.parse(localStorage.getItem('tt_favs')||'[]'); }catch(e){ return []; } })());
+function paintFavs(){ document.querySelectorAll('.spot').forEach(b=>b.classList.toggle('fav', FAVS.has(b.dataset.sid))); }
+paintFavs();
+let favOnlyOn=false;
+document.getElementById('favOnly').onclick=e=>{ favOnlyOn=!favOnlyOn; e.currentTarget.classList.toggle('on', favOnlyOn);
+  document.querySelectorAll('.spot').forEach(b=>{ b.style.display=(favOnlyOn&&!FAVS.has(b.dataset.sid))?'none':''; }); };
+
+const SHEET_STATES=['hide','peek','half','full']; let sheetState='peek';
+function setSheet(st){ sheetState=st; infoEl.classList.remove('st-peek','st-half','st-full','st-hide'); infoEl.classList.add('st-'+st);
+  const lb=document.getElementById('sheetLbl'); if(lb) lb.textContent = st==='peek' ? T('sheetPeek') : (st==='half' ? T('sheetHalf') : (st==='full' ? T('sheetFull') : ''));
+  const tg=document.getElementById('sheetToggle'); if(tg) tg.textContent = st==='peek' ? T('expand') : T('collapse');
+  const cv=document.getElementById('sheetChev'); if(cv) cv.textContent = st==='full' ? '⌄' : '⌃';
+  const sh=document.getElementById('sheetShade'); if(sh) sh.classList.toggle('on', (st==='half'||st==='full') && matchMedia('(pointer:coarse)').matches);
+  const tb=document.getElementById('tourbar');
+  if(tb){ const touring = tb.style.display==='block';
+    if(touring && (st==='half' || st==='full')) tourPauseRead();
+    if(touring && st==='peek') tourResumeRead();
+    if(st==='hide' || !touring || !matchMedia('(pointer:coarse)').matches){ tb.style.bottom=''; tb.style.visibility=''; }
+    else if(st==='full'){ tb.style.visibility='hidden'; }
+    else { tb.style.visibility='visible';
+      const dock=()=>{ const r=infoEl.getBoundingClientRect(); tb.style.bottom=Math.min(Math.round(innerHeight-r.top+10), innerHeight-170)+'px'; };
+      dock(); setTimeout(()=>{ if(sheetState===st && tb.style.display==='block') dock(); },430); } } }
+function setPeek(name, meta, img){ const pk=document.getElementById('sheetPeek'); if(!pk) return;
+  const cur=(window.__cur && window.__cur.type==='spot') ? window.__cur.s : null;
+  let acts='';
+  if(cur){ const gq2=encodeURIComponent(GMAPS[cur.id]||cur.name);
+    acts='<div class="pkActs"><a class="pkBtn" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination='+gq2+'" aria-label="route">🧭</a><button class="pkBtn'+(FAVS.has(cur.id)?' on':'')+'" id="pkFav" aria-label="fav">'+(FAVS.has(cur.id)?'★':'☆')+'</button></div>'; }
+  pk.innerHTML=(img?'<img src="'+img+'" alt="">':'')+'<div class="pkTx"><div class="pkName">'+name+'</div><div class="pkMeta">'+meta+'</div></div>'+acts;
+  const pf=document.getElementById('pkFav');
+  if(pf && cur){ pf.onclick=e=>{ e.stopPropagation(); if(FAVS.has(cur.id)) FAVS.delete(cur.id); else FAVS.add(cur.id); try{ localStorage.setItem('tt_favs', JSON.stringify([...FAVS])); }catch(_){ } pf.textContent=FAVS.has(cur.id)?'★':'☆'; pf.classList.toggle('on', FAVS.has(cur.id)); const fb3=document.getElementById('favBtn'); if(fb3) fb3.textContent=FAVS.has(cur.id)?T('favOn'):T('fav'); paintFavs(); }; }
+  const pd=pk.querySelector('.pkActs a'); if(pd) pd.addEventListener('click', e=>e.stopPropagation());
+}
+if(matchMedia('(pointer:coarse)').matches) setSheet('peek');
+(function(){ const h=document.getElementById('sheetHandle'); if(!h) return;
+  const shadeEl=document.getElementById('sheetShade');
+  const heights=()=>{ const ih=window.innerHeight; return [0, 92, Math.min(Math.round(ih*0.66), ih-96), ih-46]; };
+  function shadeFor(ht){ if(!shadeEl) return; const hs=heights(); const f=Math.max(0, Math.min(1, (ht-hs[1])/Math.max(1,hs[3]-hs[1]))); shadeEl.style.opacity=f.toFixed(3); shadeEl.style.pointerEvents='none'; }
+  function endShade(){ if(!shadeEl) return; shadeEl.style.opacity=''; shadeEl.style.pointerEvents=''; }
+  let drag=null;
+  infoEl.addEventListener('pointerdown', e=>{
+    if(drag || !matchMedia('(pointer:coarse)').matches) return;
+    const t=e.target;
+    if(t.closest('button, a, input, select, textarea') && !t.closest('#sheetHandle')) return;
+    let src=null;
+    if(t.closest('#sheetHandle')) src='handle';
+    else if(t.closest('#sheetPeek')) src='peek';
+    else if(t.closest('.car') && !t.closest('.carBtn')) src='car';
+    if(!src) return;
+    drag={ src, y0:e.clientY, x0:e.clientX, h0:infoEl.getBoundingClientRect().height, samples:[{t:performance.now(), y:e.clientY}], moved:false, lock:false };
+    try{ infoEl.setPointerCapture(e.pointerId); }catch(_){ }
+  });
+  infoEl.addEventListener('pointermove', e=>{
+    if(!drag) return;
+    const dy=e.clientY-drag.y0, dx=e.clientX-drag.x0;
+    const now=performance.now(); drag.samples.push({t:now, y:e.clientY}); while(drag.samples.length>2 && now-drag.samples[0].t>110) drag.samples.shift();
+    if(!drag.lock){
+      if(Math.abs(dy)<7) return;
+      if(drag.src==='car' && Math.abs(dx)>Math.abs(dy)){ drag=null; return; }
+      drag.lock=true; drag.moved=true; infoEl.classList.add('draging');
+    }
+    const hs=heights(), full=hs[3];
+    const raw=drag.h0-dy; let shown;
+    if(raw>full) shown=full+Math.min(64,(raw-full)*0.35);
+    else if(raw<92) shown=Math.max(44, 92-(92-raw)*0.45);
+    else shown=raw;
+    infoEl.style.maxHeight=shown+'px';
+    shadeFor(shown);
+  });
+  function finish(commit){
+    if(!drag) return;
+    const d=drag; drag=null;
+    infoEl.classList.remove('draging'); infoEl.style.maxHeight=''; endShade();
+    if(!commit) return;
+    const dy=d.samples[d.samples.length-1].y-d.y0;
+    if(!d.moved){
+      if(d.src==='handle'){ const ix=(sheetState==='peek')?2:(sheetState==='half'?3:2); setSheet(SHEET_STATES[ix]); }
+      return;
+    }
+    const s0=d.samples[0], s1=d.samples[d.samples.length-1];
+    const v=(s1.t>s0.t)? (s1.y-s0.y)/(s1.t-s0.t) : 0;
+    const hs=heights(); const cur=d.h0-dy; const proj=cur - v*230;
+    let best=1, bd=1e9; hs.forEach((val,idx)=>{ const dd=Math.abs(val-proj); if(dd<bd){ bd=dd; best=idx; } });
+    if(v>0.6 && sheetState==='peek' && cur<150) best=0;
+    setSheet(SHEET_STATES[best]);
+  }
+  infoEl.addEventListener('pointerup', ()=>finish(true));
+  infoEl.addEventListener('pointercancel', ()=>finish(false));
+  const pk=document.getElementById('sheetPeek'); if(pk) pk.addEventListener('click', ()=>setSheet('half'));
+  if(shadeEl) shadeEl.addEventListener('click', ()=>setSheet('peek'));
+})();
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && infoEl.style.display!=='none'){ const ic=document.getElementById('infoClose'); if(ic) ic.click(); } });
+
+const TOURS={ classic:{name:'东京经典一日游', ids:dayIds},
+  trendy:{name:'东京潮流之旅', ids:['harajuku','shibuya','roppongi','odaiba','toyosu']},
+  night:{name:'东京夜景之旅', ids:['tokyost','ginza','tower','roppongi','shibuya']},
+  culture:{name:'东京文化之旅', ids:['sensoji','ueno','toudai','palace','meiji']} };
+let TOUR=null, tourCurve=null;
+const tourbar=document.getElementById('tourbar');
+tourbar.innerHTML='<div class="tbTop"><div><div class="tbName" id="tbName"></div><div class="tbStop" id="tbStop"></div></div><div class="tbBtns"><button id="tbPrev">'+T('tbPrev')+'</button><button id="tbPlay">'+T('pause')+'</button><button id="tbNext">'+T('tbNext')+'</button><button id="tbExit">'+T('tbExit')+'</button></div></div><div class="tbProg"><i id="tbProgFill"></i></div>';
+function tourPts(ids){ const pts=ids.map(id=>{ const sp=spots.find(v=>v&&v.id===id); return new THREE.Vector3(sp.x,0,sp.z); }); const mid=[]; for(let i=0;i<pts.length-1;i++){ mid.push(pts[i]); mid.push(pts[i].clone().lerp(pts[i+1],0.5).setY(2.2)); } mid.push(pts[pts.length-1]); return new THREE.CatmullRomCurve3(mid); }
+function goStop(i){ if(!TOUR) return; TOUR.idx=Math.max(0, Math.min(TOUR.ids.length-1, i)); TOUR.tAcc=0;
+  const sp=spots.find(v=>v&&v.id===TOUR.ids[TOUR.idx]); selectGroup(SPOT_GROUPS[sp.id]); showInfo(sp);
+  document.getElementById('tbStop').textContent=T('stopOf').replace('{i}',TOUR.idx+1).replace('{n}',TOUR.ids.length)+' · '+sName(sp);
+  document.getElementById('tbProgFill').style.width=((TOUR.idx+1)/TOUR.ids.length*100)+'%'; }
+function startTour(key){ const TT=TOURS[key]; if(!TT) return;
+  document.getElementById('panel').classList.add('hidden');
+  TOUR={key, ids:TT.ids, idx:0, playing:true, tAcc:0, dotU:0};
+  tourCurve=tourPts(TT.ids); dayTube.geometry.dispose(); dayTube.geometry=new THREE.TubeGeometry(tourCurve,120,0.3,8);
+  dayTube.visible=true; dayDot.visible=true; tourbar.style.display='block';
+  document.getElementById('tbName').textContent=T('tourNames')[key]; document.getElementById('tbPlay').textContent=T('pause');
+  if(key==='night') setDaypart('night');
+  document.querySelectorAll('[data-tour],#daytripBtn').forEach(b=>b.classList.toggle('active', (key==='classic'&&b.id==='daytripBtn')||b.dataset.tour===key));
+  goStop(0); }
+function stopTour(){ TOUR=null; tourCurve=null; applyDpMode(); dayTube.visible=false; dayDot.visible=false; tourbar.style.display='none'; tourbar.style.bottom=''; tourbar.style.visibility='';
+  document.querySelectorAll('[data-tour],#daytripBtn').forEach(b=>b.classList.remove('active')); }
+function tourPauseRead(){ if(TOUR && TOUR.playing){ TOUR.playing=false; TOUR.readPause=true; TOUR.tAcc=0; const bp=document.getElementById('tbPlay'); if(bp) bp.textContent=T('resume'); } }
+function tourResumeRead(){ if(TOUR && TOUR.readPause){ TOUR.readPause=false; TOUR.playing=true; TOUR.tAcc=0; const bp=document.getElementById('tbPlay'); if(bp) bp.textContent=T('pause'); } }
+window.tickTour=dt=>{ if(!TOUR||!tourCurve) return; TOUR.dotU=(TOUR.dotU+dt*0.03)%1; dayDot.position.copy(tourCurve.getPointAt(TOUR.dotU));
+  if(TOUR.playing){ TOUR.tAcc+=dt; if(TOUR.tAcc>7){ if(TOUR.idx<TOUR.ids.length-1) goStop(TOUR.idx+1); else { TOUR.playing=false; document.getElementById('tbPlay').textContent=T('replay'); } } } };
+document.getElementById('daytripBtn').onclick=()=>{ if(TOUR&&TOUR.key==='classic') stopTour(); else startTour('classic'); };
+document.querySelectorAll('[data-tour]').forEach(b=>{ b.onclick=()=>{ const k=b.dataset.tour; if(TOUR&&TOUR.key===k) stopTour(); else startTour(k); }; });
+document.getElementById('tbPrev').onclick=()=>goStop((TOUR?TOUR.idx:0)-1);
+document.getElementById('tbNext').onclick=()=>goStop((TOUR?TOUR.idx:0)+1);
+document.getElementById('tbExit').onclick=()=>stopTour();
+document.getElementById('tbPlay').onclick=e=>{ if(!TOUR) return; TOUR.readPause=false; if(!TOUR.playing&&TOUR.idx>=TOUR.ids.length-1){ goStop(0); TOUR.playing=true; e.currentTarget.textContent=T('pause'); return; } TOUR.playing=!TOUR.playing; e.currentTarget.textContent=TOUR.playing?T('pause'):T('resume'); };
+setPeek(T('welcome'),T('welcomeSub'), null);
+// ===== 欢迎提示 Toast：首屏不常驻欢迎卡，加载完成后轻提示问候，数秒自动消失，任意操作立即消失 =====
+infoEl.style.display='none';
+let wtTimer=null, wtShown=false;
+function showWelcomeToast(){ if(wtShown) return; wtShown=true; const w=document.getElementById('wToast'); if(!w) return; document.getElementById('wtTitle').textContent=T('welcome'); document.getElementById('wtBody').textContent=T('welcomeSub'); requestAnimationFrame(()=>requestAnimationFrame(()=>w.classList.add('show'))); wtTimer=setTimeout(hideWelcomeToast, 5600); }
+function hideWelcomeToast(){ const w=document.getElementById('wToast'); if(w) w.classList.remove('show'); if(wtTimer){ clearTimeout(wtTimer); wtTimer=null; } }
+document.getElementById('wtClose').onclick=hideWelcomeToast;
+renderer.domElement.addEventListener('pointerdown', ()=>{ if(wtShown) hideWelcomeToast(); }, {passive:true});
+
+
+
+// ===== 天气模式：默认跟随东京实时天气，可手动切 晴/阴/雨/雷雨/雪 =====
+let wxMode='live'; try{ const v=localStorage.getItem('tt_wxmode'); if(v&&['live','clear','cloudy','rain','thunder','snow'].indexOf(v)>=0) wxMode=v; }catch(e){}
+let liveWxCode=0, precipKind=null, thunderTimer=null, snowVeil=null;
+function effWxKind(){ if(wxMode!=='live') return wxMode; const c=liveWxCode;
+  if([95,96,99].indexOf(c)>=0) return 'thunder';
+  if([71,73,75,77,85,86].indexOf(c)>=0) return 'snow';
+  if([51,53,55,56,57,61,63,65,66,67,80,81,82].indexOf(c)>=0) return 'rain';
+  if([2,3,45,48].indexOf(c)>=0) return 'cloudy';
+  return 'clear'; }
+function clearPrecip(){ if(precip){ scene.remove(precip); precip.geometry.dispose(); precip.material.dispose(); precip=null; } precipKind=null;
+  if(thunderTimer){ clearTimeout(thunderTimer); thunderTimer=null; }
+  const fl=document.getElementById('flashFx'); if(fl) fl.style.opacity='0';
+  if(snowVeil) snowVeil.visible=false; }
+function makePrecip(kind){ const CX=matchMedia('(pointer:coarse)').matches; const snow=kind==='snow';
+  const N=snow?(CX?900:2200):(CX?1000:2600);
+  const arr=new Float32Array(N*3);
+  for(let i=0;i<N;i++){ arr[i*3]=RND(-108,80); arr[i*3+1]=RND(2,58); arr[i*3+2]=RND(-95,105); }
+  const geo=new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(arr,3));
+  precip=new THREE.Points(geo, new THREE.PointsMaterial({color: snow?0xffffff:0x9db8d9, size: snow?0.38:0.16, transparent:true, opacity: snow?0.95:(kind==='thunder'?0.65:0.5)}));
+  precipKind=kind; scene.add(precip); }
+function ensureSnowVeil(){ if(snowVeil) return; snowVeil=new THREE.Mesh(new THREE.PlaneGeometry(SE[0]-NW[0], SE[1]-NW[1]), new THREE.MeshBasicMaterial({color:0xffffff, transparent:true, opacity:0.15, depthWrite:false})); snowVeil.rotation.x=-Math.PI/2; snowVeil.position.set((NW[0]+SE[0])/2, 0.14, (NW[1]+SE[1])/2); snowVeil.renderOrder=1; scene.add(snowVeil); }
+function flashLightning(){ const fl=document.getElementById('flashFx'); if(!fl) return;
+  const seq=[[0.85,70],[0,90],[0.55,60],[0,0]]; let t=0;
+  seq.forEach(pr=>{ setTimeout(()=>{ fl.style.opacity=String(pr[0]); }, t); t+=pr[1]+40; }); }
+function scheduleThunder(){ if(thunderTimer) clearTimeout(thunderTimer);
+  thunderTimer=setTimeout(()=>{ if(precipKind!=='thunder') return; flashLightning(); scheduleThunder(); }, 2500+Math.random()*5500); }
+function renderWeatherFx(){ const kind=effWxKind(); clearPrecip();
+  if(kind==='rain'||kind==='thunder'){ makePrecip(kind); if(kind==='thunder') scheduleThunder(); }
+  else if(kind==='snow'){ makePrecip('snow'); ensureSnowVeil(); snowVeil.visible=true; }
+  paintWxBtn(); }
+ANIM.push((t,dt)=>{ if(!precip||!precipKind) return; const a=precip.geometry.attributes.position; const snow=precipKind==='snow'; const speed=snow?2.4:(precipKind==='thunder'?31:27);
+  for(let i=0;i<a.count;i++){ let y=a.getY(i)-speed*dt*(0.7+((i*37)%10)/14); if(y<0.2) y=56+((i*13)%5); a.setY(i,y); if(snow) a.setX(i, a.getX(i)+Math.sin(t*1.3+i)*dt*0.7); } a.needsUpdate=true; });
+function paintWxBtn(){ const b=document.getElementById('wxModeBtn'); if(!b) return; b.textContent=T('wxModePrefix')+T('wxm_'+wxMode); b.classList.toggle('active', wxMode!=='live'); }
+function paintGroundBtn(){ const b=document.getElementById('groundBtn'); if(!b) return; b.textContent=T('groundPrefix')+(groundMode==='sat'?T('gmSat'):T('gmMap')); b.classList.toggle('active', groundMode==='sat'); }
+document.getElementById('groundBtn').onclick=()=>{ groundMode = groundMode==='sat' ? 'map' : 'sat'; try{ localStorage.setItem('tt_ground_v2', groundMode); }catch(e){} paintGroundBtn(); groundMat.emissiveIntensity = groundMode==='sat' ? envCur.gem : 0; loadGroundTiles(); };
+// 背景音乐：WebAudio 程序化生成（原创旋律，无音频文件）。两档风格：钢琴（梦幻爵士华尔兹）/ 和风（都节音阶·筝）
+let bgmStyle='off', bgmOn=false, bgmCtx=null, bgmGain=null, bgmTimer=null, bgmBar=0, bgmNextT=0, bgmAudio=null;
+let audioOut=null, ambGain=null, ambType='off', ambTimer=null, ambNext={}, noiseBuf=null, ambOn=true;
+try{ ambOn = localStorage.getItem('tt_amb')!=='off'; }catch(e){}
+try{ const v=localStorage.getItem('tt_bgm'); bgmStyle=(v==='piano')?'piano':((v==='on'||v==='wa')?'wa':'off'); bgmOn=bgmStyle!=='off'; }catch(e){}
+const BGM_SCALE=[0,1,5,7,8,12,13,17,19,20,24], BGM_BASE=293.66, BGM_BAR=60/72*4, PIANO_BAR=60/92*3;
+const bgmF=deg=>BGM_BASE*Math.pow(2, BGM_SCALE[deg]/12);
+const NF=m=>440*Math.pow(2,(m-69)/12);
+const BGM_MEL_A=[[0,4],[1,3],[2,2],[3,3],[4,4],[6,5],[7,4],[8,3],[9,2],[10,1],[11,2],[12,3],[14,2]];
+const BGM_MEL_B=[[0,4],[1,3],[2,2],[3,3],[4,4],[6,5],[7,4],[8,5],[9,4],[10,3],[11,2],[12,1],[14,0]];
+const BGM_CHORDS=[[146.83,220,293.66,349.23],[116.54,174.61,233.08,293.66],[87.31,174.61,261.63,349.23],[130.81,196,261.63,329.63]];
+const BGM_BASS=[73.42,58.27,87.31,65.41];
+function bgmPluck(t, freq, vol){ const o1=bgmCtx.createOscillator(), o2=bgmCtx.createOscillator(), gn=bgmCtx.createGain(), fl=bgmCtx.createBiquadFilter(), g2=bgmCtx.createGain(); o1.type='triangle'; o1.frequency.value=freq; o2.type='sine'; o2.frequency.value=freq*2; g2.gain.value=0.35; fl.type='lowpass'; fl.frequency.value=2600; gn.gain.setValueAtTime(0,t); gn.gain.linearRampToValueAtTime(vol, t+0.008); gn.gain.exponentialRampToValueAtTime(0.0001, t+1.4); o1.connect(fl); o2.connect(g2); g2.connect(fl); fl.connect(gn); gn.connect(bgmGain); o1.start(t); o2.start(t); o1.stop(t+1.5); o2.stop(t+1.5); }
+function bgmPad(t, freqs, dur){ freqs.forEach((fq,i)=>{ const o=bgmCtx.createOscillator(), gn=bgmCtx.createGain(), fl=bgmCtx.createBiquadFilter(); o.type='triangle'; o.frequency.value=fq; o.detune.value=(i-1.5)*4; fl.type='lowpass'; fl.frequency.value=1100; gn.gain.setValueAtTime(0,t); gn.gain.linearRampToValueAtTime(0.04, t+dur*0.3); gn.gain.setValueAtTime(0.04, t+dur*0.7); gn.gain.linearRampToValueAtTime(0, t+dur); o.connect(fl); fl.connect(gn); gn.connect(bgmGain); o.start(t); o.stop(t+dur+0.05); }); }
+function bgmBass(t, freq){ const o=bgmCtx.createOscillator(), gn=bgmCtx.createGain(); o.type='sine'; o.frequency.value=freq; gn.gain.setValueAtTime(0.0001,t); gn.gain.exponentialRampToValueAtTime(0.13, t+0.03); gn.gain.exponentialRampToValueAtTime(0.0001, t+2.0); o.connect(gn); gn.connect(bgmGain); o.start(t); o.stop(t+2.1); }
+function bgmBell(t, freq){ const o=bgmCtx.createOscillator(), gn=bgmCtx.createGain(); o.type='sine'; o.frequency.value=freq; gn.gain.setValueAtTime(0.0001,t); gn.gain.exponentialRampToValueAtTime(0.035, t+0.01); gn.gain.exponentialRampToValueAtTime(0.0001, t+1.1); o.connect(gn); gn.connect(bgmGain); o.start(t); o.stop(t+1.2); }
+function bgmWaBar(bar, t){ const ci=bar%4; bgmPad(t, BGM_CHORDS[ci], BGM_BAR); bgmBass(t, BGM_BASS[ci]); if(bar%2===0) bgmBass(t+BGM_BAR*0.75, BGM_BASS[ci]); const mel=(Math.floor(bar/4)%2===0)?BGM_MEL_A:BGM_MEL_B, inP=bar%4; mel.forEach(nt=>{ if(Math.floor(nt[0]/4)!==inP) return; bgmPluck(t+(nt[0]%4)*(BGM_BAR/4), bgmF(nt[1]), 0.2); }); if(inP===2||inP===3){ [0,4,7,11].forEach((semi,k)=>bgmBell(t+(k*0.5+0.25)*(BGM_BAR/4), BGM_BASE*2*Math.pow(2,semi/12))); } }
+const PCH=[{b:50,t:[66,69,73,76]},{b:47,t:[62,66,69,74]},{b:52,t:[62,67,71,74]},{b:45,t:[61,64,67,73]},{b:42,t:[61,66,69,73]},{b:47,t:[63,66,69,75]},{b:52,t:[62,67,71,74]},{b:45,t:[61,64,67,73]}];
+const PMEL_A=[[0,0,74,2],[0,2,73,1],[1,0,71,1.5],[1,1.5,69,0.5],[1,2,66,1],[2,0,67,2],[2,2,71,1],[3,0,73,1],[3,1,76,1],[3,2,74,1],[4,0,73,2],[4,2,69,1],[5,0,71,1],[5,1,75,1],[5,2,74,1],[6,0,71,2],[6,2,67,1],[7,0,69,3]];
+const PMEL_B=[[0,0,74,2],[0,2,73,1],[1,0,71,1.5],[1,1.5,69,0.5],[1,2,66,1],[2,0,67,2],[2,2,71,1],[3,0,76,1],[3,1,74,1],[3,2,73,1],[4,0,73,2],[4,2,69,1],[5,0,71,1],[5,1,75,1],[5,2,74,1],[6,0,71,2],[6,2,67,1],[7,0,69,1],[7,1,73,1],[7,2,74,1]];
+function bgmPianoNote(t, midi, vel, dur){ const f=NF(midi), fl=bgmCtx.createBiquadFilter(); fl.type='lowpass'; fl.frequency.value=3600; fl.connect(bgmGain); [[1,1,1],[2,0.5,0.7],[3,0.24,0.45],[4,0.1,0.3],[5,0.05,0.2]].forEach(p=>{ const o=bgmCtx.createOscillator(), gn=bgmCtx.createGain(), d=Math.max(0.3, dur*p[2]); o.type='sine'; o.frequency.value=f*p[0]; gn.gain.setValueAtTime(0,t); gn.gain.linearRampToValueAtTime(vel*p[1], t+0.006); gn.gain.exponentialRampToValueAtTime(0.0001, t+d); o.connect(gn); gn.connect(fl); o.start(t); o.stop(t+d+0.05); }); }
+function bgmPianoBar(bar, t){ const ch=PCH[bar%8], beat=PIANO_BAR/3; bgmPianoNote(t, ch.b, 0.13, 2.6); bgmPianoNote(t+beat, ch.t[0], 0.05, 1.6); if(bar%4===3){ bgmPianoNote(t+beat*2, ch.t[1], 0.045, 1.2); bgmPianoNote(t+beat*2.33, ch.t[2], 0.045, 1.2); bgmPianoNote(t+beat*2.66, ch.t[3], 0.05, 1.8); } else bgmPianoNote(t+beat*2, ch.t[1], 0.05, 1.6); const mel=(Math.floor(bar/8)%2===0)?PMEL_A:PMEL_B; mel.forEach(n=>{ if(n[0]!==bar%8) return; bgmPianoNote(t+n[1]*beat, n[2], 0.16, Math.max(1.2, n[3]*beat*1.4)); }); }
+function bgmBarLen(){ return bgmStyle==='piano'?PIANO_BAR:BGM_BAR; }
+function bgmScheduleBar(bar, t){ if(bgmStyle==='piano') bgmPianoBar(bar, t); else bgmWaBar(bar, t); }
+function ensureAudio(){ if(bgmCtx) return true; const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return false; bgmCtx=new AC(); audioOut=bgmCtx.createGain(); audioOut.gain.value=1; const IOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1); if(IOS){ try{ const msd=bgmCtx.createMediaStreamDestination(); audioOut.connect(msd); bgmAudio=document.createElement('audio'); bgmAudio.playsInline=true; bgmAudio.srcObject=msd.stream; }catch(e){ audioOut.connect(bgmCtx.destination); bgmAudio=null; } } else audioOut.connect(bgmCtx.destination); bgmGain=bgmCtx.createGain(); bgmGain.gain.value=0; bgmGain.connect(audioOut); ambGain=bgmCtx.createGain(); ambGain.gain.value=0; ambGain.connect(audioOut); noiseBuf=bgmCtx.createBuffer(1, bgmCtx.sampleRate*2, bgmCtx.sampleRate); const dc=noiseBuf.getChannelData(0); for(let i=0;i<dc.length;i++) dc[i]=Math.random()*2-1; return true; }
+function audioResume(){ if(!bgmCtx) return; try{ if(navigator.audioSession) navigator.audioSession.type='playback'; }catch(e){} bgmCtx.resume(); if(bgmAudio) bgmAudio.play().catch(()=>{}); }
+function bgmStart(){ if(!ensureAudio()) return false; audioResume(); bgmGain.gain.cancelScheduledValues(bgmCtx.currentTime); bgmGain.gain.setTargetAtTime(0.8, bgmCtx.currentTime, 0.6); if(!bgmTimer){ bgmBar=0; bgmNextT=bgmCtx.currentTime+0.1; bgmTimer=setInterval(()=>{ if(bgmNextT<bgmCtx.currentTime-0.2) bgmNextT=bgmCtx.currentTime+0.05; while(bgmNextT<bgmCtx.currentTime+0.8){ bgmScheduleBar(bgmBar, bgmNextT); bgmBar++; bgmNextT+=bgmBarLen(); } }, 300); } return true; }
+function bgmStop(){ if(bgmGain&&bgmCtx) bgmGain.gain.setTargetAtTime(0, bgmCtx.currentTime, 0.25); if(bgmTimer){ clearInterval(bgmTimer); bgmTimer=null; } setTimeout(()=>{ if(!bgmOn&&ambType==='off'&&bgmCtx){ bgmCtx.suspend(); if(bgmAudio) bgmAudio.pause(); } }, 900); }
+// ===== 景点环境音（全部 WebAudio 合成，随打开的景点切换）=====
+const AMB_TYPE={dome:'crowd',stadium:'park',sensoji:'bell',meiji:'bell',kamakura:'cross',odaiba:'sea',toyosu:'sea',disney:'musicbox',hnd:'airport',nrt:'airport',ueno:'park',palace:'park',fuji:'wind',tokyost:'station',shinagawa:'station',ikebukuro:'stationX',shinjuku:'station',toudai:'library',waseda:'library',shibuya:'crowd',harajuku:'crowd',ginza:'crowd',roppongi:'crowd',akiba:'akiba'};
+function ambTone(t, freq, vel, dur){ const o=bgmCtx.createOscillator(), gn=bgmCtx.createGain(); o.type='sine'; o.frequency.value=freq; gn.gain.setValueAtTime(0,t); gn.gain.linearRampToValueAtTime(vel, t+0.01); gn.gain.exponentialRampToValueAtTime(0.0001, t+dur); o.connect(gn); gn.connect(ambGain); o.start(t); o.stop(t+dur+0.05); }
+function ambBell(t){ [[1,0.16,7],[2.02,0.09,5],[2.74,0.06,3.6],[3.76,0.035,2.4],[5.4,0.015,1.4]].forEach(p=>ambTone(t, 196*p[0], p[1], p[2])); }
+function ambChime(t){ const notes=[1568,1760,2093,2349,2637]; const n=1+Math.floor(Math.random()*3); for(let i=0;i<n;i++) ambTone(t+i*0.14, notes[Math.floor(Math.random()*notes.length)], 0.028, 1.6); }
+function ambCross(t){ for(let i=0;i<8;i++) ambTone(t+i*0.55, i%2?659:831, 0.05, 0.32); }
+function ambNoise(t, dur, fFrom, fTo, vel, type){ const src=bgmCtx.createBufferSource(); src.buffer=noiseBuf; src.loop=true; const fl=bgmCtx.createBiquadFilter(); fl.type=type||'bandpass'; fl.frequency.setValueAtTime(fFrom,t); fl.frequency.exponentialRampToValueAtTime(Math.max(40,fTo), t+dur); fl.Q.value=0.8; const gn=bgmCtx.createGain(); gn.gain.setValueAtTime(0,t); gn.gain.linearRampToValueAtTime(vel, t+dur*0.35); gn.gain.linearRampToValueAtTime(0, t+dur); src.connect(fl); fl.connect(gn); gn.connect(ambGain); src.start(t, Math.random()*1.5); src.stop(t+dur+0.05); }
+function ambBird(t){ if(typeof night!=='undefined'&&night) return; const f0=2600+Math.random()*700; for(let i=0;i<3;i++){ const o=bgmCtx.createOscillator(), gn=bgmCtx.createGain(), tt=t+i*0.16; o.type='sine'; o.frequency.setValueAtTime(f0, tt); o.frequency.exponentialRampToValueAtTime(f0*0.72, tt+0.07); o.frequency.exponentialRampToValueAtTime(f0*1.08, tt+0.13); gn.gain.setValueAtTime(0,tt); gn.gain.linearRampToValueAtTime(0.02, tt+0.02); gn.gain.exponentialRampToValueAtTime(0.0001, tt+0.14); o.connect(gn); gn.connect(ambGain); o.start(tt); o.stop(tt+0.2); } }
+function ambAirport(t){ ambTone(t, 659, 0.045, 1.4); ambTone(t+0.28, 523, 0.045, 1.8); }
+function ambMusicbox(t){ const sc=[523,587,659,784,880,1047]; let tt=t; for(let i=0;i<4;i++){ ambTone(tt, sc[Math.floor(Math.random()*sc.length)], 0.035, 1.1); tt+=0.21+Math.random()*0.15; } }
+function ambClick(t){ const src=bgmCtx.createBufferSource(); src.buffer=noiseBuf; const fl=bgmCtx.createBiquadFilter(); fl.type='bandpass'; fl.frequency.value=1800; fl.Q.value=2; const gn=bgmCtx.createGain(); gn.gain.setValueAtTime(0.05,t); gn.gain.exponentialRampToValueAtTime(0.0001, t+0.07); src.connect(fl); fl.connect(gn); gn.connect(ambGain); src.start(t, Math.random()); src.stop(t+0.1); }
+function ambTrainPass(t){ ambNoise(t, 4.2, 300, 1100, 0.085); ambNoise(t+0.4, 3.4, 900, 350, 0.055); for(let i=0;i<7;i++){ const tt=t+0.3+i*0.46; ambClick(tt); ambClick(tt+0.16); } }
+function ambMelody(t){ [[659,0],[784,0.22],[880,0.44],[1047,0.66],[880,0.95],[784,1.17]].forEach(n=>{ ambTone(t+n[1], n[0], 0.038, 1.1); ambTone(t+n[1], n[0]*2, 0.011, 0.7); }); }
+function ambSqueal(t){ const o=bgmCtx.createOscillator(), gn=bgmCtx.createGain(); o.type='sine'; o.frequency.setValueAtTime(3900, t); o.frequency.exponentialRampToValueAtTime(2650, t+1.5); gn.gain.setValueAtTime(0, t); gn.gain.linearRampToValueAtTime(0.013, t+0.25); gn.gain.linearRampToValueAtTime(0, t+1.6); o.connect(gn); gn.connect(ambGain); o.start(t); o.stop(t+1.7); }
+function ambVoice(t){ let tt=t; for(let i=0;i<3;i++){ const o=bgmCtx.createOscillator(), gn=bgmCtx.createGain(), fl=bgmCtx.createBiquadFilter(); o.type='triangle'; const f=290+Math.random()*90; o.frequency.setValueAtTime(f, tt); o.frequency.linearRampToValueAtTime(f*1.12, tt+0.14); o.frequency.linearRampToValueAtTime(f*0.92, tt+0.4); o.frequency.linearRampToValueAtTime(f*1.04, tt+0.62); fl.type='bandpass'; fl.frequency.value=950; fl.Q.value=1.1; const dur=0.62+Math.random()*0.25; gn.gain.setValueAtTime(0, tt); gn.gain.linearRampToValueAtTime(0.02, tt+0.06); gn.gain.setValueAtTime(0.02, tt+dur-0.1); gn.gain.linearRampToValueAtTime(0, tt+dur); o.connect(fl); fl.connect(gn); gn.connect(ambGain); o.start(tt); o.stop(tt+dur+0.05); tt+=dur+0.28; } }
+function ambPA(t){ [[1047,0],[784,0.2],[880,0.4],[1047,0.6]].forEach(n=>{ ambTone(t+n[1], n[0], 0.026, 0.75); ambTone(t+n[1], n[0]*2, 0.007, 0.4); }); ambVoice(t+1.1); }
+function ambDoor(t){ ambTone(t, 784, 0.034, 0.85); ambTone(t+0.3, 587, 0.034, 1.1); }
+function ambArrive(t){ ambNoise(t, 2.9, 180, 520, 0.05); ambSqueal(t+2.1); ambNoise(t+3.8, 0.45, 4200, 3000, 0.016); ambDoor(t+4.4); if(Math.random()<0.7) ambPA(t+5.6); }
+function ambDepartMelody(t){ [[523,0],[659,0.19],[784,0.38],[1047,0.57],[880,0.84],[784,1.03],[1047,1.22]].forEach(n=>{ ambTone(t+n[1], n[0], 0.036, 1.15); ambTone(t+n[1], n[0]*2, 0.01, 0.7); }); }
+function ambDepart(t){ for(let i=0;i<5;i++) ambTone(t+i*0.17, 1175, 0.017, 0.09); ambDoor(t+1.0); ambDepartMelody(t+1.7); ambNoise(t+2.4, 3.6, 650, 180, 0.05); let tt=t+2.5, gap=0.44; for(let i=0;i<8;i++){ ambClick(tt); ambClick(tt+0.15); tt+=gap; gap=Math.max(0.17, gap*0.86); } }
+function ambPage(t){ const flip=tt=>{ const src=bgmCtx.createBufferSource(); src.buffer=noiseBuf; const fl=bgmCtx.createBiquadFilter(); fl.type='bandpass'; fl.Q.value=1.1; fl.frequency.setValueAtTime(1600, tt); fl.frequency.exponentialRampToValueAtTime(3400, tt+0.16); const gn=bgmCtx.createGain(); gn.gain.setValueAtTime(0,tt); gn.gain.linearRampToValueAtTime(0.055, tt+0.03); gn.gain.linearRampToValueAtTime(0, tt+0.2); src.connect(fl); fl.connect(gn); gn.connect(ambGain); src.start(tt, Math.random()); src.stop(tt+0.25); }; flip(t); if(Math.random()<0.6) flip(t+0.28); }
+function ambBlip(t){ const o=bgmCtx.createOscillator(), gn=bgmCtx.createGain(), fl=bgmCtx.createBiquadFilter(); o.type='sine'; const f=700+Math.random()*500; o.frequency.setValueAtTime(f, t); o.frequency.linearRampToValueAtTime(f*(0.9+Math.random()*0.25), t+0.09); o.frequency.linearRampToValueAtTime(f*0.95, t+0.18); fl.type='bandpass'; fl.frequency.value=1000; fl.Q.value=1.4; gn.gain.setValueAtTime(0,t); gn.gain.linearRampToValueAtTime(0.016, t+0.03); gn.gain.linearRampToValueAtTime(0, t+0.2); o.connect(fl); fl.connect(gn); gn.connect(ambGain); o.start(t); o.stop(t+0.25); }
+function ambSteps(t){ for(let i=0;i<5;i++){ const tt=t+i*0.27; const src=bgmCtx.createBufferSource(); src.buffer=noiseBuf; const fl=bgmCtx.createBiquadFilter(); fl.type='lowpass'; fl.frequency.value=500; const gn=bgmCtx.createGain(); gn.gain.setValueAtTime(0.028, tt); gn.gain.exponentialRampToValueAtTime(0.0001, tt+0.06); src.connect(fl); fl.connect(gn); gn.connect(ambGain); src.start(tt, Math.random()); src.stop(tt+0.09); } }
+function ambBeep(t){ const f=[1320,1568,1760][Math.floor(Math.random()*3)]; ambTone(t, f, 0.02, 0.3); ambTone(t+0.16, f*1.335, 0.02, 0.35); }
+const AMB_EV={ bell:[['bell',9,15],['chime',4,9]], cross:[['cross',7,12],['wave',3,6]], sea:[['wave',2.5,5]], musicbox:[['box',5,9],['wave',4,7]], airport:[['airport',11,18],['hush',4,7]], park:[['bird',4,10],['windS',5,8]], wind:[['windS',3.5,6]], city:[['hush',4,7],['car',8,14]], station:[['arrive',14,22],['depart',16,26],['train',7,12],['pa',18,30],['hush',5,8]], stationX:[['arrive',9,15],['depart',11,18],['train',6,10],['pa',13,20],['hush',5,8]], library:[['page',3.5,7],['hushL',6,10]], crowd:[['murmur',2.5,4.5],['blip',3,6.5],['steps',5,9]], akiba:[['murmur',2.5,4.5],['blip',3,6.5],['beep',6,11],['steps',6,10]] };
+function ambFire(kind, t){ if(kind==='bell') ambBell(t); else if(kind==='chime') ambChime(t); else if(kind==='cross') ambCross(t); else if(kind==='wave') ambNoise(t, 3.8, 380, 900, 0.11); else if(kind==='bird') ambBird(t); else if(kind==='airport') ambAirport(t); else if(kind==='box') ambMusicbox(t); else if(kind==='hush') ambNoise(t, 5, 240, 200, 0.016, 'lowpass'); else if(kind==='windS') ambNoise(t, 4.5, 300, 620, 0.05); else if(kind==='car') ambNoise(t, 2.6, 500, 1300, 0.03); else if(kind==='train') ambTrainPass(t); else if(kind==='melody') ambMelody(t); else if(kind==='arrive') ambArrive(t); else if(kind==='depart') ambDepart(t); else if(kind==='pa') ambPA(t); else if(kind==='page') ambPage(t); else if(kind==='murmur') ambNoise(t, 3.6, 420, 700, 0.05); else if(kind==='blip') ambBlip(t); else if(kind==='steps') ambSteps(t); else if(kind==='beep') ambBeep(t); else if(kind==='hushL') ambNoise(t, 5, 200, 170, 0.008, 'lowpass'); }
+let visitStats=null;
+function paintVisit(){ const el=document.getElementById('visitLine'); if(!el) return; el.textContent = visitStats ? T('statsLine').replace('{a}', visitStats.v).replace('{b}', visitStats.p) : ''; }
+function loadVisits(){ const NS='https://abacus.jasoncameron.dev/'; const get=u=>fetch(u).then(r=>r.json()).then(j=>j.value);
+  const mode=(store,key)=>{ try{ if(store.getItem(key)) return 'get'; store.setItem(key,'1'); return 'hit'; }catch(e){ return 'get'; } };
+  const pv=mode(sessionStorage,'tt_vc'), vv=mode(localStorage,'tt_vid');
+  Promise.allSettled([ get(NS+pv+'/ibun-fun/views'), get(NS+vv+'/ibun-fun/visitors') ]).then(rs=>{ if(rs[0].status==='fulfilled'&&rs[1].status==='fulfilled'&&typeof rs[0].value==='number'&&typeof rs[1].value==='number'){ visitStats={p:rs[0].value, v:rs[1].value}; paintVisit(); } }); }
+loadVisits();
+function ambSet(type, force){ if(type!=='off'&&!ambOn){ ambType=type; if(ambTimer){ clearInterval(ambTimer); ambTimer=null; } if(ambGain&&bgmCtx) ambGain.gain.setTargetAtTime(0, bgmCtx.currentTime, 0.3); paintAmbBtn(); return; } if(type===ambType&&type!=='off'&&!force){ paintAmbBtn(); return; } ambType=type; if(ambTimer){ clearInterval(ambTimer); ambTimer=null; } if(type==='off'){ if(ambGain&&bgmCtx) ambGain.gain.setTargetAtTime(0, bgmCtx.currentTime, 0.3); setTimeout(()=>{ if(!bgmOn&&ambType==='off'&&bgmCtx){ bgmCtx.suspend(); if(bgmAudio) bgmAudio.pause(); } }, 900); paintAmbBtn(); return; } if(!ensureAudio()){ ambType='off'; paintAmbBtn(); return; } audioResume(); ambGain.gain.cancelScheduledValues(bgmCtx.currentTime); ambGain.gain.setTargetAtTime(0.6, bgmCtx.currentTime, 0.5); const evs=AMB_EV[type]||AMB_EV.city; ambNext={}; evs.forEach(e=>{ ambNext[e[0]]=bgmCtx.currentTime+0.4+Math.random()*1.5; }); ambFire(evs[0][0], bgmCtx.currentTime+0.15); ambTimer=setInterval(()=>{ if(!bgmCtx) return; const now=bgmCtx.currentTime; evs.forEach(e=>{ if(now>=ambNext[e[0]]){ ambFire(e[0], now+0.05); ambNext[e[0]]=now+e[1]+Math.random()*(e[2]-e[1]); } }); }, 500); paintAmbBtn(); }
+function paintAmbBtn(){ const b=document.getElementById('ambBtn'); if(!b) return; b.textContent=(ambOn?'🔊 ':'🔇 ')+T('ambLabel'); b.classList.toggle('active', ambOn&&ambType!=='off'); }
+function paintBgmBtn(){ const b=document.getElementById('bgmBtn'); if(!b) return; b.textContent=T('bgmPrefix')+(bgmStyle==='off'?T('bgmOff'):bgmStyle==='wa'?T('bgmWa'):T('bgmPiano')); b.classList.toggle('active', bgmOn); }
+document.getElementById('bgmBtn').onclick=()=>{ bgmStyle = bgmStyle==='off' ? 'piano' : (bgmStyle==='piano' ? 'wa' : 'off'); bgmOn = bgmStyle!=='off'; try{ localStorage.setItem('tt_bgm', bgmStyle); }catch(e){} if(bgmOn){ if(!bgmStart()){ bgmStyle='off'; bgmOn=false; } else { bgmBar=0; if(bgmCtx) bgmNextT=bgmCtx.currentTime+0.06; } } else bgmStop(); paintBgmBtn(); };
+if(bgmOn){ document.addEventListener('pointerdown', function h(){ document.removeEventListener('pointerdown', h); if(bgmOn && !bgmTimer) bgmStart(); }); }
+document.getElementById('wxModeBtn').onclick=()=>{ const order=['live','clear','cloudy','rain','thunder','snow']; wxMode=order[(order.indexOf(wxMode)+1)%order.length]; try{ localStorage.setItem('tt_wxmode', wxMode); }catch(e){} renderWeatherFx(); };
+renderWeatherFx();
+
+// ===== 明信片模式：把当前 3D 画面合成一张明信片 =====
+function paintCardBtn(){ const b=document.getElementById('cardBtn'); if(b) b.textContent=T('postcard'); const sv=document.getElementById('pcSave'); if(sv) sv.textContent=T('pcSave'); const h=document.getElementById('pcHint'); if(h) h.textContent=T('pcHint'); }
+function tokyoDateStr(){ try{ return new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Tokyo'}).replace(/-/g,'.'); }catch(e){ return ''; } }
+function capturePostcard(){
+  try{ composer.render(); }catch(e){ try{ renderer.render(scene,camera); }catch(e2){} }
+  const src=renderer.domElement; if(!src.width) return;
+  const W=1200,H=800, cv=document.createElement('canvas'); cv.width=W; cv.height=H; const g=cv.getContext('2d');
+  const tkM=new Date(Date.now()+9*3600*1000).getUTCMonth()+1;
+  const SEA = tkM>=3&&tkM<=5 ? {paper:'#fff7f9', frame:'#e58bb1', ink:'rgba(190,90,130,.5)', inkF:'rgba(178,74,116,.66)', motif:'🌸'}
+    : tkM>=6&&tkM<=8 ? {paper:'#f6fbff', frame:'#7fb2d9', ink:'rgba(70,130,180,.5)', inkF:'rgba(58,110,158,.66)', motif:'🎐'}
+    : tkM>=9&&tkM<=11 ? {paper:'#fff9f0', frame:'#d97b36', ink:'rgba(180,95,35,.5)', inkF:'rgba(168,84,26,.66)', motif:'🍁'}
+    : {paper:'#fdfdff', frame:'#a9c2d4', ink:'rgba(110,145,175,.5)', inkF:'rgba(96,128,158,.66)', motif:'❄️'};
+  g.fillStyle=SEA.paper; g.fillRect(0,0,W,H);
+  const m=36, pw=W-2*m, ph=H-176;
+  const sa=src.width/src.height, ta=pw/ph; let sw,sh,sx,sy;
+  if(sa>ta){ sh=src.height; sw=Math.round(sh*ta); sx=Math.round((src.width-sw)/2); sy=0; } else { sw=src.width; sh=Math.round(sw/ta); sx=0; sy=Math.round((src.height-sh)/2); }
+  g.save(); g.beginPath(); g.rect(m,m,pw,ph); g.clip(); g.drawImage(src,sx,sy,sw,sh,m,m,pw,ph); g.restore();
+  g.strokeStyle=SEA.frame; g.lineWidth=3; g.strokeRect(m,m,pw,ph);
+  const stx=W-m-118, sty=m+16;
+  g.save(); g.translate(stx,sty); g.fillStyle='#ffffff'; g.fillRect(0,0,92,112); g.setLineDash([5,4]); g.strokeStyle='#b08d4f'; g.lineWidth=2; g.strokeRect(4,4,84,104); g.setLineDash([]);
+  g.textAlign='center'; g.font='42px serif'; g.fillText('🗼',46,60); g.fillStyle='#12325e'; g.font='bold 16px sans-serif'; g.fillText('TOKYO',46,90); g.restore();
+  g.save(); g.translate(stx-36,sty+46); g.rotate(-0.22); g.strokeStyle=SEA.ink; g.lineWidth=2;
+  g.beginPath(); g.arc(0,0,45,0,7); g.stroke(); g.beginPath(); g.arc(0,0,34,0,7); g.stroke();
+  g.fillStyle=SEA.inkF; g.font='bold 11.5px sans-serif'; g.textAlign='center'; g.fillText(tokyoDateStr(),0,-1); g.fillText('TOKYO',0,14); g.restore();
+  g.save(); g.globalAlpha=.88; g.font='27px serif'; g.textAlign='center'; [[60,642,0.25],[1140,642,-0.3],[60,70,-0.2]].forEach(p=>{ g.save(); g.translate(p[0],p[1]); g.rotate(p[2]); g.fillText(SEA.motif,0,0); g.restore(); }); g.restore();
+  const nm=(window.__cur&&window.__cur.type==='spot'&&window.__cur.id)?sName(window.__cur.id):'東京';
+  g.textAlign='left'; g.fillStyle='#20304d'; g.font='bold 43px sans-serif'; g.fillText(nm,m+4,H-100);
+  const wxEl=document.getElementById('sbWx'); const wx=wxEl?wxEl.textContent.trim():'';
+  g.font='19.5px sans-serif'; g.fillStyle='#7a6a45'; g.fillText('TOKYO CLOUD TOUR · '+tokyoDateStr()+(wx?' · '+wx:''), m+4, H-60);
+  g.textAlign='right'; g.font='21px sans-serif'; g.fillStyle='#b08d4f'; g.fillText('云游东京', W-m-4, H-60);
+  cv.toBlob(b=>{ if(!b) return; const url=URL.createObjectURL(b); const img=document.getElementById('pcImg'); const old=img.dataset.u; if(old) URL.revokeObjectURL(old); img.dataset.u=url; img.src=url;
+    const sv=document.getElementById('pcSave'); sv.href=url; document.getElementById('pcModal').style.display='flex'; },'image/png');
+}
+document.getElementById('cardBtn').onclick=capturePostcard;
+document.getElementById('pcClose').onclick=()=>{ document.getElementById('pcModal').style.display='none'; };
+document.getElementById('pcModal').addEventListener('click', e=>{ if(e.target.id==='pcModal') e.currentTarget.style.display='none'; });
+paintCardBtn();
+
+// ===== 御朱印护照 =====
+function esc(t){ return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+let STAMPS={}; try{ const raw=JSON.parse(localStorage.getItem('tt_stamps')||'{}')||{}; for(const k in raw){ STAMPS[k]=(typeof raw[k]==='string')?{d:raw[k],note:''}:(raw[k]||{d:'',note:''}); } }catch(e){ STAMPS={}; }
+function stampDate(id){ return (STAMPS[id]&&STAMPS[id].d)?STAMPS[id].d:''; }
+function saveStamps(){ try{ localStorage.setItem('tt_stamps', JSON.stringify(STAMPS)); }catch(e){} }
+function stampRot(id){ let h=0; for(let i=0;i<id.length;i++) h=(h*31+id.charCodeAt(i))>>>0; return (h%5)-2; }
+function gsNameCls(nm){ if(/[぀-ヿ一-鿿가-힣]/.test(nm)) return nm.length>5?'gsName long':'gsName'; return 'gsName h'; }
+const SEAL_EMOJI={tower:'🗼',skytree:'📡',sensoji:'🏮',shibuya:'🐕',shinjuku:'🌃',akiba:'🎮',ueno:'🐼',palace:'🏯',tokyost:'🚉',meiji:'⛩️',odaiba:'🎡',roppongi:'🌆',ikebukuro:'🦉',shinagawa:'🚄',ginza:'🛍️',harajuku:'🎀',toyosu:'🐟',disney:'🏰',hnd:'✈️',nrt:'🛫',toudai:'🎓',waseda:'📚',fuji:'🗻',kamakura:'🚃'};
+const SEAL_CH={tower:'塔',skytree:'空',sensoji:'寺',shibuya:'谷',shinjuku:'宿',akiba:'叶',ueno:'野',palace:'居',tokyost:'京',meiji:'宫',odaiba:'台',roppongi:'木',ikebukuro:'袋',shinagawa:'川',ginza:'座',harajuku:'原',toyosu:'洲',disney:'梦',hnd:'羽',nrt:'成',toudai:'大',waseda:'稲',fuji:'山',kamakura:'仓'};
+function stampHtml(id,big){ const nm=sName(id); const inf=(typeof INFO!=='undefined'&&INFO&&INFO[id])?INFO[id]:null; const ph=inf&&inf.imgs&&inf.imgs[0]?inf.imgs[0].url:(inf&&inf.img?inf.img:'');
+  const note=(STAMPS[id]&&STAMPS[id].note)?('<span class="gsCNote">'+esc(STAMPS[id].note)+'</span>'):'';
+  const art=ph?('<img src="'+esc(ph)+'" alt="" loading="lazy">'):('<span class="gsMotifBig">'+(SEAL_EMOJI[id]||'🗼')+'</span>');
+  return '<div class="gsCard'+(big?' big':'')+'" style="--r:'+stampRot(id)+'deg"><div class="gsArt">'+art+'<span class="gsVert">'+esc(nm)+'</span></div><div class="gsCap"><div class="gsCapMain"><span class="gsCName">'+esc(nm)+'</span><span class="gsCDate">'+stampDate(id)+'</span>'+note+'</div><span class="gsSeal">'+(SEAL_CH[id]||'印')+'</span></div></div>'; }
+function paintStampBtn(id){ const b=document.getElementById('stampBtn'); if(!b||!id) return; if(STAMPS[id]){ b.textContent='✓ '+T('stampedFmt').replace('{d}',stampDate(id)); b.classList.add('active'); } else { b.textContent=T('stampBtn'); b.classList.remove('active'); } }
+function renderGoshuin(){ const ids=spots.filter(sp=>sp&&sp.id).map(sp=>sp.id).concat(['hnd','nrt']);
+  const n=ids.filter(id=>STAMPS[id]).length;
+  const set=(i,v)=>{ const el=document.getElementById(i); if(el) el.textContent=v; };
+  set('hGsT',T('goshuin')); set('gsTitle',T('goshuin')+' · '+n+'/'+ids.length); set('gsOpenB',T('stampOpen')); set('gsOpenS',T('stampHint'));
+  set('gsProg',T('stampProgress').replace('{n}',n).replace('{t}',ids.length));
+  const grid=document.getElementById('gsGrid'); if(!grid) return;
+  grid.innerHTML=ids.map(id=> STAMPS[id] ? '<div class="gsCell got" data-sid="'+id+'">'+stampHtml(id,false)+'</div>' : '<div class="gsCell"><div class="gsTodo"><span class="gsTodoM">'+(SEAL_EMOJI[id]||'')+'</span>'+esc(sName(id))+'</div></div>').join('');
+  grid.querySelectorAll('.gsCell.got').forEach(c=>{ c.onclick=()=>openGsEdit(c.dataset.sid); }); }
+let gsEditId=null;
+function openGsEdit(id){ if(!STAMPS[id]) return; gsEditId=id; document.getElementById('gsEditStamp').innerHTML=stampHtml(id,true); const inp=document.getElementById('gsNoteIn'); inp.value=STAMPS[id].note||''; inp.placeholder=T('notePh'); document.getElementById('gsSaveBtn').textContent=T('gsSave'); document.getElementById('gsDelBtn').textContent=T('gsDel'); document.getElementById('gsEdit').style.display='flex'; }
+function closeGsEdit(){ document.getElementById('gsEdit').style.display='none'; gsEditId=null; }
+document.getElementById('gsSaveBtn').onclick=()=>{ if(!gsEditId||!STAMPS[gsEditId]) return; STAMPS[gsEditId].note=document.getElementById('gsNoteIn').value.trim().slice(0,24); saveStamps(); renderGoshuin(); closeGsEdit(); };
+document.getElementById('gsDelBtn').onclick=()=>{ if(!gsEditId) return; if(!confirm(T('gsDelConfirm'))) return; const id=gsEditId; delete STAMPS[id]; saveStamps(); renderGoshuin(); if(window.__cur&&window.__cur.s&&window.__cur.s.id===id) paintStampBtn(id); closeGsEdit(); };
+document.getElementById('gsEditClose').onclick=closeGsEdit;
+document.getElementById('gsEdit').addEventListener('click', e=>{ if(e.target.id==='gsEdit') closeGsEdit(); });
+let stampFxTimer=null;
+function clearStampFx(){ const fx=document.getElementById('stampFx'); if(stampFxTimer){ clearTimeout(stampFxTimer); stampFxTimer=null; } if(fx){ fx.classList.remove('play'); fx.innerHTML=''; } }
+function stampFxPlay(id){ const fx=document.getElementById('stampFx'); if(!fx) return; if(stampFxTimer){ clearTimeout(stampFxTimer); stampFxTimer=null; } fx.innerHTML=stampHtml(id,true); fx.classList.remove('play'); void fx.offsetWidth; fx.classList.add('play'); stampFxTimer=setTimeout(clearStampFx, 1900); }
+function collectStamp(id){ if(!id) return; if(STAMPS[id]){ openGoshuin(); return; } STAMPS[id]={d:tokyoDateStr(),note:''}; saveStamps(); paintStampBtn(id); renderGoshuin(); stampFxPlay(id); }
+function openGoshuin(){ renderGoshuin(); document.getElementById('gsModal').style.display='flex'; }
+document.getElementById('gsOpen').onclick=openGoshuin;
+document.getElementById('gsClose').onclick=()=>{ document.getElementById('gsModal').style.display='none'; };
+document.getElementById('gsModal').addEventListener('click', e=>{ if(e.target.id==='gsModal') e.currentTarget.style.display='none'; });
+renderGoshuin();
+
+
+
+window.__cur={type:'welcome'};
+function renderWelcome(){ ambSet('off'); window.__cur={type:'welcome'}; infoBody.innerHTML='<h3>'+T('welcome')+'</h3><p>'+T('welcomeBody')+'</p><div class="meta">'+T('naritaNote')+'</div>'; setPeek(T('welcome'), T('welcomeSub'), null); const wt=document.getElementById('wtTitle'), wb=document.getElementById('wtBody'); if(wt) wt.textContent=T('welcome'); if(wb) wb.textContent=T('welcomeSub'); }
+function renderTourBtns(){ const stopsOf=ids=>ids.map(id=>{ const sp=spots.find(v=>v&&v.id===id); return sp?sName(sp):id; }).join(' \u2192 '); const colon=LANG==='zh'?'\uFF1A':': ';
+  const setB=(el,key,ids,playKey)=>{ if(el) el.innerHTML='<b>'+T('tourNames')[key]+'</b>'+colon+stopsOf(ids)+'<small>'+T(playKey)+'</small>'; };
+  setB(document.getElementById('daytripBtn'),'classic',dayIds,'playClassic');
+  document.querySelectorAll('[data-tour]').forEach(b=>{ const k=b.dataset.tour; if(TOURS[k]) setB(b,k,TOURS[k].ids, k==='night'?'playNight':'play'); }); }
+function renderAreas(){ const U=window.I18NUI; const labels=(U&&U.areas[LANG])||(U&&U.areas.zh); if(!labels) return; document.querySelectorAll('#areaBtns .areaBtn').forEach((b,i)=>{ if(labels[i]) b.textContent=labels[i]; }); }
+function renderSpotList(){ document.querySelectorAll('.spot').forEach(b=>{ const sp=spots.find(v=>v&&v.id===b.dataset.sid); if(sp){ b.textContent=sName(sp); b.dataset.names=namesOf(sp); } }); }
+async function applyLang(l){ LANG=l; try{ localStorage.setItem('tt_lang', l); }catch(e){}
+  document.documentElement.lang=LOCALES[l]||'zh-CN'; document.title=T('title');
+  const setT=(id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
+  setT('brandEl',T('brand')); setT('ldLogo',T('brand')); setT('subEl',T('subtitle'));
+  setT('menuBtn',T('menu')); setT('homeBtn',T('home')); setT('rotateBtn',T('rotate'));
+  setT('hSetT',T('settings')); setT('hWxT',T('wxTitle')); setT('hSearchT',T('search')); setT('hSpotsT',T('spotsTitle')); setT('hToursT',T('toursTitle')); setT('hAreasT',T('areasTitle')); setT('hAboutT',T('aboutTitle'));
+  const si=document.getElementById('search'); if(si) si.placeholder=T('searchPh');
+  setT('favOnly',T('favOnly')); setT('discEl',T('disclaimer'));
+  const ab=document.getElementById('aboutEl'); if(ab) ab.innerHTML=T('aboutHtml');
+  paintVisit();
+  setT('hint',T('hint'));
+  const bs=document.getElementById('bldgStatus'); if(bs&&bs.style.display!=='none') bs.textContent=T('bldgLoading');
+  paintDpBtn();
+  const sm=document.getElementById('sbMode'); if(sm) sm.textContent=T('dp_'+daypartState);
+  const ls=document.getElementById('langSel'); if(ls) ls.value=l;
+  const ic=document.getElementById('infoClose'); if(ic) ic.setAttribute('aria-label', T('close'));
+  const pc=document.getElementById('panelClose'); if(pc) pc.setAttribute('aria-label', T('closeMenu'));
+  const stg=document.getElementById('sheetToggle'); if(stg) stg.setAttribute('aria-label', T('sheetToggleLabel'));
+  const tp1=document.getElementById('tbPrev'); if(tp1) tp1.textContent=T('tbPrev');
+  const tp2=document.getElementById('tbNext'); if(tp2) tp2.textContent=T('tbNext');
+  const tp3=document.getElementById('tbExit'); if(tp3) tp3.textContent=T('tbExit');
+  renderTourBtns(); renderAreas(); renderSpotList(); paintWxBtn(); paintGroundBtn(); paintBgmBtn(); paintCardBtn(); paintHomeLine(); renderGoshuin();
+  await ensureContent();
+  Object.keys(SPOT_GROUPS).forEach(id=>{ const g=SPOT_GROUPS[id], sp=g.userData.spot, lb=g.userData.labelSprite; if(sp&&lb){ const nl=label(sName(sp),0.95); lb.material.map=nl.material.map; lb.material.needsUpdate=true; lb.scale.copy(nl.scale); } });
+  if(window.__tickClock) window.__tickClock();
+  loadWx();
+  const bp=document.getElementById('tbPlay'); if(bp&&TOUR) bp.textContent=TOUR.playing?T('pause'):(TOUR.idx>=TOUR.ids.length-1?T('replay'):T('resume'));
+  if(TOUR){ const tn=document.getElementById('tbName'); if(tn) tn.textContent=T('tourNames')[TOUR.key]; goStop(TOUR.idx); }
+  else if(window.__cur&&window.__cur.type==='spot') showInfo(window.__cur.s);
+  else if(window.__cur&&window.__cur.type==='route') selectRoute(window.__cur.i);
+  else renderWelcome();
+  setSheet(sheetState);
+}
+const hdrBtns=document.querySelector('header .btns');
+function layoutControls(){ const mobile=innerWidth<=760; const grid=document.getElementById('setGrid'); if(!grid||!hdrBtns) return;
+  ['homeBtn','rotateBtn','nightBtn','wxModeBtn','groundBtn','cardBtn','bgmBtn'].forEach(id=>{ const el=document.getElementById(id); if(el&&el.parentElement!==grid) grid.appendChild(el); });
+  const sel=document.getElementById('langSel'); if(sel){ if(mobile){ if(sel.parentElement!==grid) grid.insertBefore(sel, grid.firstChild); } else if(sel.parentElement!==hdrBtns){ const mb=document.getElementById('menuBtn'); if(mb) hdrBtns.insertBefore(sel, mb); else hdrBtns.appendChild(sel); } } }
+layoutControls();
+document.getElementById('langSel').addEventListener('change', e=>{ applyLang(e.target.value); });
+applyLang(LANG);
+
+animate();
+
+if(window.setLoad) setLoad(78,T('loadBldg')); setTimeout(()=>{ if(window.finishLoad) window.finishLoad(); }, 2400);
+addEventListener('resize', ()=>{ layoutControls(); camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); composer.setSize(innerWidth, innerHeight); });
+</script>
+<!-- Statcounter (visitor log incl. IP, owner-only dashboard) -->
+<script type="text/javascript">
+var sc_project=13365228;
+var sc_invisible=1;
+var sc_security="081240b8";
+</script>
+<script type="text/javascript" src="https://www.statcounter.com/counter/counter.js" async></script>
+<noscript><div class="statcounter"><a title="Web Analytics" href="https://statcounter.com/" target="_blank" rel="noopener"><img class="statcounter" src="https://c.statcounter.com/13365228/0/081240b8/1/" alt="Web Analytics" referrerPolicy="no-referrer-when-downgrade"></a></div></noscript>
+<script>
+(function(){ if(!window.matchMedia||!matchMedia('(hover:hover)').matches) return; document.addEventListener('pointermove', function(e){ var t=e.target; var m=t&&t.closest?t.closest('.mod'):null; if(!m) return; var r=m.getBoundingClientRect(); if(!r.width) return; m.style.setProperty('--mx', ((e.clientX-r.left)/r.width*100)+'%'); m.style.setProperty('--my', ((e.clientY-r.top)/r.height*100)+'%'); }, {passive:true}); })();
+</script>
+</body>
+</html>

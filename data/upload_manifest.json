@@ -1,0 +1,34 @@
+{
+ "bldg0.bin": {
+  "sha": "8f1bdcb2bb1d9424b868ebf50f183e05a74f1350",
+  "size": 65536
+ },
+ "bldg1.bin": {
+  "sha": "1f5bf9a140b5a5d5708b949f12a4232d3f194988",
+  "size": 65536
+ },
+ "bldg2.bin": {
+  "sha": "601877233a4bc4b3c7b4d0f39a5ab346fac04ff9",
+  "size": 65536
+ },
+ "bldg3.bin": {
+  "sha": "6a8e655ede03e7cb79d3dfee3f2623b487e0c306",
+  "size": 65536
+ },
+ "bldg4.bin": {
+  "sha": "aefe35f955afd86e6a97b6917f49146bd33e2980",
+  "size": 65536
+ },
+ "bldg5.bin": {
+  "sha": "795fef1b4342479799b11d341cfe9cebcc15f034",
+  "size": 65536
+ },
+ "bldg6.bin": {
+  "sha": "2146c4669c97323cfca15749c247e7a39b89effc",
+  "size": 65536
+ },
+ "bldg7.bin": {
+  "sha": "bb3727b8ec77c4b2628f98f88bf5760628376266",
+  "size": 48044
+ }
+}
