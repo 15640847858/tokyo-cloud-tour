@@ -476,7 +476,7 @@ composer.addPass(new OutputPass());
 if(matchMedia('(pointer:coarse)').matches) bloomPass.enabled=false;
 
 // 基础材质
-import { M, ANIM, RND, label, spots, box, cyl, cone, sph, beam, ring, tor, cnv, std, texMat, glowMat, facadeTex, signTex, hipRoof, tree, pinkTree, treeMat, people, blink , buildCity } from './builders.js';
+import { M, ANIM, RND, label, spots, box, cyl, cone, sph, beam, ring, tor, cnv, std, texMat, glowMat, facadeTex, glassTex, signTex, hipRoof, tree, pinkTree, treeMat, people, blink , buildCity } from './builders.js';
 
 // 地面：真实 OpenStreetMap 地图纹理（东京真实街区/海岸线）
 // 运行时加载 OpenStreetMap 瓦片拼成真实地图纹理（zoom 13）；瓦片范围与地面边缘严格对齐
@@ -609,6 +609,77 @@ function makePlane(){
   g.add(box(0.55,0.09,1.3,M.blue,-1.75,0.8,0));
   return g;
 }
+function airportTex(labelTxt){ const cv=document.createElement('canvas'); cv.width=1024; cv.height=648; const g=cv.getContext('2d'); const SX=1024/30, SZ=648/19; const X=v=>(v+15)*SX, Z=v=>(v+9.5)*SZ;
+  g.fillStyle='#6f8563'; g.fillRect(0,0,1024,648);
+  for(let i=0;i<2000;i++){ g.fillStyle=Math.random()>0.5?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.05)'; g.fillRect(Math.random()*1024, Math.random()*648, 3, 3); }
+  g.fillStyle='#939ba2'; g.fillRect(0, Z(-4.4), 1024, Z(4.4)-Z(-4.4));
+  for(let i=0;i<1500;i++){ g.fillStyle=Math.random()>0.5?'rgba(255,255,255,0.05)':'rgba(30,34,40,0.06)'; g.fillRect(Math.random()*1024, Z(-4.4)+Math.random()*(Z(4.4)-Z(-4.4)), 3, 3); }
+  g.strokeStyle='rgba(60,66,72,0.35)'; g.lineWidth=1; for(let x=-12;x<=12;x+=3){ g.beginPath(); g.moveTo(X(x),Z(-4.4)); g.lineTo(X(x),Z(4.4)); g.stroke(); } for(let z=-3;z<=3;z+=3){ g.beginPath(); g.moveTo(0,Z(z)); g.lineTo(1024,Z(z)); g.stroke(); }
+  g.fillStyle='#33373b'; g.fillRect(0, Z(-8.8), 1024, Z(-5.6)-Z(-8.8));
+  g.fillStyle='rgba(255,255,255,0.85)'; g.fillRect(0, Z(-8.75), 1024, 2); g.fillRect(0, Z(-5.75), 1024, 2);
+  for(let x=-14;x<14;x+=2.2) g.fillRect(X(x), Z(-7.28), 26, 4);
+  for(let i=0;i<8;i++) g.fillRect(X(-14.6)+i*7, Z(-8.55), 4, Z(-5.85)-Z(-8.55));
+  g.save(); g.translate(X(13.4), Z(-7.2)); g.rotate(-Math.PI/2); g.fillStyle='rgba(255,255,255,0.9)'; g.font='bold 44px sans-serif'; g.textAlign='center'; g.fillText(labelTxt, 0, 14); g.restore();
+  g.fillStyle='#3d4147'; g.fillRect(0, Z(-5.2), 1024, Z(-4.4)-Z(-5.2));
+  g.fillStyle='#e8b93b'; for(let x=-15;x<15;x+=1.6) g.fillRect(X(x), Z(-4.85), 18, 3);
+  g.strokeStyle='#e8b93b'; g.lineWidth=3;
+  [-11.5,-9,-6.5,-1.5,1.2,7.2,9.8].forEach(gx=>{ g.beginPath(); g.moveTo(X(gx), Z(3.5)); g.lineTo(X(gx), Z(1.9)); g.stroke(); g.fillStyle='#e8b93b'; g.fillRect(X(gx)-9, Z(1.82), 18, 4); });
+  g.fillStyle='#3a3f45'; g.fillRect(0, Z(7.6), 1024, Z(8.9)-Z(7.6));
+  g.fillStyle='rgba(255,255,255,0.6)'; for(let x=-14;x<14;x+=2.4) g.fillRect(X(x), Z(8.2), 22, 3);
+  const t=new THREE.CanvasTexture(cv); t.anisotropy=8; t.colorSpace=THREE.SRGBColorSpace; return t; }
+function makePlane2(stripe, tail){
+  const g=new THREE.Group(); const W=M.white; const stripeM=std({color:stripe,roughness:0.45}); const tailM=std({color:tail,roughness:0.5});
+  const fus=new THREE.Mesh(new THREE.CylinderGeometry(0.30,0.30,3.3,14), W); fus.rotation.z=Math.PI/2; fus.position.y=0.62; g.add(fus);
+  const nose=cone(0.30,0.85,W,1.95,0,14); nose.rotation.z=-Math.PI/2; nose.position.set(1.95,0.62,0); g.add(nose);
+  const tailC=new THREE.Mesh(new THREE.CylinderGeometry(0.30,0.10,0.8,12), W); tailC.rotation.z=Math.PI/2; tailC.position.set(-1.95,0.68,0); g.add(tailC);
+  const band=new THREE.Mesh(new THREE.CylinderGeometry(0.305,0.305,2.3,14), stripeM); band.rotation.z=Math.PI/2; band.position.set(0.05,0.62,0); g.add(band);
+  g.add(box(0.5,0.15,0.42, M.dark, 1.78,0.84,0));
+  const wing=box(0.62,0.06,2.9, std({color:0xd8dde2,roughness:0.4,metalness:0.3}), -0.1,0.42,0); wing.rotation.y=-0.28; g.add(wing);
+  [-0.72,0.72].forEach(z=>{ const en=cyl(0.10,0.10,0.38, M.dark, 0,0,10); en.rotation.z=Math.PI/2; en.position.set(0.3,0.3,z); g.add(en); });
+  const fin=box(0.52,0.68,0.07, tailM, -2.18,1.06,0); fin.rotation.z=-0.3; g.add(fin);
+  g.add(box(0.4,0.05,1.25, W, -2.25,0.74,0));
+  [[1.05,0],[-0.25,0.17],[-0.25,-0.17]].forEach(([gx,gz])=>g.add(box(0.09,0.3,0.09, M.dark, gx,0.15,gz)));
+  return g; }
+function jetBridge(gx, gz, ang){ const gr=new THREE.Group(); gr.position.set(gx,0.3,gz); gr.rotation.y=ang||0;
+  gr.add(box(0.3,1.05,0.3, M.grey, 0,0.52,0)); const arm=box(0.36,0.44,1.7, M.white, 0,1.18,-0.8); gr.add(arm); gr.add(box(0.44,0.5,0.3, M.dark, 0,1.18,-1.6)); return gr; }
+function airportHND(x,z){
+  const g=new THREE.Group(); g.position.set(x,0,z); g.scale.setScalar(0.85);
+  g.add(box(30,0.3,19, texMat(airportTex('34R'),{roughness:0.95}), 0,0.15,0));
+  const t3=new THREE.Group(); t3.position.set(-8.2,0.3,5.6); g.add(t3);
+  const t3g=glassTex('#b9d2e4'); t3g.repeat.set(6,2);
+  t3.add(box(10.6,2.5,3.1, texMat(t3g), 0,1.25,0));
+  const roofM=std({color:0xd8dde2,roughness:0.35,metalness:0.55});
+  const r1=box(10.9,0.09,2.05, roofM, 0,2.98,-0.88); r1.rotation.x=0.36; t3.add(r1);
+  const r2=box(10.9,0.09,2.05, roofM, 0,2.98,0.88); r2.rotation.x=-0.36; t3.add(r2);
+  t3.add(box(10.7,0.35,0.5, texMat(glassTex('#cfe2f2')), 0,3.28,0));
+  t3.add(box(8.2,0.12,1.1, M.dark, 0,1.55,-2.05));
+  t3.add(box(3.4,0.62,0.14, glowMat(signTex('羽田空港 HND','#0c4a6e','#ffffff',false)), 0,2.1,-1.62));
+  const t1=new THREE.Group(); t1.position.set(0.6,0.3,5.7); g.add(t1);
+  t1.add(box(8.6,2.3,3.0, texMat(facadeTex('#d5dbe1')), 0,1.15,0));
+  const t1r1=box(8.8,0.08,1.9, roofM, 0,2.62,-0.8); t1r1.rotation.x=0.3; t1.add(t1r1);
+  const t1r2=box(8.8,0.08,1.9, roofM, 0,2.62,0.8); t1r2.rotation.x=-0.3; t1.add(t1r2);
+  t1.add(box(8.7,0.4,2.6, texMat(glassTex('#c3d5e4')), 0,0.5,0));
+  t1.add(box(2.8,0.55,0.14, glowMat(signTex('第1ターミナル','#7c2d12','#ffffff',false)), 0,1.8,-1.57));
+  const t2=new THREE.Group(); t2.position.set(9.3,0.3,5.7); g.add(t2);
+  t2.add(box(6.2,2.5,3.0, texMat(facadeTex('#e3e7ec')), 0,1.25,0));
+  t2.add(box(6.4,0.35,3.2, M.dark, 0,2.68,0));
+  t2.add(box(6.3,0.3,0.1, std({color:0x2563eb,roughness:0.5}), 0,1.55,-1.53));
+  t2.add(box(6.3,0.3,0.1, std({color:0x2563eb,roughness:0.5}), 0,0.75,-1.53));
+  t2.add(box(2.8,0.55,0.14, glowMat(signTex('第2ターミナル','#1e3a5f','#ffffff',false)), 0,2.0,-1.57));
+  const twr=new THREE.Group(); twr.position.set(4.6,0.3,3.9); g.add(twr);
+  twr.add(cyl(0.15,0.32,5.4, M.white, 0,0,10));
+  const cab=cyl(0.54,0.4,0.68, M.glass, 0,0,12); cab.position.y=5.72; twr.add(cab);
+  const tr2=cyl(0.6,0.6,0.12, M.dark, 0,0,12); tr2.position.y=6.12; twr.add(tr2);
+  twr.add(cyl(0.025,0.025,0.95, M.dark, 0,0,6));
+  const bc=sph(0.07, new THREE.MeshBasicMaterial({color:0xff3333}), 4.6,6.85,3.9); g.add(bc);
+  const gates=[[-11.5,0x2563eb,0x1e40af,1.12],[-9,0xdc2626,0xdc2626,1.0],[-6.5,0x2563eb,0x1e40af,1.05],[-1.5,0xdc2626,0xdc2626,0.95],[1.2,0x2563eb,0x1e40af,1.0],[7.2,0x2563eb,0x1e40af,0.95],[9.8,0x0ea5e9,0x0369a1,0.9]];
+  gates.forEach(([gx,stripe,tail,sc],i)=>{ g.add(jetBridge(gx, 3.55, (i%2? -0.12:0.12))); if(i!==3){ const pl=makePlane2(stripe,tail); pl.position.set(gx+0.4,0.3,1.15); pl.rotation.y=-Math.PI/2+(i%2?0.05:-0.05); pl.scale.setScalar(sc); g.add(pl); } });
+  g.add(box(3.4,2.9,2.6, texMat(facadeTex('#c9d1d9')), 13.4,1.45,5.9));
+  const bus=new THREE.Group(); bus.add(box(1.9,0.66,0.75,std({color:0x0891b2,roughness:0.5}),0,0.12,0)); bus.add(box(1.7,0.32,0.77, M.glass, 0,0.56,0)); bus.position.set(-3.5,0.32,8.2); g.add(bus);
+  const lb=label('羽田 HND', 1.15, '#7c2d12'); lb.position.y=8.6; g.add(lb);
+  g.userData.spot={id:'hnd', x:x, z:z, name:'羽田机场', desc:'位于东京湾边，距市中心约 15 公里。京急线或单轨电车 15 分钟左右就能进城，是离市区最近的机场。'};
+  g.traverse(o=>{o.userData.spot=g.userData.spot;}); scene.add(g); pickables.push(g); return g;
+}
 function airport(x,z,name,code){
   const g=new THREE.Group(); g.position.set(x,0,z); g.scale.setScalar(0.85);
   g.add(box(14,0.35,5.4,M.dark,0,0.18,0));
@@ -625,7 +696,7 @@ function airport(x,z,name,code){
   g.userData.spot={id:code.toLowerCase(), x:x, z:z, name:name+'机场', desc:code==='NRT'?'位于千叶县成田市，距市中心约 60 公里（地图已压缩）。进城首选 Skyliner、成田特快 NEX 或 Access 特快。':'位于东京湾边，距市中心约 15 公里。京急线或单轨电车 15 分钟左右就能进城，是离市区最近的机场。'};
   g.traverse(o=>{o.userData.spot=g.userData.spot;}); scene.add(g); pickables.push(g); return g;
 }
-const HNDP=proj(139.780, 35.549); airport(HNDP[0], HNDP[1], '羽田', 'HND');
+const HNDP=proj(139.780, 35.549); airportHND(HNDP[0], HNDP[1]);
 airport(58, -44, '成田', 'NRT');
 
 // 路线数据（站点为真实经纬度，成田为示意起点）

@@ -1145,4 +1145,4 @@ function buildCity(scene, d, sr, isNight){
     window.__streetTrees={inst:tInst, seeds:tList.map(tp=>tp[2])};
   }
 }
-export { M, ANIM, RND, label, spots, box, cyl, cone, sph, beam, ring, tor, cnv, std, texMat, glowMat, facadeTex, signTex, hipRoof, tree, pinkTree, treeMat, people, blink , buildCity };
+export { M, ANIM, RND, label, spots, box, cyl, cone, sph, beam, ring, tor, cnv, std, texMat, glowMat, facadeTex, glassTex, signTex, hipRoof, tree, pinkTree, treeMat, people, blink , buildCity };
