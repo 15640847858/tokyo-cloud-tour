@@ -711,6 +711,7 @@ function havKm(a,b){ const R=6371, dLa=(b[1]-a[1])*Math.PI/180, dLo=(b[0]-a[0])*
 function detHtml(inf){ return (inf.details||[]).map(d=>'<h4>'+d[0]+'</h4><p>'+d[1]+'</p>').join(''); }
 function nearHtml(s){ const me=WXGEO[s.id]; if(!me) return ''; const AM=allSpotsMap(); const list=Object.keys(WXGEO).filter(id=>id!==s.id&&AM[id]).map(id=>({id, name:sName(AM[id]), km:havKm(me, WXGEO[id])})).sort((a,b)=>a.km-b.km).slice(0,4);
   return '<h4>'+T('nearTitle')+'</h4>'+list.map(n=>'<div class="nearRow"><span>'+n.name+' · '+T('approx')+' '+(n.km<1?Math.round(n.km*1000)+' m':n.km.toFixed(1)+' km')+'</span><button class="nearBtn" data-sid="'+n.id+'">'+T('goTo')+'</button></div>').join('')+'<div class="credit">'+T('nearNote')+'</div>'; }
+function goGuide(s){ if(!s) return; const ov=infoBody.querySelector('.gtab[data-p="ov"]'); if(ov) ov.click(); if(typeof s.x==='number') flyTo(s.x, s.z, 54, 36); routeObjs.forEach(r=>{ r.mat.opacity=0.9; }); setTimeout(()=>routeObjs.forEach(r=>{ r.mat.opacity=0.28; }), 6000); if(matchMedia('(pointer:coarse)').matches) setSheet('half'); else infoEl.classList.remove('cmp'); }
 function showInfo(s){ clearStampFx(); hideWelcomeToast(); infoEl.style.display=''; infoEl.classList.add('hasSpot','cmp'); paintSheetToggle(); infoEl.classList.remove('popIn'); void infoEl.offsetWidth; infoEl.classList.add('popIn'); const m=locMeta(s.id); const inf=locInf(s.id); window.__cur={type:'spot', s}; stopCar();
   const gq=encodeURIComponent(GMAPS[s.id]||s.name);
   const actions='<div class="actions"><button class="actbtn" id="goBtn">'+T('directions')+'</button><a class="actbtn ghost" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+gq+'">'+T('gmaps')+' \u2197</a><button class="actbtn ghost" id="stampBtn">🖌 盖御朱印</button><button class="actbtn ghost" id="favBtn">☆ 收藏</button><button class="actbtn ghost" id="ambBtn">🔊 环境音</button><button class="actbtn ghost" id="shareBtn">🔗 分享</button></div>';
@@ -733,7 +734,7 @@ function showInfo(s){ clearStampFx(); hideWelcomeToast(); infoEl.style.display='
     if(navigator.share){ try{ await navigator.share(data); }catch(_){ } return; }
     try{ await navigator.clipboard.writeText(data.url); shb.textContent='\u2713 '+T('copied'); setTimeout(()=>{ shb.textContent='\u{1F517} '+T('share'); },1800); }catch(_){ } }; }
   const gb=document.getElementById('goBtn');
-  if(gb){ gb.onclick=()=>{ const ov=infoBody.querySelector('.gtab[data-p="ov"]'); if(ov) ov.click(); if(typeof s.x==='number') flyTo(s.x, s.z, 54, 36); routeObjs.forEach(r=>{ r.mat.opacity=0.9; }); setTimeout(()=>routeObjs.forEach(r=>{ r.mat.opacity=0.28; }), 6000); if(matchMedia('(pointer:coarse)').matches) setSheet('half'); }; }
+  if(gb){ gb.onclick=()=>goGuide(s); }
   const fb=document.getElementById('favBtn');
   if(fb){ const paint=()=>{ fb.textContent = FAVS.has(s.id) ? T('favOn') : T('fav'); }; paint();
     fb.onclick=()=>{ if(FAVS.has(s.id)) FAVS.delete(s.id); else FAVS.add(s.id); try{ localStorage.setItem('tt_favs', JSON.stringify([...FAVS])); }catch(e){} paint(); paintFavs(); }; }
@@ -896,7 +897,7 @@ function setPeek(name, meta, img, desc, sub){ const pk=document.getElementById('
   const stop=e=>e.stopPropagation();
   const pf=document.getElementById('pkFav');
   if(pf) pf.onclick=e=>{ stop(e); if(FAVS.has(cur.id)) FAVS.delete(cur.id); else FAVS.add(cur.id); try{ localStorage.setItem('tt_favs', JSON.stringify([...FAVS])); }catch(_){ } const on=FAVS.has(cur.id); pf.textContent=on?'\u2605':'\u2606'; pf.classList.toggle('on', on); const fb3=document.getElementById('favBtn'); if(fb3) fb3.textContent=on?T('favOn'):T('fav'); paintFavs(); };
-  const pfo=document.getElementById('pkFocus'); if(pfo) pfo.onclick=e=>{ stop(e); const CF=matchMedia('(pointer:coarse)').matches; flyTo(cur.x, cur.z, CF?19:30, CF?12.5:21); };
+  const pfo=document.getElementById('pkFocus'); if(pfo) pfo.onclick=e=>{ stop(e); goGuide(cur); };
   const pc=document.getElementById('pkClose'); if(pc) pc.onclick=e=>{ stop(e); closeCard(); };
   const pv=document.getElementById('pkChev'); if(pv) pv.onclick=e=>{ stop(e); expandCard(); };
   const pm=document.getElementById('pkMore'); if(pm) pm.onclick=e=>{ stop(e); expandCard(); };
