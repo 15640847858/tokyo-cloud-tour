@@ -126,6 +126,7 @@
     #info{transition:max-height .38s ease,transform .38s ease}
     #info.st-hide{transform:translateY(calc(100% + 24px))}
     #info.st-peek{max-height:92px;overflow:hidden}
+    #info.hasSpot.st-peek{max-height:180px}
     #info.st-half{max-height:54vh}
     #info.st-full{max-height:calc(100dvh - 108px)}
     #info.st-peek #infoBody{display:none}
@@ -319,6 +320,30 @@ header h1{background:linear-gradient(100deg,#e9cf8f 15%,#caa25e 38%,#fff3cf 50%,
 
 /* day-sky legibility for floating texts */
 header .sub, #hint{ text-shadow:0 1px 3px rgba(5,10,20,.65), 0 0 10px rgba(5,10,20,.45); }
+
+/* ===== POI card redesign: premium glass + compact/expanded dual state ===== */
+#info{background:linear-gradient(165deg,rgba(16,24,42,.87),rgba(7,11,20,.94));-webkit-backdrop-filter:blur(20px) saturate(1.35);backdrop-filter:blur(20px) saturate(1.35);border:1px solid rgba(230,200,135,.25);box-shadow:0 24px 60px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.08)}
+#sheetPeek{flex-direction:column;align-items:stretch;gap:10px}
+#info.st-peek #sheetPeek{align-items:stretch;padding:2px 2px 2px}
+.pkRow{display:flex;gap:12px;align-items:center;min-width:0}
+#sheetPeek .pkRow img{width:64px;height:64px;border-radius:14px}
+.pkTx{flex:1;min-width:0}
+#sheetPeek .pkName{font-size:16.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pkSub{font-size:11px;color:#e6c887;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#sheetPeek .pkMeta{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pkDesc{font-size:12px;opacity:.78;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pkChev{flex:none;width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);color:#e6c887;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.pkChev:active{transform:scale(.94)}
+.pkBar{display:flex;gap:8px}
+.pkBar .pkAct{flex:1;height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#f3ead2;font-size:12.5px;display:flex;align-items:center;justify-content:center;gap:4px;cursor:pointer;text-decoration:none;padding:0 4px;white-space:nowrap}
+.pkBar .pkAct:active{transform:scale(.96)}
+.pkBar .pkAct.go{background:linear-gradient(135deg,#e6c887,#c9a45c);color:#231a08;font-weight:700;border:none}
+.pkBar .pkAct.on{color:#e6c887;border-color:rgba(230,200,135,.55);background:rgba(230,200,135,.12)}
+@media(min-width:761px){
+  #info.cmp #infoBody{display:none}
+  #info.cmp #sheetPeek{display:flex}
+  #info.hasSpot:not(.cmp) #sheetToggle{display:block;position:absolute;top:10px;right:54px;z-index:21;padding:6px 12px;border-radius:99px;border:1px solid rgba(255,255,255,.18);background:rgba(7,11,20,.5);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#e6c887;font-size:12px;cursor:pointer}
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <script type="importmap">
@@ -612,7 +637,7 @@ spots.forEach(s=>{ const b=document.createElement('button'); b.className='spot';
 
 const infoEl=document.getElementById('info');
 const infoBody=document.getElementById('infoBody');
-document.getElementById('infoClose').onclick=()=>{ infoEl.style.display='none'; const sh2=document.getElementById('sheetShade'); if(sh2) sh2.classList.remove('on'); clearStampFx(); stopCar(); ambSet('off'); clearSelection(); window.__cur={type:'welcome'}; const tb=document.getElementById('tourbar'); if(tb) tb.style.bottom=''; };
+document.getElementById('infoClose').onclick=()=>{ infoEl.style.display='none'; infoEl.classList.remove('hasSpot','cmp'); const pkc=document.getElementById('sheetPeek'); if(pkc) pkc.innerHTML=''; const sh2=document.getElementById('sheetShade'); if(sh2) sh2.classList.remove('on'); clearStampFx(); stopCar(); ambSet('off'); clearSelection(); window.__cur={type:'welcome'}; const tb=document.getElementById('tourbar'); if(tb) tb.style.bottom=''; };
 let INFO={};
 Promise.all([fetch('info.json').then(r=>r.json()).catch(()=>({})), fetch('info2.json').then(r=>r.json()).catch(()=>({}))]).then(([ia,ib])=>{ INFO=Object.assign({}, ia, ib); if(typeof renderGoshuin==='function') renderGoshuin(); });const META={dome:['水道桥站 / 后乐园站','建议停留 2–3 小时'], stadium:['国立竞技场站 / 千駄ヶ谷站','建议停留 1.5 小时'], 
  skytree:['押上站（晴空塔站）','建议停留 1.5–2 小时'], sensoji:['浅草站','建议停留 2–3 小时'], tower:['赤羽桥站 / 大门站','建议停留 1.5 小时'],
@@ -679,7 +704,7 @@ function havKm(a,b){ const R=6371, dLa=(b[1]-a[1])*Math.PI/180, dLo=(b[0]-a[0])*
 function detHtml(inf){ return (inf.details||[]).map(d=>'<h4>'+d[0]+'</h4><p>'+d[1]+'</p>').join(''); }
 function nearHtml(s){ const me=WXGEO[s.id]; if(!me) return ''; const AM=allSpotsMap(); const list=Object.keys(WXGEO).filter(id=>id!==s.id&&AM[id]).map(id=>({id, name:sName(AM[id]), km:havKm(me, WXGEO[id])})).sort((a,b)=>a.km-b.km).slice(0,4);
   return '<h4>'+T('nearTitle')+'</h4>'+list.map(n=>'<div class="nearRow"><span>'+n.name+' · '+T('approx')+' '+(n.km<1?Math.round(n.km*1000)+' m':n.km.toFixed(1)+' km')+'</span><button class="nearBtn" data-sid="'+n.id+'">'+T('goTo')+'</button></div>').join('')+'<div class="credit">'+T('nearNote')+'</div>'; }
-function showInfo(s){ clearStampFx(); hideWelcomeToast(); infoEl.style.display=''; infoEl.classList.remove('popIn'); void infoEl.offsetWidth; infoEl.classList.add('popIn'); const m=locMeta(s.id); const inf=locInf(s.id); window.__cur={type:'spot', s}; stopCar();
+function showInfo(s){ clearStampFx(); hideWelcomeToast(); infoEl.style.display=''; infoEl.classList.add('hasSpot','cmp'); paintSheetToggle(); infoEl.classList.remove('popIn'); void infoEl.offsetWidth; infoEl.classList.add('popIn'); const m=locMeta(s.id); const inf=locInf(s.id); window.__cur={type:'spot', s}; stopCar();
   const gq=encodeURIComponent(GMAPS[s.id]||s.name);
   const actions='<div class="actions"><a class="actbtn" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination='+gq+'">'+T('directions')+'</a><a class="actbtn ghost" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+gq+'">'+T('gmaps')+'</a><button class="actbtn ghost" id="stampBtn">🖌 盖御朱印</button><button class="actbtn ghost" id="favBtn">☆ 收藏</button><button class="actbtn ghost" id="ambBtn">🔊 环境音</button><button class="actbtn ghost" id="shareBtn">🔗 分享</button></div>';
   if(inf){
@@ -708,7 +733,8 @@ function showInfo(s){ clearStampFx(); hideWelcomeToast(); infoEl.style.display='
   const ab=document.getElementById('ambBtn');
   if(ab){ paintAmbBtn(); ab.onclick=()=>{ ambOn=!ambOn; try{ localStorage.setItem('tt_amb', ambOn?'on':'off'); }catch(e){} if(ambOn) ambSet(AMB_TYPE[s.id]||'city', true); else ambSet(AMB_TYPE[s.id]||'city'); }; }
   ambSet(AMB_TYPE[s.id]||'city');
-  setPeek(sName(s), (m?m[0]+' · '+m[1]:(locDesc(s)||'')), (typeof carList!=='undefined'&&carList.length)?carList[0].url:null);
+  const UU=window.I18NUI; const subName=(UU&&UU.names)?(LANG==='ja'?((UU.names.en||{})[s.id]||''):((UU.names.ja||{})[s.id]||'')):'';
+  setPeek(sName(s), (m?m[0]+' · '+m[1]:''), (typeof carList!=='undefined'&&carList.length)?carList[0].url:null, locDesc(s)||'', subName);
   if(matchMedia('(pointer:coarse)').matches) setSheet('peek');
   if(inf) spotWx(s);
   if(typeof s.x==='number'){ const CF=matchMedia('(pointer:coarse)').matches; flyTo(s.x, s.z, CF?19:30, CF?12.5:21); } }
@@ -852,20 +878,27 @@ function setSheet(st){ sheetState=st; infoEl.classList.remove('st-peek','st-half
     else { tb.style.visibility='visible';
       const dock=()=>{ const r=infoEl.getBoundingClientRect(); tb.style.bottom=Math.min(Math.round(innerHeight-r.top+10), innerHeight-170)+'px'; };
       dock(); setTimeout(()=>{ if(sheetState===st && tb.style.display==='block') dock(); },430); } } }
-function setPeek(name, meta, img){ const pk=document.getElementById('sheetPeek'); if(!pk) return;
+function setPeek(name, meta, img, desc, sub){ const pk=document.getElementById('sheetPeek'); if(!pk) return;
   const cur=(window.__cur && window.__cur.type==='spot') ? window.__cur.s : null;
-  let acts='';
-  if(cur){ const gq2=encodeURIComponent(GMAPS[cur.id]||cur.name);
-    acts='<div class="pkActs"><a class="pkBtn" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination='+gq2+'" aria-label="route">🧭</a><button class="pkBtn'+(FAVS.has(cur.id)?' on':'')+'" id="pkFav" aria-label="fav">'+(FAVS.has(cur.id)?'★':'☆')+'</button></div>'; }
-  pk.innerHTML=(img?'<img src="'+img+'" alt="">':'')+'<div class="pkTx"><div class="pkName">'+name+'</div><div class="pkMeta">'+meta+'</div></div>'+acts;
+  if(!cur){ pk.innerHTML=''; return; }
+  const gq2=encodeURIComponent(GMAPS[cur.id]||cur.name);
+  const fav=FAVS.has(cur.id);
+  pk.innerHTML='<div class="pkRow">'+(img?'<img src="'+img+'" alt="">':'')+'<div class="pkTx"><div class="pkName">'+name+'</div>'+(sub?'<div class="pkSub">'+sub+'</div>':'')+(meta?'<div class="pkMeta">'+meta+'</div>':'')+(desc?'<div class="pkDesc">'+desc+'</div>':'')+'</div><button class="pkChev" id="pkChev" aria-label="expand">\u2303</button></div>'
+    +'<div class="pkBar"><button class="pkAct" id="pkFocus">\u{1F3AF} '+T('cmpFocus')+'</button><a class="pkAct go" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination='+gq2+'">\u{1F9ED} '+T('cmpGo')+'</a><button class="pkAct'+(fav?' on':'')+'" id="pkFav">'+(fav?T('favOn'):T('fav'))+'</button><button class="pkAct" id="pkClose">\u2715 '+T('cmpClose')+'</button></div>';
+  const stop=e=>e.stopPropagation();
   const pf=document.getElementById('pkFav');
-  if(pf && cur){ pf.onclick=e=>{ e.stopPropagation(); if(FAVS.has(cur.id)) FAVS.delete(cur.id); else FAVS.add(cur.id); try{ localStorage.setItem('tt_favs', JSON.stringify([...FAVS])); }catch(_){ } pf.textContent=FAVS.has(cur.id)?'★':'☆'; pf.classList.toggle('on', FAVS.has(cur.id)); const fb3=document.getElementById('favBtn'); if(fb3) fb3.textContent=FAVS.has(cur.id)?T('favOn'):T('fav'); paintFavs(); }; }
-  const pd=pk.querySelector('.pkActs a'); if(pd) pd.addEventListener('click', e=>e.stopPropagation());
+  if(pf) pf.onclick=e=>{ stop(e); if(FAVS.has(cur.id)) FAVS.delete(cur.id); else FAVS.add(cur.id); try{ localStorage.setItem('tt_favs', JSON.stringify([...FAVS])); }catch(_){ } const on=FAVS.has(cur.id); pf.textContent=on?T('favOn'):T('fav'); pf.classList.toggle('on', on); const fb3=document.getElementById('favBtn'); if(fb3) fb3.textContent=on?T('favOn'):T('fav'); paintFavs(); };
+  const pfo=document.getElementById('pkFocus'); if(pfo) pfo.onclick=e=>{ stop(e); const CF=matchMedia('(pointer:coarse)').matches; flyTo(cur.x, cur.z, CF?19:30, CF?12.5:21); };
+  const pc=document.getElementById('pkClose'); if(pc) pc.onclick=e=>{ stop(e); document.getElementById('infoClose').click(); };
+  const pv=document.getElementById('pkChev'); if(pv) pv.onclick=e=>{ stop(e); expandCard(); };
+  const pd=pk.querySelector('.pkBar a'); if(pd) pd.addEventListener('click', stop);
 }
+function expandCard(){ if(matchMedia('(pointer:coarse)').matches) setSheet('half'); else { infoEl.classList.remove('cmp'); paintSheetToggle(); } }
+function paintSheetToggle(){ const tg=document.getElementById('sheetToggle'); if(tg) tg.textContent = infoEl.classList.contains('cmp') ? T('expand') : T('collapse'); }
 if(matchMedia('(pointer:coarse)').matches) setSheet('peek');
 (function(){ const h=document.getElementById('sheetHandle'); if(!h) return;
   const shadeEl=document.getElementById('sheetShade');
-  const heights=()=>{ const ih=window.innerHeight; return [0, 92, Math.min(Math.round(ih*0.66), ih-96), ih-46]; };
+  const heights=()=>{ const ih=window.innerHeight; return [0, infoEl.classList.contains('hasSpot')?180:92, Math.min(Math.round(ih*0.66), ih-96), ih-46]; };
   function shadeFor(ht){ if(!shadeEl) return; const hs=heights(); const f=Math.max(0, Math.min(1, (ht-hs[1])/Math.max(1,hs[3]-hs[1]))); shadeEl.style.opacity=f.toFixed(3); shadeEl.style.pointerEvents='none'; }
   function endShade(){ if(!shadeEl) return; shadeEl.style.opacity=''; shadeEl.style.pointerEvents=''; }
   let drag=null;
@@ -893,7 +926,7 @@ if(matchMedia('(pointer:coarse)').matches) setSheet('peek');
     const hs=heights(), full=hs[3];
     const raw=drag.h0-dy; let shown;
     if(raw>full) shown=full+Math.min(64,(raw-full)*0.35);
-    else if(raw<92) shown=Math.max(44, 92-(92-raw)*0.45);
+    else if(raw<hs[1]) shown=Math.max(44, hs[1]-(hs[1]-raw)*0.45);
     else shown=raw;
     infoEl.style.maxHeight=shown+'px';
     shadeFor(shown);
@@ -912,15 +945,16 @@ if(matchMedia('(pointer:coarse)').matches) setSheet('peek');
     const v=(s1.t>s0.t)? (s1.y-s0.y)/(s1.t-s0.t) : 0;
     const hs=heights(); const cur=d.h0-dy; const proj=cur - v*230;
     let best=1, bd=1e9; hs.forEach((val,idx)=>{ const dd=Math.abs(val-proj); if(dd<bd){ bd=dd; best=idx; } });
-    if(v>0.6 && sheetState==='peek' && cur<150) best=0;
+    if(v>0.6 && sheetState==='peek' && cur<205) best=0;
     setSheet(SHEET_STATES[best]);
   }
   infoEl.addEventListener('pointerup', ()=>finish(true));
   infoEl.addEventListener('pointercancel', ()=>finish(false));
-  const pk=document.getElementById('sheetPeek'); if(pk) pk.addEventListener('click', ()=>setSheet('half'));
+  const pk=document.getElementById('sheetPeek'); if(pk) pk.addEventListener('click', ()=>expandCard());
   if(shadeEl) shadeEl.addEventListener('click', ()=>setSheet('peek'));
 })();
 document.addEventListener('keydown', e=>{ if(e.key==='Escape' && infoEl.style.display!=='none'){ const ic=document.getElementById('infoClose'); if(ic) ic.click(); } });
+const stgBtn=document.getElementById('sheetToggle'); if(stgBtn) stgBtn.onclick=()=>{ if(matchMedia('(pointer:coarse)').matches){ setSheet(sheetState==='peek'?'half':'peek'); } else { infoEl.classList.toggle('cmp'); paintSheetToggle(); } };
 
 const TOURS={ classic:{name:'东京经典一日游', ids:dayIds},
   trendy:{name:'东京潮流之旅', ids:['harajuku','shibuya','roppongi','odaiba','toyosu']},
