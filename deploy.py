@@ -62,24 +62,29 @@ for src, name in ASSETS:
     print("asset upload", name, "rc:", ra.returncode)
     asset_refs.append({"file": name, "sha": dg, "size": len(blob)})
 
-# builders.js: spot-builder module split out of the inline script (the inline
-# deployment payload hit the argv cap); minified + uploaded by digest like info.json
-subprocess.run(["npx", "-y", "esbuild@0.20.2", str(base / "builders_src.js"), "--minify", "--charset=utf8",
-                "--outfile=/tmp/builders_min.js"], check=True, capture_output=True, text=True)
-subprocess.run(["node", "--check", "/tmp/builders_min.js"], check=True)
-bld = pathlib.Path("/tmp/builders_min.js").read_bytes()
-bdigest = hashlib.sha1(bld).hexdigest()
-upb = {"xVercelDigest": bdigest, "contentLength": len(bld),
-       "requestBody": base64.b64encode(bld).decode()}
-rb = subprocess.run(["/opt/hatch/bin/vercel", "call-tool", "--name", "upload_file",
-                     "--arguments-json", json.dumps(upb)], capture_output=True, text=True, timeout=180)
-print("builders upload rc:", rb.returncode, "bytes:", len(bld))
+# builders.js + airports.js: modules split out of the inline script (the
+# inline deployment payload hit the argv cap); each minified + uploaded by
+# digest like info.json, each kept under the ~95KB upload cap
+files_extra = []
+for _src, _name in (("builders_src.js", "builders.js"), ("airports_src.js", "airports.js")):
+    subprocess.run(["npx", "-y", "esbuild@0.20.2", str(base / _src), "--minify", "--charset=utf8",
+                    "--outfile=/tmp/mod_min.js"], check=True, capture_output=True, text=True)
+    subprocess.run(["node", "--check", "/tmp/mod_min.js"], check=True)
+    _blob = pathlib.Path("/tmp/mod_min.js").read_bytes()
+    _dg = hashlib.sha1(_blob).hexdigest()
+    _up = {"xVercelDigest": _dg, "contentLength": len(_blob),
+           "requestBody": base64.b64encode(_blob).decode()}
+    _r = subprocess.run(["/opt/hatch/bin/vercel", "call-tool", "--name", "upload_file",
+                         "--arguments-json", json.dumps(_up)], capture_output=True, text=True, timeout=180)
+    print("module upload", _name, "rc:", _r.returncode, "bytes:", len(_blob))
+    files_extra.append({"file": _name, "sha": _dg, "size": len(_blob)})
 
 manifest = json.loads((base / "data/upload_manifest.json").read_text())
 files = [{"file": "index.html", "data": deploy_html, "encoding": "utf-8"},
          {"file": "info.json", "sha": digest, "size": len(info)},
          {"file": "info2.json", "sha": digest2, "size": len(info2)},
-         {"file": "builders.js", "sha": bdigest, "size": len(bld)}]
+]
+files.extend(files_extra)
 files.extend(asset_refs)
 for name, m in sorted(manifest.items()):
     files.append({"file": name, "sha": m["sha"], "size": m["size"]})
