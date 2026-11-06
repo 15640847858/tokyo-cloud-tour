@@ -428,6 +428,19 @@ g.add(box(2.7,2.3,1.9, texMat(brickTex()), -4,1.45,-3.1));
 g.add(box(2.4,1.9,1.7, stone, 4.1,1.25,-2.9));
 const pd=cyl(1.05,1.05,0.1, M.water, -3.9,2.5, 18); pd.position.y=0.33; g.add(pd);
 g.add(sph(0.3, M.grey, -3.2,0.42,1.9)); g.add(tree(-4.8,3.4,1.1)); g.add(tree(4.6,2.8,1));
+// ===== UTokyo deep refine: Akamon walls, ginkgo avenue, Sanshiro pond, library =====
+[-2.35,2.35].forEach(wx=>{ aka.add(box(2.2,1.25,0.24, M.white, wx,0.62,0)); aka.add(hipRoof(2.4,0.32,0.5, texMat(kawaraTex()), wx,1.25,0)); aka.add(box(0.5,1.5,0.1, redM, wx>0?-0.55:0.55,0.75,0.1)); });
+g.add(box(1.7,0.05,8.6, std({color:0xcfc8b4,roughness:1}), 0,0.36,0.4));
+[-2.6,-0.9,0.9,2.6].forEach(z=>{ g.add(sph(0.5, ginkgo, -1.7,0.38,z)); g.add(sph(0.5, ginkgo, 1.7,0.38,z)); });
+const pd2=cyl(0.8,0.8,0.1, M.water, -4.5,1.8, 16); pd2.position.y=0.33; g.add(pd2);
+const pd3=cyl(0.62,0.62,0.1, M.water, -3.4,3.2, 14); pd3.position.y=0.33; g.add(pd3);
+g.add(sph(0.22, M.grey, -4.4,0.4,2.6)); g.add(sph(0.16, M.grey, -3.1,0.38,2.2));
+const brg=new THREE.Group(); brg.position.set(-3.85,0.32,2.5); brg.rotation.y=0.7; g.add(brg);
+[-0.3,0,0.3].forEach((ox,i)=>{ const seg=box(0.4,0.07,0.42, std({color:0x8a6844,roughness:1}), ox,0.16+Math.sin((i+0.5)/3*Math.PI)*0.14,0); seg.rotation.z=(i-1)*-0.42; brg.add(seg); });
+[-2.32,2.32].forEach(sx=>{ [-0.85,0.85].forEach(sz=>yd.add(box(0.03,0.95,0.34, M.glass, sx,0.95,sz))); });
+const libSpire=cone(0.34,1.1, std({color:0x3a4149,roughness:0.8}), -4,-3.1,8); libSpire.position.y=3.15; g.add(libSpire);
+g.add(box(1.15,0.5,0.14, glowMat(signTex('総合図書館','#5b21b6','#ffffff',false)), -4,1.15,-2.12));
+[-2.9,2.9].forEach(lx=>{ [-0.6,3.4].forEach(lz=>{ const lp=cyl(0.05,0.06,1.25, M.dark, lx,lz,6); lp.position.y=0.95; g.add(lp); g.add(sph(0.11, std({color:0xfff2c0,roughness:0.4}), lx,1.66,lz)); }); });
 people(g,8,-1,1,-1.5,3.6,0.32); } },
  {id:'palace', name:'皇居', x:-1, z:-3, h:5, desc:'天皇居住地。认得出的是护城河石墙上的白色伏见橹和前面的二重桥，东御苑免费开放，离东京站很近。', make:g=>{ g.add(box(13.5,0.3,10.5, std({color:0x86b06c,roughness:1}), 0,0.15,0));
 g.add(box(13.5,0.34,1.7,M.water,0,0.17,4.6));
