@@ -833,7 +833,7 @@ function nearHtml(s){ const me=WXGEO[s.id]; if(!me) return ''; const AM=allSpots
   return '<h4>'+T('nearTitle')+'</h4>'+list.map(n=>'<div class="nearRow"><span>'+n.name+' · '+T('approx')+' '+(n.km<1?Math.round(n.km*1000)+' m':n.km.toFixed(1)+' km')+'</span><button class="nearBtn" data-sid="'+n.id+'">'+T('goTo')+'</button></div>').join('')+'<div class="credit">'+T('nearNote')+'</div>'; }
 function showInfo(s){ clearStampFx(); hideWelcomeToast(); infoEl.style.display=''; infoEl.classList.add('hasSpot','cmp'); paintSheetToggle(); infoEl.classList.remove('popIn'); void infoEl.offsetWidth; infoEl.classList.add('popIn'); const m=locMeta(s.id); const inf=locInf(s.id); window.__cur={type:'spot', s}; stopCar();
   const gq=encodeURIComponent(GMAPS[s.id]||s.name);
-  const actions='<div class="actions"><a class="actbtn" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination='+gq+'">'+T('directions')+'</a><a class="actbtn ghost" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+gq+'">'+T('gmaps')+'</a><button class="actbtn ghost" id="stampBtn">🖌 盖御朱印</button><button class="actbtn ghost" id="favBtn">☆ 收藏</button><button class="actbtn ghost" id="ambBtn">🔊 环境音</button><button class="actbtn ghost" id="shareBtn">🔗 分享</button></div>';
+  const actions='<div class="actions"><button class="actbtn" id="goBtn">'+T('directions')+'</button><a class="actbtn ghost" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+gq+'">'+T('gmaps')+' \u2197</a><button class="actbtn ghost" id="stampBtn">🖌 盖御朱印</button><button class="actbtn ghost" id="favBtn">☆ 收藏</button><button class="actbtn ghost" id="ambBtn">🔊 环境音</button><button class="actbtn ghost" id="shareBtn">🔗 分享</button></div>';
   if(inf){
     carList = (inf.imgs && inf.imgs.length) ? inf.imgs : (inf.img?[{url:inf.img, credit:inf.credit||''}]:[]);
     carIdx=0;
@@ -852,6 +852,8 @@ function showInfo(s){ clearStampFx(); hideWelcomeToast(); infoEl.style.display='
   if(shb){ shb.textContent='\u{1F517} '+T('share'); shb.onclick=async()=>{ const data={title:document.title, text:sName(s), url:'https://ibun.fun/'};
     if(navigator.share){ try{ await navigator.share(data); }catch(_){ } return; }
     try{ await navigator.clipboard.writeText(data.url); shb.textContent='\u2713 '+T('copied'); setTimeout(()=>{ shb.textContent='\u{1F517} '+T('share'); },1800); }catch(_){ } }; }
+  const gb=document.getElementById('goBtn');
+  if(gb){ gb.onclick=()=>{ const ov=infoBody.querySelector('.gtab[data-p="ov"]'); if(ov) ov.click(); if(typeof s.x==='number') flyTo(s.x, s.z, 54, 36); routeObjs.forEach(r=>{ r.mat.opacity=0.9; }); setTimeout(()=>routeObjs.forEach(r=>{ r.mat.opacity=0.28; }), 6000); if(matchMedia('(pointer:coarse)').matches) setSheet('half'); }; }
   const fb=document.getElementById('favBtn');
   if(fb){ const paint=()=>{ fb.textContent = FAVS.has(s.id) ? T('favOn') : T('fav'); }; paint();
     fb.onclick=()=>{ if(FAVS.has(s.id)) FAVS.delete(s.id); else FAVS.add(s.id); try{ localStorage.setItem('tt_favs', JSON.stringify([...FAVS])); }catch(e){} paint(); paintFavs(); }; }
