@@ -344,6 +344,24 @@ header .sub, #hint{ text-shadow:0 1px 3px rgba(5,10,20,.65), 0 0 10px rgba(5,10,
   #info.cmp #sheetPeek{display:flex}
   #info.hasSpot:not(.cmp) #sheetToggle{display:block;position:absolute;top:10px;right:54px;z-index:21;padding:6px 12px;border-radius:99px;border:1px solid rgba(255,255,255,.18);background:rgba(7,11,20,.5);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#e6c887;font-size:12px;cursor:pointer}
 }
+
+/* ===== POI card v2: Apple-Maps minimal ===== */
+#info{background:linear-gradient(180deg,rgba(17,25,40,.94),rgba(10,15,26,.97));border:1px solid rgba(255,255,255,.09);border-radius:24px;box-shadow:0 22px 55px rgba(0,0,0,.5)}
+#sheetPeek{gap:9px}
+#sheetPeek .pkRow img{width:72px;height:72px;border-radius:16px;border:none;box-shadow:none}
+#sheetPeek .pkName{font-size:19px;font-weight:700;letter-spacing:.01em}
+.pkSub{font-size:11.5px;color:rgba(235,240,255,.55);letter-spacing:.14em;text-transform:uppercase;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#sheetPeek .pkMeta{font-size:13px;color:rgba(238,242,250,.78);margin-top:5px}
+.pkChev{border:none;background:transparent;color:#fff;font-size:20px;width:36px;height:36px;box-shadow:none}
+.pkDiv{height:1px;background:rgba(255,255,255,.13)}
+.pkBar{display:none}
+.pkBar2{display:flex;align-items:center;gap:12px}
+.pkCirc{width:44px;height:44px;flex:none;border-radius:50%;border:none;background:rgba(255,255,255,.09);color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.pkCirc.fav{color:#e6c887;font-size:20px}
+.pkCirc:active{transform:scale(.93)}
+.pkSpacer{flex:1}
+.pkTxt{background:none;border:none;color:rgba(238,242,250,.88);font-size:13.5px;cursor:pointer;padding:11px 4px}
+.pkTxt:active{opacity:.6}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <script type="importmap">
@@ -733,7 +751,7 @@ function showInfo(s){ clearStampFx(); hideWelcomeToast(); infoEl.style.display='
   const ab=document.getElementById('ambBtn');
   if(ab){ paintAmbBtn(); ab.onclick=()=>{ ambOn=!ambOn; try{ localStorage.setItem('tt_amb', ambOn?'on':'off'); }catch(e){} if(ambOn) ambSet(AMB_TYPE[s.id]||'city', true); else ambSet(AMB_TYPE[s.id]||'city'); }; }
   ambSet(AMB_TYPE[s.id]||'city');
-  const UU=window.I18NUI; const subName=(UU&&UU.names)?(LANG==='ja'?((UU.names.en||{})[s.id]||''):((UU.names.ja||{})[s.id]||'')):'';
+  const UU=window.I18NUI; const subName=(UU&&UU.names)?(LANG==='en'?((UU.names.ja||{})[s.id]||''):((UU.names.en||{})[s.id]||'')):'';
   setPeek(sName(s), (m?m[0]+' · '+m[1]:''), (typeof carList!=='undefined'&&carList.length)?carList[0].url:null, locDesc(s)||'', subName);
   if(matchMedia('(pointer:coarse)').matches) setSheet('peek');
   if(inf) spotWx(s);
@@ -881,17 +899,16 @@ function setSheet(st){ sheetState=st; infoEl.classList.remove('st-peek','st-half
 function setPeek(name, meta, img, desc, sub){ const pk=document.getElementById('sheetPeek'); if(!pk) return;
   const cur=(window.__cur && window.__cur.type==='spot') ? window.__cur.s : null;
   if(!cur){ pk.innerHTML=''; return; }
-  const gq2=encodeURIComponent(GMAPS[cur.id]||cur.name);
   const fav=FAVS.has(cur.id);
-  pk.innerHTML='<div class="pkRow">'+(img?'<img src="'+img+'" alt="">':'')+'<div class="pkTx"><div class="pkName">'+name+'</div>'+(sub?'<div class="pkSub">'+sub+'</div>':'')+(meta?'<div class="pkMeta">'+meta+'</div>':'')+(desc?'<div class="pkDesc">'+desc+'</div>':'')+'</div><button class="pkChev" id="pkChev" aria-label="expand">\u2303</button></div>'
-    +'<div class="pkBar"><button class="pkAct" id="pkFocus">\u{1F3AF} '+T('cmpFocus')+'</button><a class="pkAct go" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination='+gq2+'">\u{1F9ED} '+T('cmpGo')+'</a><button class="pkAct'+(fav?' on':'')+'" id="pkFav">'+(fav?T('favOn'):T('fav'))+'</button><button class="pkAct" id="pkClose">\u2715 '+T('cmpClose')+'</button></div>';
+  pk.innerHTML='<div class="pkRow">'+(img?'<img src="'+img+'" alt="">':'')+'<div class="pkTx"><div class="pkName">'+name+'</div>'+(sub?'<div class="pkSub">'+sub+'</div>':'')+(meta?'<div class="pkMeta">'+meta+'</div>':'')+'</div><button class="pkChev" id="pkChev" aria-label="expand">\u2303</button></div>'
+    +'<div class="pkDiv"></div><div class="pkBar2"><button class="pkCirc" id="pkFocus" aria-label="focus">\u27A4</button><button class="pkCirc fav'+(fav?' on':'')+'" id="pkFav" aria-label="fav">'+(fav?'\u2605':'\u2606')+'</button><span class="pkSpacer"></span><button class="pkTxt" id="pkMore">'+T('cmpMore')+'</button><button class="pkTxt" id="pkClose">'+T('cmpClose')+' \u00D7</button></div>';
   const stop=e=>e.stopPropagation();
   const pf=document.getElementById('pkFav');
-  if(pf) pf.onclick=e=>{ stop(e); if(FAVS.has(cur.id)) FAVS.delete(cur.id); else FAVS.add(cur.id); try{ localStorage.setItem('tt_favs', JSON.stringify([...FAVS])); }catch(_){ } const on=FAVS.has(cur.id); pf.textContent=on?T('favOn'):T('fav'); pf.classList.toggle('on', on); const fb3=document.getElementById('favBtn'); if(fb3) fb3.textContent=on?T('favOn'):T('fav'); paintFavs(); };
+  if(pf) pf.onclick=e=>{ stop(e); if(FAVS.has(cur.id)) FAVS.delete(cur.id); else FAVS.add(cur.id); try{ localStorage.setItem('tt_favs', JSON.stringify([...FAVS])); }catch(_){ } const on=FAVS.has(cur.id); pf.textContent=on?'\u2605':'\u2606'; pf.classList.toggle('on', on); const fb3=document.getElementById('favBtn'); if(fb3) fb3.textContent=on?T('favOn'):T('fav'); paintFavs(); };
   const pfo=document.getElementById('pkFocus'); if(pfo) pfo.onclick=e=>{ stop(e); const CF=matchMedia('(pointer:coarse)').matches; flyTo(cur.x, cur.z, CF?19:30, CF?12.5:21); };
   const pc=document.getElementById('pkClose'); if(pc) pc.onclick=e=>{ stop(e); document.getElementById('infoClose').click(); };
   const pv=document.getElementById('pkChev'); if(pv) pv.onclick=e=>{ stop(e); expandCard(); };
-  const pd=pk.querySelector('.pkBar a'); if(pd) pd.addEventListener('click', stop);
+  const pm=document.getElementById('pkMore'); if(pm) pm.onclick=e=>{ stop(e); expandCard(); };
 }
 function expandCard(){ if(matchMedia('(pointer:coarse)').matches) setSheet('half'); else { infoEl.classList.remove('cmp'); paintSheetToggle(); } }
 function paintSheetToggle(){ const tg=document.getElementById('sheetToggle'); if(tg) tg.textContent = infoEl.classList.contains('cmp') ? T('expand') : T('collapse'); }
