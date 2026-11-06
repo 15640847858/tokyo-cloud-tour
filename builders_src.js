@@ -348,6 +348,7 @@ for(let i=0;i<5;i++){ g.add(box(0.34,0.62,0.3, std({color:['#d92323','#2563eb','
 people(g,14,-1.2,1.2,-3.4,3.4,0.32); } },
  {id:'ueno', name:'上野公园', x:10, z:-17, h:5, desc:'博物馆、美术馆和动物园集中的文化区，正面是东京国立博物馆本馆，春天满园樱花。从成田坐 Skyliner 直达这里。', make:g=>{ g.add(box(12.5,0.3,9.5,M.park,0,0.15,0));
 const cream=std({color:0xe8e0cc,roughness:0.9}); const grnRoof=std({color:0x4a7d6a,roughness:0.8});
+g.add(box(8.2,0.07,3.4, texMat(paveTex(),{roughness:1}), 0,0.34,0.6));
 g.add(box(6.6,2.3,2.7, texMat(facadeTex('#e8e0cc','#fff6d8')), 0,1.15,-2.4));
 g.add(hipRoof(7.4,1,3.5,grnRoof,0,2.3,-2.4));
 g.add(box(2.6,1,1.8, cream, 0,2.8,-2.4)); g.add(hipRoof(3.2,0.8,2.4,grnRoof,0,3.3,-2.4));
@@ -824,7 +825,7 @@ ANIM.push(t=>{ cl1.position.x=-4+Math.sin(t*0.05)*1.2; cl2.position.x=5.5+Math.s
 people(g,6,-5.5,-1.5,3.5,6.5,0.35); } },
 
 {id:'dome', name:'东京巨蛋', x:0, z:0, h:6.6, desc:'日本第一座全天候巨蛋球场（1988 年），读卖巨人队主场，白色屋顶靠气压撑起，人称“BIG EGG”。旁边的东京巨蛋城里有无心摩天轮 Big O 与穿楼而过的过山车。', make:g=>{
-g.add(box(19,0.3,14.5, std({color:0xa3a294,roughness:1}), 0,0.15,0));
+g.add(box(19,0.3,14.5, texMat(paveTex(),{roughness:1}), 0,0.15,0));
 const dmat=std({color:0xf3f1ec, roughness:0.5, metalness:0.05});
 const dm=new THREE.Mesh(new THREE.SphereGeometry(6.4, 40, 20, 0, Math.PI*2, 0, Math.PI/2), dmat);
 dm.scale.set(1,0.52,0.88); dm.position.set(-2.4,0.8,0); dm.castShadow=true; g.add(dm);
@@ -850,7 +851,7 @@ people(g,7,-6,2,4.5,6.2,0.3);
 } },
 
 {id:'stadium', name:'国立竞技场', x:0, z:0, h:5.4, desc:'2020 东京奥运会主会场，隈研吾设计的“森林体育场”：五层檐廊的木格栅来自全日本 47 个都道府县，藏在神宫外苑的绿荫里。五楼空中回廊免费开放。', make:g=>{
-const plaza=cyl(10.6,10.9,0.3, std({color:0xa8a294,roughness:1}), 0,0, 48); plaza.scale.z=0.72; plaza.position.y=0.15; g.add(plaza);
+const plaza=cyl(10.6,10.9,0.3, texMat(paveTex(),{roughness:1}), 0,0, 48); plaza.scale.z=0.72; plaza.position.y=0.15; g.add(plaza);
 const wood=std({color:0xa87f56,roughness:0.85}), woodD=std({color:0x8a6844,roughness:0.9}), eaveM=std({color:0xeae5db,roughness:0.8});
 for(let tI=0;tI<5;tI++){ const y=0.62+tI*0.8, r=8.7-tI*0.58;
   const ring=cyl(r, r+0.3, 0.6, tI%2?woodD:wood, 0,0, 48); ring.scale.z=0.72; ring.position.y=y+0.3; g.add(ring);
