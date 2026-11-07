@@ -500,7 +500,7 @@ header #langMenu{right:auto;min-width:172px}
 
 <script src="i18n_ui.js"></script><script src="narr_ui.js"></script>
 <script type="module">
-const BUILD='20261108.21';
+const BUILD='20261108.22';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Sky } from 'three/addons/objects/Sky.js';
@@ -1299,7 +1299,8 @@ function stampRot(id){ let h=0; for(let i=0;i<id.length;i++) h=(h*31+id.charCode
 function gsNameCls(nm){ if(/[぀-ヿ一-鿿가-힣]/.test(nm)) return nm.length>5?'gsName long':'gsName'; return 'gsName h'; }
 const SEAL_EMOJI={tower:'🗼',skytree:'📡',sensoji:'🏮',shibuya:'🐕',shinjuku:'🌃',akiba:'🎮',ueno:'🐼',palace:'🏯',tokyost:'🚉',meiji:'⛩️',odaiba:'🎡',roppongi:'🌆',ikebukuro:'🦉',shinagawa:'🚄',ginza:'🛍️',harajuku:'🎀',toyosu:'🐟',disney:'🏰',hnd:'✈️',nrt:'🛫',toudai:'🎓',waseda:'📚',fuji:'🗻',kamakura:'🚃',ghibli:'🎬',kasukabe:'🖍️',kichijoji:'🦢',teamlab:'✨',kawagoe:'🔔',inagi:'🎢'};
 const SEAL_CH={tower:'塔',skytree:'空',sensoji:'寺',shibuya:'谷',shinjuku:'宿',akiba:'叶',ueno:'野',palace:'居',tokyost:'京',meiji:'宫',odaiba:'台',roppongi:'木',ikebukuro:'袋',shinagawa:'川',ginza:'座',harajuku:'原',toyosu:'洲',disney:'梦',hnd:'羽',nrt:'成',toudai:'大',waseda:'稲',fuji:'山',kamakura:'仓',ghibli:'森',kasukabe:'春',kichijoji:'吉',teamlab:'光',kawagoe:'越',inagi:'稲'};
-function stampHtml(id,big){ const nm=sName(id); const inf=(typeof INFO!=='undefined'&&INFO&&INFO[id])?INFO[id]:null; const ph=inf&&inf.imgs&&inf.imgs[0]?inf.imgs[0].url:(inf&&inf.img?inf.img:'');
+function nameOfId(id){ const sp=allSpotsMap()[id]; if(sp) return sName(sp); const U=window.I18NUI; if(U&&U.names) return (U.names[LANG]&&U.names[LANG][id])||(U.names.zh&&U.names.zh[id])||id; return id; }
+function stampHtml(id,big){ const nm=nameOfId(id); const inf=(typeof INFO!=='undefined'&&INFO&&INFO[id])?INFO[id]:null; const ph=inf&&inf.imgs&&inf.imgs[0]?inf.imgs[0].url:(inf&&inf.img?inf.img:'');
   const note=(STAMPS[id]&&STAMPS[id].note)?('<span class="gsCNote">'+esc(STAMPS[id].note)+'</span>'):'';
   const art=ph?('<img src="'+esc(ph)+'" alt="" loading="lazy">'):('<span class="gsMotifBig">'+(SEAL_EMOJI[id]||'🗼')+'</span>');
   return '<div class="gsCard'+(big?' big':'')+'" style="--r:'+stampRot(id)+'deg"><div class="gsArt">'+art+'<span class="gsVert">'+esc(nm)+'</span></div><div class="gsCap"><div class="gsCapMain"><span class="gsCName">'+esc(nm)+'</span><span class="gsCDate">'+stampDate(id)+'</span>'+note+'</div><span class="gsSeal">'+(SEAL_CH[id]||'印')+'</span></div></div>'; }
@@ -1310,7 +1311,7 @@ function renderGoshuin(){ const ids=spots.filter(sp=>sp&&sp.id).map(sp=>sp.id).c
   set('hGsT',T('goshuin')); set('gsTitle',T('goshuin')+' · '+n+'/'+ids.length); set('gsOpenB',T('stampOpen')); set('gsOpenS',T('stampHint').replace('{t}',ids.length));
   set('gsProg',T('stampProgress').replace('{n}',n).replace('{t}',ids.length));
   const grid=document.getElementById('gsGrid'); if(!grid) return;
-  grid.innerHTML=ids.map(id=> STAMPS[id] ? '<div class="gsCell got" data-sid="'+id+'">'+stampHtml(id,false)+'</div>' : '<div class="gsCell"><div class="gsTodo"><span class="gsTodoN">'+esc(sName(id))+'</span></div></div>').join('');
+  grid.innerHTML=ids.map(id=> STAMPS[id] ? '<div class="gsCell got" data-sid="'+id+'">'+stampHtml(id,false)+'</div>' : '<div class="gsCell"><div class="gsTodo"><span class="gsTodoN">'+esc(nameOfId(id))+'</span></div></div>').join('');
   grid.querySelectorAll('.gsCell.got').forEach(c=>{ c.onclick=()=>openGsEdit(c.dataset.sid); }); }
 let gsEditId=null;
 function openGsEdit(id){ if(!STAMPS[id]) return; gsEditId=id; document.getElementById('gsEditStamp').innerHTML=stampHtml(id,true); const inp=document.getElementById('gsNoteIn'); inp.value=STAMPS[id].note||''; inp.placeholder=T('notePh'); document.getElementById('gsSaveBtn').textContent=T('gsSave'); document.getElementById('gsDelBtn').textContent=T('gsDel'); document.getElementById('gsEdit').style.display='flex'; }
