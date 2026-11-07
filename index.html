@@ -1190,7 +1190,7 @@ function paintStampBtn(id){ const b=document.getElementById('stampBtn'); if(!b||
 function renderGoshuin(){ const ids=spots.filter(sp=>sp&&sp.id).map(sp=>sp.id).concat(['hnd','nrt']);
   const n=ids.filter(id=>STAMPS[id]).length;
   const set=(i,v)=>{ const el=document.getElementById(i); if(el) el.textContent=v; };
-  set('hGsT',T('goshuin')); set('gsTitle',T('goshuin')+' · '+n+'/'+ids.length); set('gsOpenB',T('stampOpen')); set('gsOpenS',T('stampHint'));
+  set('hGsT',T('goshuin')); set('gsTitle',T('goshuin')+' · '+n+'/'+ids.length); set('gsOpenB',T('stampOpen')); set('gsOpenS',T('stampHint').replace('{t}',ids.length));
   set('gsProg',T('stampProgress').replace('{n}',n).replace('{t}',ids.length));
   const grid=document.getElementById('gsGrid'); if(!grid) return;
   grid.innerHTML=ids.map(id=> STAMPS[id] ? '<div class="gsCell got" data-sid="'+id+'">'+stampHtml(id,false)+'</div>' : '<div class="gsCell"><div class="gsTodo"><span class="gsTodoM">'+(SEAL_EMOJI[id]||'')+'</span>'+esc(sName(id))+'</div></div>').join('');
