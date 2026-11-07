@@ -52,6 +52,10 @@ import glob as _glob
 for _p in sorted(_glob.glob(str(base / "data" / "info_*.json"))) + [str(base / "data" / "i18n_ui.js")]:
     ASSETS.append(("data/" + pathlib.Path(_p).name, pathlib.Path(_p).name))
 asset_refs = []
+import re as _re
+_mb=_re.search(r"const BUILD='([^']+)'", pathlib.Path('index.html').read_text())
+pathlib.Path('build.txt').write_text(_mb.group(1) if _mb else 'dev')
+ASSETS.append(('build.txt','build.txt'))
 for src, name in ASSETS:
     blob = (base / src).read_bytes()
     dg = hashlib.sha1(blob).hexdigest()

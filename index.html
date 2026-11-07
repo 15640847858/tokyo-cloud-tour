@@ -473,7 +473,7 @@ header #langMenu{right:auto;min-width:172px}
   <section class="mod"><h2 id="hAreasT">区域聚焦</h2><div class="areaBtns" id="areaBtns"></div></section>
   <section class="mod"><h2 id="hAboutT">关于云游东京</h2><p class="about" id="visitLine"></p><p class="about" id="aboutEl">真实地图与建筑数据来自 OpenStreetMap：市中心 14,000 栋建筑按真实轮廓生成，景点周边只保留高楼地标。景点照片来自 Wikimedia Commons，作者与授权标注在介绍卡内。<br>地图 © OpenStreetMap contributors<br>卫星影像 © Esri, Maxar, Earthstar Geographics<br>天空：three.js 官网示例 Sky</p><p class="about" id="modelCredit">明治神宫鸟居模型：Quaternius，CC0（经 Poly Pizza 取得）</p></section></div></aside>
 <div id="flashFx"></div>
-<div id="statusbar"><span id="sbClock">东京 --:--</span><span id="sbWx"></span><span id="sbMode">白天</span></div><div id="tourbar"></div>
+<div id="statusbar"><span id="sbClock">东京 --:--</span><span id="sbWx"></span><span id="sbMode">白天</span><span id="sbBuild" style="opacity:.55;font-size:10px"></span></div><div id="tourbar"></div>
 <div id="pcModal"><div class="pcBox"><img id="pcImg" alt="postcard"><div class="pcRow"><a id="pcSave" download="tokyo-postcard.png">保存图片</a><button id="pcClose" aria-label="close">×</button></div><p id="pcHint">也可以长按图片保存到相册</p></div></div>
 <div id="gsModal"><div class="gsBox"><div class="gsHead"><h3 id="gsTitle">御朱印护照</h3><button id="gsClose" aria-label="close">×</button></div><p class="gsSub" id="gsSub"></p><div class="gsGrid" id="gsGrid"></div></div></div>
 <div id="gsEdit"><div class="geBox"><div id="gsEditStamp"></div><input id="gsNoteIn" maxlength="24" autocomplete="off"><div class="geRow"><button id="gsSaveBtn">保存</button><button id="gsDelBtn">删除这枚章</button></div><button id="gsEditClose" aria-label="close">✕</button></div></div>
@@ -483,6 +483,9 @@ header #langMenu{right:auto;min-width:172px}
 
 <script src="i18n_ui.js"></script>
 <script type="module">
+const BUILD='20261108.5';
+try{ const _sbe=document.getElementById('sbBuild'); if(_sbe) _sbe.textContent='v'+BUILD; }catch(e){}
+try{ fetch('build.txt',{cache:'no-store'}).then(r=>r.ok?r.text():null).then(t=>{ if(t&&t.trim()&&t.trim()!==BUILD){ try{ if(sessionStorage.getItem('tt_brel')!==BUILD){ sessionStorage.setItem('tt_brel',BUILD); location.replace(location.pathname+'?v='+BUILD+location.hash); } }catch(e){} } }).catch(()=>{}); }catch(e){}
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Sky } from 'three/addons/objects/Sky.js';
