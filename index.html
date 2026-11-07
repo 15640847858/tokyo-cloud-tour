@@ -101,7 +101,8 @@
 #tourbar .tbStop{font-size:12.5px;opacity:.9;margin-top:3px}
 #tbNarr{font-size:11px;color:#e6c887;opacity:.9;margin-left:7px;white-space:nowrap}
 #tbNarrText{display:none;font-size:12.5px;line-height:1.65;color:rgba(246,236,210,.94);margin-top:8px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-#tourbar .tbBtns{display:flex;gap:6px}
+#tourbar .tbBtns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+@media (max-width:600px){ .tbTop{flex-direction:column;align-items:stretch;gap:6px} .tbBtns{justify-content:flex-start} .tbBtns button{padding:7px 10px;font-size:12.5px} }
 #tourbar .tbBtns button{padding:6px 11px;font-size:13px}
 #tourbar .tbProg{height:3px;background:rgba(255,255,255,.15);border-radius:99px;margin-top:9px;overflow:hidden}
 #tourbar .tbProg i{display:block;height:100%;background:#e6c887;width:0;transition:width .4s}
