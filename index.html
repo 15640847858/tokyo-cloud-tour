@@ -465,7 +465,7 @@ header #langMenu{right:auto;min-width:172px}
   <section class="mod"><h2 id="hWxT">实时天气 · 东京</h2><div id="wxBody">正在获取天气…</div><div id="wxHomeLine"></div></section>
   <section class="mod"><h2 id="hSearchT">搜索</h2><input id="search" type="text" placeholder="搜索景点，如：迪士尼 / 银座"></section>
   <section class="mod"><h2 id="hSpotsT">景点介绍</h2><button id="favOnly" class="chip">只看收藏 ★</button><div id="spots"></div></section>
-  <section class="mod"><h2 id="hToursT">精选玩法</h2><button id="daytripBtn" class="route"><b>东京经典一日游</b>：浅草 → 晴空塔 → 上野 → 秋叶原 → 东京站 → 银座 → 东京塔 → 涩谷<small>开始播放：镜头逐站飞行导览</small></button><button class="route" data-tour="trendy"><b>东京潮流之旅</b>：原宿 → 涩谷 → 六本木 → 台场 → 丰洲<small>开始播放</small></button><button class="route" data-tour="night"><b>东京夜景之旅</b>：东京站 → 银座 → 东京塔 → 六本木 → 涩谷<small>开始播放（自动切换夜晚）</small></button><button class="route" data-tour="culture"><b>东京文化之旅</b>：浅草 → 上野 → 东京大学 → 皇居 → 明治神宫<small>开始播放</small></button><p class="about" id="discEl">路线与机场线路均为示意：地图距离经过压缩，仅用于可视化，不能作为实际导航距离；时间与票价为参考值。</p></section>
+  <section class="mod"><h2 id="hToursT">精选玩法</h2><button id="daytripBtn" class="route"><b>东京经典一日游</b>：浅草 → 晴空塔 → 上野 → 秋叶原 → 东京站 → 银座 → 东京塔 → 涩谷 → 明治神宫 → 新宿<small>开始播放：镜头逐站飞行导览</small></button><button class="route" data-tour="trendy"><b>东京潮流之旅</b>：原宿 → 涩谷 → 六本木 → 台场 → 丰洲<small>开始播放</small></button><button class="route" data-tour="night"><b>东京夜景之旅</b>：东京站 → 银座 → 东京塔 → 六本木 → 涩谷<small>开始播放（自动切换夜晚）</small></button><button class="route" data-tour="culture"><b>东京文化之旅</b>：浅草 → 上野 → 东京大学 → 皇居 → 明治神宫<small>开始播放</small></button><p class="about" id="discEl">路线与机场线路均为示意：地图距离经过压缩，仅用于可视化，不能作为实际导航距离；时间与票价为参考值。</p></section>
   <section class="mod"><h2 id="hGsT">御朱印护照</h2><p class="about" id="gsProg">已收集 0/24</p><button id="gsOpen" class="route"><b id="gsOpenB">打开护照</b><small id="gsOpenS">打开景点卡点「盖御朱印」，集齐 24 处朱印</small></button></section>
   <section class="mod"><h2 id="hAreasT">区域聚焦</h2><div class="areaBtns" id="areaBtns"></div></section>
   <section class="mod"><h2 id="hAboutT">关于云游东京</h2><p class="about" id="visitLine"></p><p class="about" id="aboutEl">真实地图与建筑数据来自 OpenStreetMap：市中心 14,000 栋建筑按真实轮廓生成，景点周边只保留高楼地标。景点照片来自 Wikimedia Commons，作者与授权标注在介绍卡内。<br>地图 © OpenStreetMap contributors<br>卫星影像 © Esri, Maxar, Earthstar Geographics<br>天空：three.js 官网示例 Sky</p><p class="about" id="modelCredit">明治神宫鸟居模型：Quaternius，CC0（经 Poly Pizza 取得）</p></section></div></aside>
@@ -857,7 +857,7 @@ if(innerWidth<=760) document.getElementById('panel').classList.add('hidden');
 document.getElementById('homeBtn').onclick=()=>{ flyHome(); clearSelection(); };
 
 // 一日经典游金色线路
-const dayIds=['sensoji','skytree','ueno','akiba','tokyost','ginza','tower','shibuya'];
+const dayIds=['sensoji','skytree','ueno','akiba','tokyost','ginza','tower','shibuya','meiji','shinjuku'];
 const dayPts=dayIds.map(id=>{ const s=spots.find(v=>v&&v.id===id); return new THREE.Vector3(s.x,0,s.z); });
 const dayMid=[]; for(let i=0;i<dayPts.length-1;i++){ dayMid.push(dayPts[i]); dayMid.push(dayPts[i].clone().lerp(dayPts[i+1],0.5).setY(2.2)); } dayMid.push(dayPts[dayPts.length-1]);
 const dayCurve=new THREE.CatmullRomCurve3(dayMid);
@@ -866,7 +866,7 @@ const dayDot=new THREE.Mesh(new THREE.SphereGeometry(0.95,16,16), new THREE.Mesh
 let dayOn=false;
 document.getElementById('daytripBtn').onclick=e=>{
   dayOn=!dayOn; dayTube.visible=dayOn; dayDot.visible=dayOn; e.currentTarget.classList.toggle('active', dayOn);
-  if(dayOn){ infoBody.innerHTML='<h3>一日经典游</h3><p>浅草寺 → 晴空塔 → 上野公园 → 秋叶原 → 东京站 → 银座 → 东京塔 → 涩谷</p><div class="meta">金色线路是建议的游览顺序：上午逛老东京（浅草、上野），下午转到东京站和银座，傍晚在东京塔看日落，晚上到涩谷看十字路口夜景。</div>'; flyHome(); }
+  if(dayOn){ infoBody.innerHTML='<h3>一日经典游</h3><p>浅草寺 → 晴空塔 → 上野公园 → 秋叶原 → 东京站 → 银座 → 东京塔 → 涩谷</p><div class="meta">金色线路是建议的游览顺序：上午逛老东京（浅草、上野），下午转到东京站和银座，傍晚在东京塔看日落，晚上到涩谷看十字路口夜景，最后走进明治神宫的静谧，在新宿的霓虹里收尾。</div>'; flyHome(); }
 };
 
 // 真实建筑层：OpenStreetMap 实际建筑轮廓 + 高度（分块加载）
