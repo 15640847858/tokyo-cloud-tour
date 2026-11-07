@@ -105,53 +105,6 @@ const cl2=cl1.clone(); cl2.position.set(5.5,10.4,-5); cl2.scale.setScalar(1.3); 
 ANIM.push(t=>{ cl1.position.x=-4+Math.sin(t*0.05)*1.2; cl2.position.x=5.5+Math.sin(t*0.04+2)*1.4; });
 people(g,6,-5.5,-1.5,3.5,6.5,0.35); } },
 
-{id:'dome', name:'东京巨蛋', x:0, z:0, h:6.6, desc:'日本第一座全天候巨蛋球场（1988 年），读卖巨人队主场，白色屋顶靠气压撑起，人称“BIG EGG”。旁边的东京巨蛋城里有无心摩天轮 Big O 与穿楼而过的过山车。', make:g=>{
-g.add(box(19,0.3,14.5, std({color:0xa3a294,roughness:1}), 0,0.15,0));
-const dmat=std({color:0xf3f1ec, roughness:0.5, metalness:0.05});
-const dm=new THREE.Mesh(new THREE.SphereGeometry(6.4, 40, 20, 0, Math.PI*2, 0, Math.PI/2), dmat);
-dm.scale.set(1,0.52,0.88); dm.position.set(-2.4,0.8,0); dm.castShadow=true; g.add(dm);
-[0.5,0.95,1.35].forEach(th=>{ const r=6.4*Math.sin(th), y=0.8+6.4*0.52*Math.cos(th); const rg=new THREE.Mesh(new THREE.TorusGeometry(r,0.035,6,48), std({color:0xd9d5ca,roughness:0.7})); rg.rotation.x=Math.PI/2; rg.scale.set(1,0.88,1); rg.position.set(-2.4,y,0); g.add(rg); });
-const bring=cyl(6.5,6.65,0.85, std({color:0x848b93,roughness:0.55}), -2.4, 0, 40); bring.scale.z=0.88; bring.position.y=0.43; g.add(bring);
-const bglass=cyl(6.56,6.56,0.3, std({color:0x2e3e4e,roughness:0.25,metalness:0.3}), -2.4, 0, 40); bglass.scale.z=0.88; bglass.position.y=0.62; g.add(bglass);
-g.add(box(2.4,0.9,0.18, glowMat(signTex('東京ドーム','#20303e','#ffd76a',false)), -2.4,0.75,5.85));
-const hotel=box(2.7,7.4,2.3, texMat(facadeTex('#bcc3ca')), 6.9,3.7,-3.6); g.add(hotel);
-g.add(box(2.9,0.35,2.5, M.white, 6.9,7.55,-3.6));
-g.add(box(0.16,1.6,1.4, glowMat(signTex('東京ドームホテル','#7a1f1f','#ffffff',true)), 8.32,6.4,-3.6));
-g.add(box(4.6,2.7,2.6, texMat(facadeTex('#c9bda6')), 7.2,1.35,3.9));
-const wo=new THREE.Group(); wo.position.set(3.6,3.1,4.1); g.add(wo);
-const wr=new THREE.Mesh(new THREE.TorusGeometry(2.75,0.09,8,40), std({color:0xe8e4da,roughness:0.4,metalness:0.4})); wo.add(wr);
-const wr2=new THREE.Mesh(new THREE.TorusGeometry(2.1,0.05,8,36), std({color:0xcfd4d9,roughness:0.4,metalness:0.4})); wo.add(wr2);
-for(let i=0;i<10;i++){ const a=i/10*Math.PI*2; wo.add(box(0.34,0.3,0.3, std({color:[0xd94f3d,0x2e7f86,0xe0a83c,0x33527a,0x7a4a86][i%5],roughness:0.5}), Math.cos(a)*2.75, Math.sin(a)*2.75, 0)); }
-g.add(beam(2.2,0,3.4, 3.6,3.1,4.1, M.grey, 0.07)); g.add(beam(5.0,0,3.4, 3.6,3.1,4.1, M.grey, 0.07));
-ANIM.push(t=>{ wo.rotation.z=t*0.06; });
-const cpts=[[0.2,3.6,4.3],[1.6,1.4,4.8],[3.2,0.6,4.5],[5.2,2.2,4.1],[6.8,3.4,4.3],[8.6,2.4,4.0]].map(q=>new THREE.Vector3(q[0],q[1],q[2]));
-const ctr=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(cpts), 40, 0.055, 6), std({color:0x2e7f86,roughness:0.4,metalness:0.3})); g.add(ctr);
-[[1.6,4.8],[3.2,4.5],[5.2,4.1]].forEach(q=>{ const sup=cyl(0.045,0.045,1, M.grey, q[0],q[1],6); sup.scale.y=[1.4,0.6,2.2][[1.6,3.2,5.2].indexOf(q[0])]; sup.position.y=sup.scale.y/2; g.add(sup); });
-[[-7.5,5.6],[-5.5,-5.8],[0.5,6.1],[5.8,-5.9],[8.6,-0.8],[-8.2,-4.6]].forEach(q=>g.add(tree(q[0],q[1],0.85,treeMat)));
-people(g,7,-6,2,4.5,6.2,0.3);
-} },
-
-{id:'stadium', name:'国立竞技场', x:0, z:0, h:5.4, desc:'2020 东京奥运会主会场，隈研吾设计的“森林体育场”：五层檐廊的木格栅来自全日本 47 个都道府县，藏在神宫外苑的绿荫里。五楼空中回廊免费开放。', make:g=>{
-const plaza=cyl(10.6,10.9,0.3, std({color:0xa8a294,roughness:1}), 0,0, 48); plaza.scale.z=0.72; plaza.position.y=0.15; g.add(plaza);
-const wood=std({color:0xa87f56,roughness:0.85}), woodD=std({color:0x8a6844,roughness:0.9}), eaveM=std({color:0xeae5db,roughness:0.8});
-for(let tI=0;tI<5;tI++){ const y=0.62+tI*0.8, r=8.7-tI*0.58;
-  const ring=cyl(r, r+0.3, 0.6, tI%2?woodD:wood, 0,0, 48); ring.scale.z=0.72; ring.position.y=y+0.3; g.add(ring);
-  const ev=cyl(r+0.44, r+0.44, 0.1, eaveM, 0,0, 48); ev.scale.z=0.72; ev.position.y=y+0.65; g.add(ev); }
-const slatGeo=new THREE.BoxGeometry(0.07,0.6,0.05);
-const slats=new THREE.InstancedMesh(slatGeo, wood, 300); const dum=new THREE.Object3D();
-for(let i=0;i<300;i++){ const tier=i<170?0:1, ang=(i%170)/170*Math.PI*2 + tier*0.02, r=9.06-tier*0.58;
-  dum.position.set(Math.cos(ang)*r, 0.92+tier*0.8, Math.sin(ang)*r*0.72); dum.rotation.set(0,-ang,0); dum.updateMatrix(); slats.setMatrixAt(i, dum.matrix); }
-g.add(slats);
-const roof=new THREE.Mesh(new THREE.TorusGeometry(6.2, 1.45, 10, 48), std({color:0xf1eee7,roughness:0.55}));
-roof.rotation.x=Math.PI/2; roof.scale.set(1,0.72,1); roof.position.y=5.15; roof.castShadow=true; g.add(roof);
-const seats=cyl(6.15,6.15,0.16, std({color:0x77806f,roughness:1}), 0,0, 44); seats.scale.z=0.72; seats.position.y=4.68; g.add(seats);
-const pitch=cyl(3.3,3.3,0.1, std({color:0x4d8146,roughness:1}), 0,0, 36); pitch.scale.z=0.68; pitch.position.y=4.78; g.add(pitch);
-const pline=new THREE.Mesh(new THREE.TorusGeometry(2.5,0.035,6,40), M.white); pline.rotation.x=Math.PI/2; pline.scale.set(1,0.68,1); pline.position.y=4.84; g.add(pline);
-for(let i=0;i<9;i++){ const a=i/9*Math.PI*2+0.2; g.add(tree(Math.cos(a)*11.6, Math.sin(a)*8.6, 0.95, treeMat)); }
-const gink=std({color:0xc9a437,roughness:1});
-for(let i=0;i<5;i++) g.add(tree(12.6, -4.4+i*2.2, 0.9, gink));
-people(g,8,-8,8,5.6,6.8,0.3);
-} },
 {id:'kamakura', name:'镰仓高校前', x:0, z:0, h:5, desc:'《灌篮高手》片头那个面朝大海的铁路道口——县立镰仓高校门前、江之岛电铁镰仓高校前站旁。位于东京西南约 55 公里处，地图上为示意位置。', make:g=>{
   g.add(box(22,0.35,14, std({color:0x8a9a72,roughness:1}), 0,0.17,0));
   g.add(box(22,0.5,3.6, std({color:0x2f6db0,roughness:0.25,metalness:0.15}), 0,0.28,5.2));
