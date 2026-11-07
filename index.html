@@ -417,6 +417,35 @@ header #langMenu{right:auto;min-width:172px}
 .langOpt.on .langCk{opacity:1}
 .langOpt:active{background:rgba(230,200,135,.22)}
 #setMod{overflow:visible}
+
+/* ===== first-visit guide ===== */
+#gdOverlay{position:fixed;inset:0;z-index:1200;display:none;align-items:center;justify-content:center;background:rgba(8,9,13,.42);backdrop-filter:blur(7px) saturate(1.25);-webkit-backdrop-filter:blur(7px) saturate(1.25);padding:14px}
+#gdOverlay.on{display:flex}
+.gdCard{width:min(540px,100%);max-height:88dvh;display:flex;flex-direction:column;border-radius:22px;padding:22px 22px 16px;color:#f2ead8;background:linear-gradient(160deg,rgba(26,25,31,.86),rgba(12,12,16,.88));border:1px solid rgba(230,200,135,.38);box-shadow:0 24px 60px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.08);backdrop-filter:blur(22px) saturate(1.45);-webkit-backdrop-filter:blur(22px) saturate(1.45);animation:gdIn .38s cubic-bezier(.2,.9,.25,1)}
+@keyframes gdIn{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+.gdDots{display:flex;gap:7px;justify-content:center;margin-bottom:12px}
+.gdDots i{width:7px;height:7px;border-radius:99px;background:rgba(230,200,135,.25);transition:all .3s}
+.gdDots i.on{width:22px;background:#e6c887}
+.gdStepTxt{text-align:center;font-size:11px;letter-spacing:.14em;color:rgba(242,234,216,.55);margin-bottom:8px}
+.gdPage{display:none;overflow-y:auto;padding:2px 2px 6px}
+.gdPage.on{display:block}
+.gdPage h2{font-size:24px;line-height:1.3;margin:4px 0 8px;text-align:center;color:#f6ecd2}
+.gdPage h3{font-size:17px;margin:2px 0 10px;color:#e6c887}
+.gdSub{text-align:center;font-size:14px;line-height:1.65;color:rgba(242,234,216,.82);margin:0 6px 6px}
+.gdBody{font-size:13.5px;line-height:1.95;white-space:pre-line;color:rgba(242,234,216,.9)}
+.gdIntro{font-size:13px;line-height:1.7;color:rgba(242,234,216,.78);margin-bottom:10px}
+.gdRegQ{font-size:12.5px;color:rgba(242,234,216,.75);margin:12px 0 8px}
+.gdRegs{display:flex;flex-wrap:wrap;gap:7px}
+.gdRegs button{padding:7px 13px;border-radius:999px;border:1px solid rgba(230,200,135,.35);background:rgba(255,255,255,.05);color:#f2ead8;font-size:12.5px;cursor:pointer}
+.gdRegs button.on{background:rgba(230,200,135,.2);border-color:#e6c887;color:#ffe9b0}
+.gdRegNote{font-size:12.5px;line-height:1.75;color:rgba(242,234,216,.85);background:rgba(255,255,255,.045);border:1px solid rgba(230,200,135,.16);border-radius:12px;padding:10px 12px;margin-top:10px}
+.gdNav{display:flex;align-items:center;gap:8px;margin-top:14px;padding-top:13px;border-top:1px solid rgba(230,200,135,.16)}
+.gdNav .sp{flex:1}
+.gdBtn{padding:10px 16px;border-radius:999px;border:1px solid rgba(230,200,135,.35);background:rgba(255,255,255,.05);color:#f2ead8;font-size:13.5px;cursor:pointer}
+.gdBtn.primary{background:linear-gradient(160deg,#e6c887,#c9a45c);color:#241b08;border-color:transparent;font-weight:700}
+.gdBtn:disabled{opacity:.35;cursor:default}
+.gdBtn.ghost{border-color:transparent;background:transparent;color:rgba(242,234,216,.6)}
+@media (max-width:560px){ .gdCard{padding:18px 16px 13px;border-radius:19px} .gdPage h2{font-size:21px} .gdBody{font-size:13px;line-height:1.9} }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <script type="importmap">
@@ -926,7 +955,50 @@ composer.render();
 // ===== 2.0 系统：加载进度 / 状态栏 / 收藏 / 底部抽屉 / 路线播放 =====
 window.setLoad=(pct,txt)=>{ const f=document.getElementById('ldFill'), t=document.getElementById('ldTxt'); if(f) f.style.width=pct+'%'; if(t&&txt) t.textContent=txt; };
 let loadDone=false;
-window.finishLoad=()=>{ if(loadDone) return; loadDone=true; window.setLoad(100,T('loadDone')); const l=document.getElementById('loading'); if(l){ l.style.opacity='0'; setTimeout(()=>{ l.style.display='none'; }, 520); } setTimeout(showWelcomeToast, 700); };
+window.finishLoad=()=>{ if(loadDone) return; loadDone=true; window.setLoad(100,T('loadDone')); const l=document.getElementById('loading'); if(l){ l.style.opacity='0'; setTimeout(()=>{ l.style.display='none'; }, 520); } setTimeout(()=>{ if(!maybeShowGuide()) showWelcomeToast(); }, 700); };
+/* ===== first-visit guide ===== */
+const GD_VER='1';
+window.__gd={open:false,page:1};
+function gdSet(id,txt){ const e=document.getElementById(id); if(e) e.textContent=txt; }
+function gdRegion(){ try{ return localStorage.getItem('tt_region')||'none'; }catch(e){ return 'none'; } }
+function paintGuideBtn(){ const b=document.getElementById('gdReopenBtn'); if(b) b.textContent=T('gdReopen'); }
+function paintGuide(){
+  const G=window.__gd;
+  gdSet('gdTitle',T('gdTitle')); gdSet('gdSub',T('gdSub'));
+  gdSet('gdHowT',T('gdHowT')); gdSet('gdFeatT',T('gdFeatT')); gdSet('gdSvcT',T('gdSvcT'));
+  const coarse=window.matchMedia&&matchMedia('(pointer:coarse)').matches;
+  const hd=document.getElementById('gdHowD'), hm=document.getElementById('gdHowM');
+  if(hd){ hd.textContent=T('gdHowD'); hd.style.display=coarse?'none':'block'; }
+  if(hm){ hm.textContent=T('gdHowM'); hm.style.display=coarse?'block':'none'; }
+  const total=(typeof spots!=='undefined'?spots.length:32)+2;
+  gdSet('gdFeat',T('gdFeat').replace('{n}',total));
+  gdSet('gdSvcIntro',T('gdSvcIntro')); gdSet('gdSvc',T('gdSvc')); gdSet('gdRegQ',T('gdRegQ'));
+  gdSet('gdRcn',T('gdRcn')); gdSet('gdRjp',T('gdRjp')); gdSet('gdRother',T('gdRother')); gdSet('gdRnone',T('gdRnone'));
+  const reg=gdRegion();
+  document.querySelectorAll('#gdRegs button').forEach(b=>b.classList.toggle('on', b.dataset.reg===reg));
+  gdSet('gdRegNote',T(reg==='cn'?'gdRegCN':reg==='jp'?'gdRegJP':reg==='other'?'gdRegOther':'gdRegNone'));
+  document.querySelectorAll('.gdPage').forEach(pg=>pg.classList.toggle('on', +pg.dataset.gdp===G.page));
+  document.querySelectorAll('.gdDots i').forEach((d,i)=>d.classList.toggle('on', i===G.page-1));
+  gdSet('gdStepTxt',T('gdStepFmt').replace('{a}',G.page).replace('{b}',4));
+  gdSet('gdSkip',T('gdSkip')); gdSet('gdPrev',T('gdPrev'));
+  gdSet('gdNext',G.page===4?T('gdStart'):T('gdNext'));
+  const pv=document.getElementById('gdPrev'); if(pv) pv.disabled=(G.page===1);
+  const sk=document.getElementById('gdSkip'); if(sk) sk.style.visibility=(G.page===4)?'hidden':'visible';
+}
+function openGuide(){ window.__gd.open=true; window.__gd.page=1; paintGuide(); const o=document.getElementById('gdOverlay'); if(o) o.classList.add('on'); }
+function closeGuide(){ try{ localStorage.setItem('tt_guide', GD_VER); }catch(e){} window.__gd.open=false; const o=document.getElementById('gdOverlay'); if(o) o.classList.remove('on'); }
+function maybeShowGuide(){ let seen=null; try{ seen=localStorage.getItem('tt_guide'); }catch(e){} if(seen===GD_VER) return false; openGuide(); return true; }
+(function initGuide(){
+  const nx=document.getElementById('gdNext'), pv=document.getElementById('gdPrev'), sk=document.getElementById('gdSkip');
+  if(nx) nx.addEventListener('click',()=>{ const G=window.__gd; if(G.page<4){ G.page++; paintGuide(); } else closeGuide(); });
+  if(pv) pv.addEventListener('click',()=>{ const G=window.__gd; if(G.page>1){ G.page--; paintGuide(); } });
+  if(sk) sk.addEventListener('click',closeGuide);
+  document.querySelectorAll('#gdRegs button').forEach(b=>b.addEventListener('click',()=>{ try{ localStorage.setItem('tt_region', b.dataset.reg); }catch(e){} paintGuide(); }));
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&window.__gd&&window.__gd.open) closeGuide(); });
+  const sg=document.getElementById('setGrid');
+  if(sg&&!document.getElementById('gdReopenBtn')){ const b=document.createElement('button'); b.id='gdReopenBtn'; b.textContent=T('gdReopen'); b.addEventListener('click',openGuide); sg.appendChild(b); }
+})();
+
 window.setLoad(45,T('sbReady'));
 (function(){ const tick=()=>{ const el=document.getElementById('sbClock'); if(el){ try{ el.textContent=T('tokyo')+' '+new Intl.DateTimeFormat(LOCALES[LANG],{timeZone:'Asia/Tokyo',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date()); }catch(e){} } }; window.__tickClock=tick; tick(); setInterval(tick, 30000); })();
 
@@ -1226,7 +1298,7 @@ async function applyLang(l){ LANG=l; try{ localStorage.setItem('tt_lang', l); }c
   const tp1=document.getElementById('tbPrev'); if(tp1) tp1.textContent=T('tbPrev');
   const tp2=document.getElementById('tbNext'); if(tp2) tp2.textContent=T('tbNext');
   const tp3=document.getElementById('tbExit'); if(tp3) tp3.textContent=T('tbExit');
-  renderTourBtns(); renderAreas(); renderSpotList(); paintWxBtn(); paintGroundBtn(); paintBgmBtn(); paintCardBtn(); paintHomeLine(); renderGoshuin();
+  renderTourBtns(); renderAreas(); renderSpotList(); paintWxBtn(); paintGroundBtn(); paintBgmBtn(); paintCardBtn(); paintHomeLine(); renderGoshuin(); try{ paintGuideBtn(); if(window.__gd&&window.__gd.open) paintGuide(); }catch(e){}
   await ensureContent();
   Object.keys(SPOT_GROUPS).forEach(id=>{ const g=SPOT_GROUPS[id], sp=g.userData.spot, lb=g.userData.labelSprite; if(sp&&lb){ const nl=label(sName(sp),0.95); lb.material.map=nl.material.map; lb.material.needsUpdate=true; lb.scale.copy(nl.scale); } });
   if(window.__tickClock) window.__tickClock();
@@ -1275,5 +1347,28 @@ var sc_security="081240b8";
 <script>
 (function(){ if(!window.matchMedia||!matchMedia('(hover:hover)').matches) return; document.addEventListener('pointermove', function(e){ var t=e.target; var m=t&&t.closest?t.closest('.mod'):null; if(!m) return; var r=m.getBoundingClientRect(); if(!r.width) return; m.style.setProperty('--mx', ((e.clientX-r.left)/r.width*100)+'%'); m.style.setProperty('--my', ((e.clientY-r.top)/r.height*100)+'%'); }, {passive:true}); })();
 </script>
+
+<div id="gdOverlay" role="dialog" aria-modal="true">
+ <div class="gdCard">
+  <div class="gdDots"><i></i><i></i><i></i><i></i></div>
+  <div class="gdStepTxt" id="gdStepTxt"></div>
+  <section class="gdPage" data-gdp="1"><h2 id="gdTitle"></h2><p class="gdSub" id="gdSub"></p></section>
+  <section class="gdPage" data-gdp="2"><h3 id="gdHowT"></h3><div class="gdBody" id="gdHowD"></div><div class="gdBody" id="gdHowM"></div></section>
+  <section class="gdPage" data-gdp="3"><h3 id="gdFeatT"></h3><div class="gdBody" id="gdFeat"></div></section>
+  <section class="gdPage" data-gdp="4"><h3 id="gdSvcT"></h3><p class="gdIntro" id="gdSvcIntro"></p><div class="gdBody" id="gdSvc"></div>
+   <p class="gdRegQ" id="gdRegQ"></p>
+   <div class="gdRegs" id="gdRegs">
+    <button data-reg="cn" id="gdRcn"></button><button data-reg="jp" id="gdRjp"></button><button data-reg="other" id="gdRother"></button><button data-reg="none" id="gdRnone"></button>
+   </div>
+   <div class="gdRegNote" id="gdRegNote"></div>
+  </section>
+  <div class="gdNav">
+   <button class="gdBtn ghost" id="gdSkip"></button>
+   <span class="sp"></span>
+   <button class="gdBtn" id="gdPrev"></button>
+   <button class="gdBtn primary" id="gdNext"></button>
+  </div>
+ </div>
+</div>
 </body>
 </html>
