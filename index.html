@@ -207,7 +207,7 @@
 .gsBox{width:min(96vw,560px);height:min(93dvh,780px);display:flex;flex-direction:column;background:rgba(15,25,45,.96);border:1px solid rgba(230,200,135,.35);border-radius:16px;padding:12px;backdrop-filter:blur(14px);box-sizing:border-box}
 .gsHead{display:flex;justify-content:space-between;align-items:center;flex:none}
 .gsBox h3{color:#e6c887;margin:0;font-size:16.5px}
-#gsClose{width:34px;height:34px;border-radius:50%;font-size:16px;flex:none}
+#gsClose{width:34px;height:34px;border-radius:0;font-size:18px;flex:none;background:none!important;background-color:transparent!important;border:none!important;box-shadow:none!important;color:#e6c887;font-weight:700;text-shadow:0 1px 7px rgba(0,0,0,.65);cursor:pointer;line-height:1;padding:0}
 .gsSub{display:none}
 .gsGrid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:1fr;gap:8px;margin-top:10px}
 .gsCell{background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.22);border-radius:8px;display:flex;align-items:center;justify-content:center;padding:4px;box-sizing:border-box;min-width:0;min-height:0;overflow:hidden}
@@ -500,7 +500,7 @@ header #langMenu{right:auto;min-width:172px}
 
 <script src="i18n_ui.js"></script><script src="narr_ui.js"></script>
 <script type="module">
-const BUILD='20261108.22';
+const BUILD='20261108.23';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Sky } from 'three/addons/objects/Sky.js';
