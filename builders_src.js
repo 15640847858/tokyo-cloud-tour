@@ -960,6 +960,85 @@ for(let i=0;i<9;i++){ const a=i/9*Math.PI*2+0.2; g.add(tree(Math.cos(a)*11.6, Ma
 const gink=std({color:0xc9a437,roughness:1});
 for(let i=0;i<5;i++) g.add(tree(12.6, -4.4+i*2.2, 0.9, gink));
 people(g,8,-8,8,5.6,6.8,0.3);
+} },
+
+{id:'yokohama', name:'横滨港未来', x:0, z:0, h:11.6, desc:'东京以南 30 公里的海港新城：296 米的地标塔带着阶梯收分的身姿立在港边，脚边停着 1930 年的帆船日本丸，对岸是直径 100 米的大摩天轮 Cosmo Clock 21，再往南是 1911 年的红砖仓库。整条海湾线一到夜里全亮起来。', make:g=>{
+g.add(box(21,0.3,15.5, texMat(paveTex(),{roughness:1}), 0,0.15,0));
+g.add(box(3.4,0.34,15.6, M.water, 10.3,0.17,0));
+g.add(box(21.5,0.34,3.2, M.water, 0,0.17,8.6));
+g.add(box(2.0,0.34,10.5, M.water, 1.35,0.17,-1.2));
+// —— 横滨地标塔（296m：阶梯收分 + 横向檐线 + 双鳍冠顶）——
+const tw=new THREE.Group(); tw.position.set(-6.3,0,-1.2); g.add(tw);
+const lmTex=facadeTex('#ddd5c0'); lmTex.wrapS=lmTex.wrapT=THREE.RepeatWrapping; lmTex.repeat.set(2,5);
+const lmMat=texMat(lmTex,{roughness:0.75});
+const stoneM=std({color:0xcfc7b2,roughness:0.9});
+tw.add(box(5.2,0.55,4.4, stoneM, 0,0.27,0));
+tw.add(box(2.6,0.6,0.14, glowMat(signTex('ランドマークタワー','#20303e','#ffd76a',false)), 0,0.78,2.24));
+tw.add(box(3.05,3.3,2.45, lmMat, 0,2.2,0));
+tw.add(box(3.3,0.22,2.7, stoneM, 0,3.9,0));
+tw.add(box(2.7,2.7,2.2, lmMat, 0,5.25,0));
+tw.add(box(2.35,2.3,1.95, lmMat, 0,7.75,0));
+tw.add(box(2.6,0.2,2.15, stoneM, 0,8.95,0));
+tw.add(box(2.0,1.6,1.7, lmMat, 0,9.72,0));
+const sgBandM=std({color:0x8fb0c9, roughness:0.2, metalness:0.3});
+tw.add(box(2.08,0.42,1.78, sgBandM, 0,10.15,0));
+tw.add(box(2.1,0.22,1.8, stoneM, 0,10.6,0));
+tw.add(box(0.55,1.0,1.8, lmMat, -0.72,11.15,0));
+tw.add(box(0.55,1.0,1.8, lmMat, 0.72,11.15,0));
+tw.add(box(0.75,0.5,1.8, lmMat, 0,10.9,0));
+const lbc=sph(0.09, new THREE.MeshBasicMaterial({color:0xff3333}), 0,11.78,0); tw.add(lbc);
+ANIM.push(t=>{ lbc.material.color.setHex(Math.sin(t*2.4+0.5)>0?0xff3333:0x551111); });
+window.NIGHT_FNS=window.NIGHT_FNS||[]; NIGHT_FNS.push(n=>{ sgBandM.emissive.setHex(n?0x35597a:0x000000); });
+// —— 皇后广场（三座玻璃塔）——
+const qs=new THREE.Group(); qs.position.set(-1.8,0,-4.9); g.add(qs);
+[[-1.9,4.5],[0,5.3],[1.9,4.5]].forEach(q=>{ qs.add(box(1.55,q[1],1.9, texMat(glassTex('#b9cfdf')), q[0],q[1]/2,0)); });
+// —— 船坞花园 + 帆船日本丸（1930 年，太平洋的白鸟）——
+const dk=new THREE.Group(); dk.position.set(-2.4,0,1.8); dk.rotation.y=0.5; g.add(dk);
+dk.add(box(1.5,0.3,4.6, M.water, 0,0.15,0));
+dk.add(box(0.35,0.55,4.9, stoneM, -0.95,0.27,0)); dk.add(box(0.35,0.55,4.9, stoneM, 0.95,0.27,0));
+dk.add(box(2.25,0.55,0.35, stoneM, 0,0.27,2.45));
+const ship=new THREE.Group(); ship.position.set(0,0.3,0); dk.add(ship);
+ship.add(sph(0.62, M.white, 0,0.05,0, 0.72,0.5,2.7));
+ship.add(box(0.66,0.09,2.5, std({color:0x8a6844,roughness:0.9}), 0,0.3,0));
+ship.add(beam(0,0.42,-1.55, 0,0.72,-2.35, M.dark, 0.035));
+[-0.95,0.05,1.0].forEach(mz=>{ const ms=cyl(0.028,0.045,2.3, M.dark, 0,mz,6); ms.position.y=1.45; ship.add(ms);
+  [1.6,2.2].forEach(hy=>{ ship.add(beam(-(2.6-hy)*0.42,hy,mz, (2.6-hy)*0.42,hy,mz, M.dark, 0.018)); }); });
+// —— 洲际酒店帆形楼 ——
+const ic=new THREE.Group(); ic.position.set(3.1,0,-5.3); ic.rotation.y=0.35; g.add(ic);
+const sailShape=new THREE.Shape();
+sailShape.moveTo(-1.05,0); sailShape.quadraticCurveTo(0.9,0.25, 1.0,2.6); sailShape.quadraticCurveTo(1.02,4.2, 0.55,5.1); sailShape.quadraticCurveTo(0.1,4.0, -0.35,2.2); sailShape.quadraticCurveTo(-0.8,0.8, -1.05,0);
+const sail=new THREE.Mesh(new THREE.ExtrudeGeometry(sailShape,{depth:0.8,bevelEnabled:false}), texMat(glassTex('#cfe0ea'),{roughness:0.35}));
+sail.castShadow=true; sail.position.z=-0.4; ic.add(sail);
+// —— Cosmo World + Cosmo Clock 21（直径 100m，会转的大时钟摩天轮）——
+const cs=new THREE.Group(); cs.position.set(4.35,0,-1.5); g.add(cs);
+cs.add(box(2.6,0.8,1.6, texMat(facadeTex('#e8e2d2')), 0,0.4,1.15));
+cs.add(box(1.9,0.5,0.12, glowMat(signTex('コスモワールド','#db2777','#ffffff',false)), 0,0.98,1.99));
+const cw=new THREE.Group(); cw.position.set(0,2.15,0); cs.add(cw);
+const rimM=std({color:0xf2f4f6, roughness:0.35, metalness:0.5});
+cw.add(tor(1.78,0.06, rimM, 0,0,0));
+for(let i=0;i<6;i++){ const sp2=box(0.06,3.56,0.05, M.steel, 0,0,0); sp2.rotation.z=i*Math.PI/6; cw.add(sp2); }
+for(let i=0;i<14;i++){ const a=i/14*Math.PI*2; cw.add(sph(0.13, std({color:[0xd94f3d,0x2e7f86,0xe0a83c,0x33527a,0xef7aa2,0x5da24a][i%6],roughness:0.5}), Math.cos(a)*1.78, Math.sin(a)*1.78, 0, 1,0.85,1)); }
+cw.add(sph(0.18, M.steel, 0,0,0));
+const cd=cyl(0.44,0.44,0.07, glowMat(clockTex()), 0,0,20); cd.rotation.x=Math.PI/2; cd.position.set(0,0,0.3); cw.add(cd);
+cs.add(beam(-1.35,0,0, 0,2.1,0, M.steel, 0.09)); cs.add(beam(1.35,0,0, 0,2.1,0, M.steel, 0.09));
+cs.add(beam(-0.95,0,-0.95, 0,2.1,0, M.steel, 0.07)); cs.add(beam(0.95,0,-0.95, 0,2.1,0, M.steel, 0.07));
+ANIM.push((t,dt)=>{ cw.rotation.z-=dt*0.09; });
+NIGHT_FNS.push(n=>{ rimM.emissive.setHex(n?0xd63384:0x000000); rimM.emissiveIntensity=n?0.55:0; });
+// —— 红砖仓库（1911/1913 年海关仓库，两栋长屋）——
+const ak=new THREE.Group(); ak.position.set(5.6,0,4.7); ak.rotation.y=-0.38; g.add(ak);
+const akaTex=cnv(512,128,(c,w,h)=>{ c.fillStyle='#96402c'; c.fillRect(0,0,w,h);
+  for(let y=0;y<h;y+=8){ c.fillStyle=(y/8)%2?'#a04632':'#9c4430'; c.fillRect(0,y,w,7); }
+  c.fillStyle='#e8ddc8'; c.fillRect(0,0,w,5); c.fillRect(0,h-6,w,6);
+  for(let r=0;r<2;r++){ const wy=26+r*48; for(let x=20;x<w-14;x+=44){ c.fillStyle='#e8ddc8'; c.fillRect(x-2,wy+6,22,28); c.fillStyle='#2c2622'; c.fillRect(x,wy+8,18,24); } } });
+const akaMat=texMat(akaTex,{roughness:0.9});
+const slateM=std({color:0x3d4450,roughness:0.9});
+[[5.6,-1.05,0],[4.6,1.05,0.3]].forEach(wd=>{ const wl=wd[0], wz=wd[1], wx=wd[2];
+  ak.add(box(wl,0.95,1.15, akaMat, wx,0.48,wz));
+  ak.add(hipRoof(wl+0.25,0.42,1.42, slateM, wx,0.95,wz));
+});
+ak.add(box(5.6,0.3,0.1, texMat(glassTex('#9fc6e0')), 0,0.2,-0.42));
+[[-7.9,-5.6],[-8.3,2.2],[7.9,-4.6]].forEach(q=>g.add(tree(q[0],q[1],0.85,treeMat)));
+people(g,9,2.6,6.4,-0.6,1.4,0.3);
 } }
 
 ];

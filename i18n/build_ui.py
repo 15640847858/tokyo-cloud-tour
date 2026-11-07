@@ -180,19 +180,19 @@ STR = {
 }
 }
 
-IDS = ["skytree","sensoji","tower","shibuya","shinjuku","akiba","ueno","toudai","palace","tokyost","meiji","odaiba","roppongi","ikebukuro","waseda","shinagawa","ginza","harajuku","toyosu","disney","kamakura","fuji","hnd","nrt","dome","stadium"]
+IDS = ["skytree","sensoji","tower","shibuya","shinjuku","akiba","ueno","toudai","palace","tokyost","meiji","odaiba","roppongi","ikebukuro","waseda","shinagawa","ginza","harajuku","toyosu","disney","kamakura","fuji","hnd","nrt","dome","stadium","yokohama"]
 NAMES = {
-"ja": ["東京スカイツリー","浅草寺","東京タワー","渋谷スクランブル交差点","新宿","秋葉原","上野公園","東京大学","皇居","東京駅","明治神宮","お台場","六本木","池袋","早稲田大学","品川","銀座","原宿","豊洲市場","東京ディズニーランド","鎌倉高校前","富士山","羽田空港","成田空港","東京ドーム","国立競技場"],
-"en": ["Tokyo Skytree","Senso-ji Temple","Tokyo Tower","Shibuya Crossing","Shinjuku","Akihabara","Ueno Park","University of Tokyo","Imperial Palace","Tokyo Station","Meiji Shrine","Odaiba","Roppongi","Ikebukuro","Waseda University","Shinagawa","Ginza","Harajuku","Toyosu Market","Tokyo Disneyland","Kamakurakokomae","Mount Fuji","Haneda Airport","Narita Airport","Tokyo Dome","Japan National Stadium"],
-"ko": ["도쿄 스카이트리","센소지 절","도쿄 타워","시부야 교차로","신주쿠","아키하바라","우에노 공원","도쿄 대학","고쿄 (황궁)","도쿄역","메이지 신궁","오다이바","롯폰기","이케부쿠로","와세다 대학","시나가와","긴자","하라주쿠","도요스 시장","도쿄 디즈니랜드","가마쿠라 고교 앞","후지산","하네다 공항","나리타 공항","도쿄 돔","일본 국립경기장"],
-"hi": ["टोक्यो स्काईट्री","सेंसो-जी मंदिर","टोक्यो टावर","शिबुया क्रॉसिंग","शिंजुकु","अकिहाबारा","उएनो पार्क","टोक्यो विश्वविद्यालय","शाही महल","टोक्यो स्टेशन","मेइजी तीर्थ","ओदाइबा","रोप्पोंगी","इकेबुकुरो","वासेदा विश्वविद्यालय","शिनागावा","गिन्ज़ा","हाराजुकु","तोयोसु बाज़ार","टोक्यो डिज़नीलैंड","कामाकुराकोकॉमाए","माउंट फ़ूजी","हानेदा हवाई अड्डा","नारिता हवाई अड्डा","टोक्यो डोम","जापान नेशनल स्टेडियम"]
+"ja": ["東京スカイツリー","浅草寺","東京タワー","渋谷スクランブル交差点","新宿","秋葉原","上野公園","東京大学","皇居","東京駅","明治神宮","お台場","六本木","池袋","早稲田大学","品川","銀座","原宿","豊洲市場","東京ディズニーランド","鎌倉高校前","富士山","羽田空港","成田空港","東京ドーム","国立競技場","横浜みなとみらい"],
+"en": ["Tokyo Skytree","Senso-ji Temple","Tokyo Tower","Shibuya Crossing","Shinjuku","Akihabara","Ueno Park","University of Tokyo","Imperial Palace","Tokyo Station","Meiji Shrine","Odaiba","Roppongi","Ikebukuro","Waseda University","Shinagawa","Ginza","Harajuku","Toyosu Market","Tokyo Disneyland","Kamakurakokomae","Mount Fuji","Haneda Airport","Narita Airport","Tokyo Dome","Japan National Stadium","Yokohama Minato Mirai"],
+"ko": ["도쿄 스카이트리","센소지 절","도쿄 타워","시부야 교차로","신주쿠","아키하바라","우에노 공원","도쿄 대학","고쿄 (황궁)","도쿄역","메이지 신궁","오다이바","롯폰기","이케부쿠로","와세다 대학","시나가와","긴자","하라주쿠","도요스 시장","도쿄 디즈니랜드","가마쿠라 고교 앞","후지산","하네다 공항","나리타 공항","도쿄 돔","일본 국립경기장","요코하마 미나토미라이"],
+"hi": ["टोक्यो स्काईट्री","सेंसो-जी मंदिर","टोक्यो टावर","शिबुया क्रॉसिंग","शिंजुकु","अकिहाबारा","उएनो पार्क","टोक्यो विश्वविद्यालय","शाही महल","टोक्यो स्टेशन","मेइजी तीर्थ","ओदाइबा","रोप्पोंगी","इकेबुकुरो","वासेदा विश्वविद्यालय","शिनागावा","गिन्ज़ा","हाराजुकु","तोयोसु बाज़ार","टोक्यो डिज़नीलैंड","कामाकुराकोकॉमाए","माउंट फ़ूजी","हानेदा हवाई अड्डा","नारिता हवाई अड्डा","टोक्यो डोम","जापान नेशनल स्टेडियम","योकोहामा मिनातो मिराई"]
 }
 AREAS = {
-"zh": ["新宿 · 原宿","涩谷","浅草 · 上野 · 东大","东京站 · 银座","六本木 · 东京塔","台场 · 丰洲","池袋 · 早稻田","迪士尼度假区","富士山","镰仓高校前"],
-"ja": ["新宿・原宿","渋谷","浅草・上野・東大","東京駅・銀座","六本木・東京タワー","お台場・豊洲","池袋・早稲田","ディズニーリゾート","富士山","鎌倉高校前"],
-"en": ["Shinjuku · Harajuku","Shibuya","Asakusa · Ueno · UTokyo","Tokyo Sta. · Ginza","Roppongi · Tokyo Tower","Odaiba · Toyosu","Ikebukuro · Waseda","Disney Resort","Mount Fuji","Kamakurakokomae"],
-"ko": ["신주쿠·하라주쿠","시부야","아사쿠사·우에노·도쿄대","도쿄역·긴자","롯폰기·도쿄 타워","오다이바·도요스","이케부쿠로·와세다","디즈니 리조트","후지산","가마쿠라 고교 앞"],
-"hi": ["शिंजुकु · हाराजुकु","शिबुया","असाकुसा · उएनो · टोक्यो विश्वविद्यालय","टोक्यो स्टेशन · गिन्ज़ा","रोप्पोंगी · टोक्यो टावर","ओदाइबा · तोयोसु","इकेबुकुरो · वासेदा","डिज़नी रिसॉर्ट","माउंट फ़ूजी","कामाकुराकोकॉमाए"]
+"zh": ["新宿 · 原宿","涩谷","浅草 · 上野 · 东大","东京站 · 银座","六本木 · 东京塔","台场 · 丰洲","池袋 · 早稻田","迪士尼度假区","富士山","镰仓高校前","横滨港未来"],
+"ja": ["新宿・原宿","渋谷","浅草・上野・東大","東京駅・銀座","六本木・東京タワー","お台場・豊洲","池袋・早稲田","ディズニーリゾート","富士山","鎌倉高校前","横浜みなとみらい"],
+"en": ["Shinjuku · Harajuku","Shibuya","Asakusa · Ueno · UTokyo","Tokyo Sta. · Ginza","Roppongi · Tokyo Tower","Odaiba · Toyosu","Ikebukuro · Waseda","Disney Resort","Mount Fuji","Kamakurakokomae","Yokohama Minato Mirai"],
+"ko": ["신주쿠·하라주쿠","시부야","아사쿠사·우에노·도쿄대","도쿄역·긴자","롯폰기·도쿄 타워","오다이바·도요스","이케부쿠로·와세다","디즈니 리조트","후지산","가마쿠라 고교 앞","요코하마 미나토미라이"],
+"hi": ["शिंजुकु · हाराजुकु","शिबुया","असाकुसा · उएनो · टोक्यो विश्वविद्यालय","टोक्यो स्टेशन · गिन्ज़ा","रोप्पोंगी · टोक्यो टावर","ओदाइबा · तोयोसु","इकेबुकुरो · वासेदा","डिज़नी रिसॉर्ट","माउंट फ़ूजी","कामाकुराकोकॉमाए","योकोहामा मिनातो मिराई"]
 }
 
 out = {
@@ -210,6 +210,6 @@ for lang, d in STR.items():
     assert set(d.keys()) == base, (lang, set(d.keys()) ^ base)
     assert len(d["relDays"]) == 4 and len(d["wxCond"]) == 17
     assert set(d["tourNames"].keys()) == {"classic","trendy","night","culture"}
-for lang, m in out["names"].items(): assert len(m) == 26, lang
-for lang, a in AREAS.items(): assert len(a) == 10, lang
+for lang, m in out["names"].items(): assert len(m) == 27, lang
+for lang, a in AREAS.items(): assert len(a) == 11, lang
 print("sanity OK: keys consistent across 5 languages")
