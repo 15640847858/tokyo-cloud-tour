@@ -401,6 +401,22 @@ header .sub, #hint{ text-shadow:0 1px 3px rgba(5,10,20,.65), 0 0 10px rgba(5,10,
 
 /* ===== card controls: truly no fill (surroundings show through), no border ===== */
 #sheetPeek .pkChev,#sheetPeek .pkTxt,#cardX,#cardCollapse{background:none!important;background-color:transparent!important;border:none!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+
+/* ===== custom language dropdown (replaces native select) ===== */
+#langSel{display:none!important}
+#langDD{position:relative}
+#setGrid #langDD{grid-column:1/-1}
+header #langDD{display:inline-block}
+#langBtn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;white-space:nowrap}
+.langChev{color:#e6c887;font-size:13px}
+#langMenu{position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:80;background:linear-gradient(165deg,rgba(43,40,33,.94),rgba(17,16,14,.96));-webkit-backdrop-filter:blur(20px) saturate(1.4);backdrop-filter:blur(20px) saturate(1.4);border:1px solid rgba(230,200,135,.4);border-radius:14px;padding:6px;box-shadow:0 18px 44px rgba(0,0,0,.5)}
+header #langMenu{right:auto;min-width:172px}
+.langOpt{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:none;color:#eef2fa;font-size:14.5px;padding:11px 12px;border-radius:9px;cursor:pointer;text-align:left}
+.langOpt .langCk{opacity:0;color:#e6c887;font-weight:700}
+.langOpt.on{color:#e6c887;background:rgba(230,200,135,.13)}
+.langOpt.on .langCk{opacity:1}
+.langOpt:active{background:rgba(230,200,135,.22)}
+#setMod{overflow:visible}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <script type="importmap">
@@ -1264,10 +1280,23 @@ async function applyLang(l){ LANG=l; try{ localStorage.setItem('tt_lang', l); }c
 const hdrBtns=document.querySelector('header .btns');
 function layoutControls(){ const mobile=innerWidth<=760; const grid=document.getElementById('setGrid'); if(!grid||!hdrBtns) return;
   ['homeBtn','rotateBtn','nightBtn','wxModeBtn','groundBtn','cardBtn','bgmBtn'].forEach(id=>{ const el=document.getElementById(id); if(el&&el.parentElement!==grid) grid.appendChild(el); });
-  const sel=document.getElementById('langSel'); if(sel){ if(mobile){ if(sel.parentElement!==grid) grid.insertBefore(sel, grid.firstChild); } else if(sel.parentElement!==hdrBtns){ const mb=document.getElementById('menuBtn'); if(mb) hdrBtns.insertBefore(sel, mb); else hdrBtns.appendChild(sel); } } }
+  const sel=document.getElementById('langDD'); if(sel){ if(mobile){ if(sel.parentElement!==grid) grid.insertBefore(sel, grid.firstChild); } else if(sel.parentElement!==hdrBtns){ const mb=document.getElementById('menuBtn'); if(mb) hdrBtns.insertBefore(sel, mb); else hdrBtns.appendChild(sel); } } }
+const langSelEl=document.getElementById('langSel');
+const langDD=document.createElement('div'); langDD.id='langDD';
+langSelEl.parentElement.insertBefore(langDD, langSelEl); langDD.appendChild(langSelEl);
+const langBtn=document.createElement('button'); langBtn.id='langBtn'; langBtn.type='button';
+langBtn.innerHTML='<span id="langBtnTx"></span><span class="langChev">\u2304</span>';
+const langMenu=document.createElement('div'); langMenu.id='langMenu'; langMenu.hidden=true;
+langDD.appendChild(langBtn); langDD.appendChild(langMenu);
+const LANGNAMES={zh:'\u4E2D\u6587',ja:'\u65E5\u672C\u8A9E',en:'English',ko:'\uD55C\uAD6D\uC5B4',hi:'\u0939\u093F\u0928\u094D\u0926\u0940'};
+function syncLangBtn(){ const tx=document.getElementById('langBtnTx'); if(tx) tx.textContent='\uD83C\uDF10 '+LANGNAMES[langSelEl.value]; langMenu.querySelectorAll('.langOpt').forEach(o=>o.classList.toggle('on', o.dataset.v===langSelEl.value)); }
+Object.keys(LANGNAMES).forEach(k=>{ const o=document.createElement('button'); o.type='button'; o.className='langOpt'; o.dataset.v=k; o.innerHTML='<span>'+LANGNAMES[k]+'</span><span class="langCk">\u2713</span>'; o.onclick=()=>{ langMenu.hidden=true; if(langSelEl.value!==k){ langSelEl.value=k; langSelEl.dispatchEvent(new Event('change')); } syncLangBtn(); }; langMenu.appendChild(o); });
+langBtn.onclick=e=>{ e.stopPropagation(); langMenu.hidden=!langMenu.hidden; };
+document.addEventListener('click', e=>{ if(!langDD.contains(e.target)) langMenu.hidden=true; });
+syncLangBtn();
 layoutControls();
-document.getElementById('langSel').addEventListener('change', e=>{ applyLang(e.target.value); });
-applyLang(LANG);
+document.getElementById('langSel').addEventListener('change', e=>{ applyLang(e.target.value); syncLangBtn(); });
+applyLang(LANG); syncLangBtn();
 
 animate();
 
