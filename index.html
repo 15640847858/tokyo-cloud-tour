@@ -921,7 +921,7 @@ function setPeek(name, meta, img, desc, sub){ const pk=document.getElementById('
   if(!cur){ pk.innerHTML=''; return; }
   const fav=FAVS.has(cur.id);
   pk.innerHTML='<div class="pkRow">'+(img?'<img src="'+img+'" alt="">':'')+'<div class="pkTx"><div class="pkName">'+name+'</div>'+(sub?'<div class="pkSub">'+sub+'</div>':'')+(meta?'<div class="pkMeta">'+meta+'</div>':'')+'</div><button class="pkChev" id="pkChev" aria-label="expand">\u2303</button></div>'
-    +'<div class="pkDiv"></div><div class="pkBar2"><button class="pkCirc" id="pkFocus" aria-label="focus">\u27A4</button><button class="pkCirc fav'+(fav?' on':'')+'" id="pkFav" aria-label="fav">'+(fav?'\u2605':'\u2606')+'</button><span class="pkSpacer"></span><button class="pkTxt" id="pkMore">'+T('cmpMore')+'</button><button class="pkTxt" id="pkClose">'+T('cmpClose')+' \u00D7</button></div>';
+    +'<div class="pkDiv"></div><div class="pkBar2"><button class="pkCirc" id="pkFocus" aria-label="focus">\u27A4</button><button class="pkCirc fav'+(fav?' on':'')+'" id="pkFav" aria-label="fav">'+(fav?'\u2605':'\u2606')+'</button><span class="pkSpacer"></span><button class="pkTxt" id="pkMore">'+T('cmpMore')+'</button><button class="pkTxt" id="pkClose">'+T('cmpClose')+'</button></div>';
   const stop=e=>e.stopPropagation();
   const pf=document.getElementById('pkFav');
   if(pf) pf.onclick=e=>{ stop(e); if(FAVS.has(cur.id)) FAVS.delete(cur.id); else FAVS.add(cur.id); try{ localStorage.setItem('tt_favs', JSON.stringify([...FAVS])); }catch(_){ } const on=FAVS.has(cur.id); pf.textContent=on?'\u2605':'\u2606'; pf.classList.toggle('on', on); const fb3=document.getElementById('favBtn'); if(fb3) fb3.textContent=on?T('favOn'):T('fav'); paintFavs(); };
