@@ -499,7 +499,7 @@ header #langMenu{right:auto;min-width:172px}
 
 <script src="i18n_ui.js"></script><script src="narr_ui.js"></script>
 <script type="module">
-const BUILD='20261108.25';
+const BUILD='20261108.26';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Sky } from 'three/addons/objects/Sky.js';
@@ -552,6 +552,10 @@ function setSun(elev, azim){
   sun.position.copy(sunVec).multiplyScalar(160);
   if(bayWater) bayWater.material.uniforms.sunDirection.value.copy(sunVec).normalize();
 }
+// 月光：夜晚方向光从太阳位置平滑摆到月亮方位（天空穹顶仍用沉入地平线的太阳，保持夜空黑暗）
+const _moonVec=new THREE.Vector3().setFromSphericalCoords(1, THREE.MathUtils.degToRad(90-32), THREE.MathUtils.degToRad(205));
+const MOON_POS=_moonVec.clone().multiplyScalar(160);
+const _sunPosTmp=new THREE.Vector3();
 setSun(30, 124);
 // 环境反射：天空渐变环境贴图（按时段切换），让玻璃与金属拥有真实光泽
 function makeEnvTexture(kind){
@@ -632,6 +636,16 @@ const seaTex=new THREE.CanvasTexture(seaCnv); seaTex.colorSpace=THREE.SRGBColorS
 const seaMat=new THREE.MeshBasicMaterial({map:seaTex, depthWrite:false});
 const sea=new THREE.Mesh(new THREE.CircleGeometry(780, 48), seaMat);
 sea.rotation.x=-Math.PI/2; sea.position.set((NW[0]+SE[0])/2, -0.4, (NW[1]+SE[1])/2); sea.renderOrder=-1; scene.add(sea);
+
+// 径向渐变贴图（星月与地面灯光池共用）
+function radialTex(stops){ const cv=document.createElement('canvas'); cv.width=cv.height=128; const g=cv.getContext('2d'); const gr=g.createRadialGradient(64,64,2,64,64,64); stops.forEach(st=>gr.addColorStop(st[0],st[1])); g.fillStyle=gr; g.fillRect(0,0,128,128); const t=new THREE.CanvasTexture(cv); t.colorSpace=THREE.SRGBColorSpace; return t; }
+// 星空（夜晚浮现）与月亮
+const starGeo=new THREE.BufferGeometry();
+{ const pts=[]; for(let i=0;i<1100;i++){ const th=Math.random()*Math.PI*2, ph=Math.acos(1-Math.random()*0.88); const v=new THREE.Vector3().setFromSphericalCoords(1450, ph, th); pts.push(v.x, Math.abs(v.y), v.z); } starGeo.setAttribute('position', new THREE.Float32BufferAttribute(pts,3)); }
+const starMat=new THREE.PointsMaterial({color:0xd6e4ff, size:1.7, sizeAttenuation:false, transparent:true, opacity:0, depthWrite:false, fog:false});
+scene.add(new THREE.Points(starGeo, starMat));
+const moonMat=new THREE.SpriteMaterial({map:radialTex([[0,'rgba(242,247,255,1)'],[0.22,'rgba(216,230,255,.95)'],[0.42,'rgba(165,195,245,.32)'],[1,'rgba(140,170,230,0)']]), transparent:true, opacity:0, depthWrite:false, fog:false});
+const moonSpr=new THREE.Sprite(moonMat); moonSpr.position.copy(_moonVec).multiplyScalar(1350); moonSpr.scale.setScalar(170); scene.add(moonSpr);
 
 // 东京湾水面已按用户要求移除（原为一块矩形动态水面，与地图贴图的水域颜色不一致）
 setSun(30, 124);
@@ -945,10 +959,17 @@ AREAS.forEach((a,ai)=>{ const b=document.createElement('button'); b.className='a
 // 昼夜与旋转
 let night=false;
 const ENVP={
- day:{el:30,az:124,sunI:2.5,hemiI:0.68,bloom:0.25,city:0.0,sunCol:new THREE.Color(0xffd9a8),gnd:new THREE.Color(0xd9d5cc),sea:new THREE.Color(0xffffff),gem:0.42,expo:0.80,label:'白天'},
- dusk:{el:2.4,az:99,sunI:1.9,hemiI:0.5,bloom:0.62,city:0.55,sunCol:new THREE.Color(0xff9a5c),gnd:new THREE.Color(0xc4b098),sea:new THREE.Color(0xd8bda6),gem:0.16,expo:0.74,label:'黄昏'},
- night:{el:-2.5,az:150,sunI:0.3,hemiI:0.22,bloom:1.15,city:0.9,sunCol:new THREE.Color(0xa8c4ff),gnd:new THREE.Color(0x5f7396),sea:new THREE.Color(0x546a86),gem:0.03,expo:0.58,label:'夜晚'}};
-const envCur={el:30,az:124,sunI:2.5,hemiI:0.68,bloom:0.25,city:0.0,expo:0.80,sunCol:new THREE.Color(0xffd9a8),gnd:new THREE.Color(0xffffff),sea:new THREE.Color(0xffffff),gem:0.42};
+ day:{el:38,az:124,sunI:2.6,hemiI:0.75,bloom:0.22,city:0.0,gem:0.42,gmap:0.0,expo:0.84,fogN:330,fogF:860,ray:1.8,turb:5,stars:0,glow:0,moon:0,sunCol:new THREE.Color(0xffe3b3),hemiSky:new THREE.Color(0xbfdcff),hemiGnd:new THREE.Color(0xe8dcc2),fog:new THREE.Color(0xd6e7f2),gnd:new THREE.Color(0xdcd8ce),sea:new THREE.Color(0xffffff),label:'白天'},
+ dusk:{el:4.5,az:99,sunI:1.75,hemiI:0.55,bloom:0.7,city:0.7,gem:0.16,gmap:0.05,expo:0.77,fogN:300,fogF:800,ray:3.1,turb:7,stars:0.15,glow:0.4,moon:0,sunCol:new THREE.Color(0xff8f4d),hemiSky:new THREE.Color(0x9383bd),hemiGnd:new THREE.Color(0x5f4630),fog:new THREE.Color(0xa08084),gnd:new THREE.Color(0xc9ae94),sea:new THREE.Color(0xd9bda6),label:'黄昏'},
+ night:{el:-2.5,az:150,sunI:0.55,hemiI:0.52,bloom:1.05,city:1.0,gem:0.05,gmap:0.14,expo:0.68,fogN:300,fogF:820,ray:0.4,turb:2,stars:0.95,glow:1,moon:1,sunCol:new THREE.Color(0xa9c6ff),hemiSky:new THREE.Color(0x3d5c8f),hemiGnd:new THREE.Color(0x16202e),fog:new THREE.Color(0x18263c),gnd:new THREE.Color(0x8298ba),sea:new THREE.Color(0x46648c),label:'夜晚'}};
+const envCur={el:38,az:124,sunI:2.6,hemiI:0.75,bloom:0.22,city:0.0,gem:0.42,gmap:0.0,expo:0.84,fogN:330,fogF:860,ray:1.8,turb:5,stars:0,glow:0,moon:0,sunCol:new THREE.Color(0xffe3b3),hemiSky:new THREE.Color(0xbfdcff),hemiGnd:new THREE.Color(0xe8dcc2),fog:new THREE.Color(0xd6e7f2),gnd:new THREE.Color(0xdcd8ce),sea:new THREE.Color(0xffffff)};
+{ hemi.color.copy(envCur.hemiSky); hemi.groundColor.copy(envCur.hemiGnd); scene.fog.color.copy(envCur.fog); scene.fog.near=envCur.fogN; scene.fog.far=envCur.fogF; sky.material.uniforms.rayleigh.value=envCur.ray; sky.material.uniforms.turbidity.value=envCur.turb; }
+// 全图灯光池：每个景点一团贴地光晕，夜里整张地图都有灯火（机场为冷白，其余暖黄）
+const glowTex=radialTex([[0,'rgba(255,255,255,.9)'],[0.4,'rgba(255,255,255,.36)'],[1,'rgba(255,255,255,0)']]);
+const glowMatW=new THREE.MeshBasicMaterial({map:glowTex, color:0xffa257, transparent:true, opacity:0, depthWrite:false, blending:THREE.AdditiveBlending});
+const glowMatC=new THREE.MeshBasicMaterial({map:glowTex, color:0x9fd0ff, transparent:true, opacity:0, depthWrite:false, blending:THREE.AdditiveBlending});
+const glowGeo=new THREE.PlaneGeometry(1,1);
+Object.values(allSpotsMap()).forEach(sp=>{ try{ const gx=(typeof sp.x==='number')?sp.x:(sp.group?sp.group.position.x:0); const gz=(typeof sp.z==='number')?sp.z:(sp.group?sp.group.position.z:0); if(!gx&&!gz) return; const m=new THREE.Mesh(glowGeo, (sp.id==='hnd'||sp.id==='nrt')?glowMatC:glowMatW); m.rotation.x=-Math.PI/2; m.position.set(gx,0.55,gz); const sc=(sp.id==='fuji'||sp.id==='disney'||sp.id==='hnd'||sp.id==='nrt')?100:66; m.scale.set(sc,sc,1); m.renderOrder=2; scene.add(m); }catch(e){} });
 let envTarget=ENVP.day, daypartState='day';
 function setDaypart(st){ daypartState=st; envTarget=ENVP[st]; scene.environment=ENV_TEX[st]; night=(st!=='day'); applyTowerNight(); if(window.NIGHT_FNS) NIGHT_FNS.forEach(f=>f(night));
   const nb=document.getElementById('nightBtn'); nb.textContent=T('envPrefix')+T('dp_'+st); nb.classList.toggle('active', night);
@@ -966,10 +987,19 @@ applyDpMode();
 setInterval(()=>{ if(dpMode!=='auto') return; const tb=document.getElementById('tourbar'); if(tb&&tb.style.display==='block') return; if(autoDaypart()!==daypartState) applyDpMode(); else paintDpBtn(); }, 60000);
 document.addEventListener('visibilitychange', ()=>{ if(document.hidden||dpMode!=='auto') return; const tb=document.getElementById('tourbar'); if(tb&&tb.style.display==='block') return; if(autoDaypart()!==daypartState) applyDpMode(); });
 function tickEnv(dt){ const k=1-Math.exp(-dt*2.4); let moving=false;
-  ['el','az','sunI','hemiI','bloom','city','gem','expo'].forEach(f=>{ const d=envTarget[f]-envCur[f]; if(Math.abs(d)>0.002){ envCur[f]+=d*k; moving=true; } });
-  if(envCur.sunCol.getHex()!==envTarget.sunCol.getHex()){ envCur.sunCol.lerp(envTarget.sunCol,k); envCur.gnd.lerp(envTarget.gnd,k); envCur.sea.lerp(envTarget.sea,k); moving=true; }
-  if(moving){ setSun(envCur.el, envCur.az); sun.intensity=envCur.sunI; sun.color.copy(envCur.sunCol); hemi.intensity=envCur.hemiI; bloomPass.strength=envCur.bloom; renderer.toneMappingExposure=envCur.expo; groundMat.color.copy(envCur.gnd); groundMat.emissiveIntensity = groundMode==='sat' ? envCur.gem : 0; seaMat.color.copy(envCur.sea); if(window.cityMats) cityMats.forEach(m=>{ m.emissiveIntensity=envCur.city; }); } }
-groundMat.emissiveIntensity = groundMode==='sat' ? envCur.gem : 0;
+  ['el','az','sunI','hemiI','bloom','city','gem','gmap','expo','fogN','fogF','ray','turb','stars','glow','moon'].forEach(f=>{ const d=envTarget[f]-envCur[f]; if(Math.abs(d)>0.002){ envCur[f]+=d*k; moving=true; } });
+  ['sunCol','gnd','sea','hemiSky','hemiGnd','fog'].forEach(f=>{ if(envCur[f].getHex()!==envTarget[f].getHex()){ envCur[f].lerp(envTarget[f],k); moving=true; } });
+  if(moving){ setSun(envCur.el, envCur.az); if(envCur.moon>0.002) sun.position.lerpVectors(_sunPosTmp.copy(sunVec).multiplyScalar(160), MOON_POS, envCur.moon);
+    sun.intensity=envCur.sunI; sun.color.copy(envCur.sunCol);
+    hemi.intensity=envCur.hemiI; hemi.color.copy(envCur.hemiSky); hemi.groundColor.copy(envCur.hemiGnd);
+    scene.fog.color.copy(envCur.fog); scene.fog.near=envCur.fogN; scene.fog.far=envCur.fogF;
+    sky.material.uniforms.rayleigh.value=envCur.ray; sky.material.uniforms.turbidity.value=envCur.turb;
+    bloomPass.strength=envCur.bloom; renderer.toneMappingExposure=envCur.expo;
+    groundMat.color.copy(envCur.gnd); groundMat.emissiveIntensity = groundMode==='sat' ? envCur.gem : envCur.gmap; seaMat.color.copy(envCur.sea);
+    if(window.cityMats) cityMats.forEach(m=>{ m.emissiveIntensity=envCur.city; });
+    starMat.opacity=envCur.stars*0.92; moonMat.opacity=envCur.stars;
+    glowMatW.opacity=0.15*envCur.glow; glowMatC.opacity=0.11*envCur.glow; } }
+groundMat.emissiveIntensity = groundMode==='sat' ? envCur.gem : envCur.gmap;
 document.getElementById('rotateBtn').onclick=()=>setAutoRotate(!controls.autoRotate);
 
 const clock=new THREE.Clock();
@@ -1240,7 +1270,7 @@ ANIM.push((t,dt)=>{ if(!precip||!precipKind) return; const a=precip.geometry.att
   for(let i=0;i<a.count;i++){ let y=a.getY(i)-speed*dt*(0.7+((i*37)%10)/14); if(y<0.2) y=56+((i*13)%5); a.setY(i,y); if(snow) a.setX(i, a.getX(i)+Math.sin(t*1.3+i)*dt*0.7); } a.needsUpdate=true; });
 function paintWxBtn(){ const b=document.getElementById('wxModeBtn'); if(!b) return; b.textContent=T('wxModePrefix')+T('wxm_'+wxMode); b.classList.toggle('active', wxMode!=='live'); }
 function paintGroundBtn(){ const b=document.getElementById('groundBtn'); if(!b) return; b.textContent=T('groundPrefix')+(groundMode==='sat'?T('gmSat'):T('gmMap')); b.classList.toggle('active', groundMode==='sat'); }
-document.getElementById('groundBtn').onclick=()=>{ groundMode = groundMode==='sat' ? 'map' : 'sat'; try{ localStorage.setItem('tt_ground_v2', groundMode); }catch(e){} paintGroundBtn(); groundMat.emissiveIntensity = groundMode==='sat' ? envCur.gem : 0; loadGroundTiles(); };
+document.getElementById('groundBtn').onclick=()=>{ groundMode = groundMode==='sat' ? 'map' : 'sat'; try{ localStorage.setItem('tt_ground_v2', groundMode); }catch(e){} paintGroundBtn(); groundMat.emissiveIntensity = groundMode==='sat' ? envCur.gem : envCur.gmap; loadGroundTiles(); };
 let visitStats=null;
 function paintVisit(){ const el=document.getElementById('visitLine'); if(!el) return; el.textContent = visitStats ? T('statsLine').replace('{a}', visitStats.v).replace('{b}', visitStats.p) : ''; }
 function loadVisits(){ const NS='https://abacus.jasoncameron.dev/'; const get=u=>fetch(u).then(r=>r.json()).then(j=>j.value);
