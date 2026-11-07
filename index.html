@@ -176,12 +176,12 @@
 .gsVert{position:absolute;top:9px;right:8px;writing-mode:vertical-rl;font-family:'Ma Shan Zheng','Caveat',cursive;font-size:17px;letter-spacing:2px;color:#c73e2c;text-shadow:0 0 7px rgba(253,248,238,.95),0 0 3px rgba(253,248,238,.95);max-height:80%;overflow:hidden;z-index:2}
 .gsCap{display:flex;align-items:center;gap:6px;padding:6px 8px 7px;background:#fdf8ee}
 .gsCapMain{flex:1;min-width:0}
-.gsCName{display:block;font-family:'Ma Shan Zheng','Caveat',cursive;font-size:19px;color:#33405c;line-height:1.12;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gsCName{display:block;font-family:'Ma Shan Zheng','Caveat',cursive;font-size:10px;color:#33405c;line-height:1.12;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gsCDate{display:block;font-size:9px;color:#9a8a68;letter-spacing:1.2px;margin-top:1px;font-family:sans-serif}
 .gsCNote{display:block;font-size:10.5px;color:#8a6d3b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
 .gsSeal{flex:none;width:22px;height:22px;background:#c73e2c;color:#fdf6e9;font-family:"Hiragino Mincho ProN","YuMincho",serif;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;border-radius:3px;transform:rotate(3deg);opacity:.94}
 .gsCard.big{width:212px;height:268px}
-.gsCard.big .gsCName{font-size:26px}
+.gsCard.big .gsCName{font-size:12px}
 .gsCard.big .gsVert{font-size:23px}
 .gsCard.big .gsCDate{font-size:11px}
 .gsCard.big .gsCNote{font-size:13px}
@@ -214,7 +214,7 @@
 .gsCell.got{background:#f3ead2;border:1px solid #d8c9a3;padding:3px}
 .gsCell .gsCard{width:100%;height:100%;box-shadow:0 0 0 2px #fdf8ee,0 0 0 3px rgba(176,141,79,.5)}
 .gsCell .gsCap{padding:3px 5px 4px;gap:4px}
-.gsCell .gsCName{font-size:12.5px}
+.gsCell .gsCName{font-size:8px}
 .gsCell .gsCDate{font-size:7px;margin-top:0}
 .gsCell .gsCNote{display:none}
 .gsCell .gsVert{font-size:10.5px;top:5px;right:4px}
@@ -500,7 +500,7 @@ header #langMenu{right:auto;min-width:172px}
 
 <script src="i18n_ui.js"></script><script src="narr_ui.js"></script>
 <script type="module">
-const BUILD='20261108.23';
+const BUILD='20261108.24';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Sky } from 'three/addons/objects/Sky.js';
@@ -1303,7 +1303,7 @@ function nameOfId(id){ const sp=allSpotsMap()[id]; if(sp) return sName(sp); cons
 function stampHtml(id,big){ const nm=nameOfId(id); const inf=(typeof INFO!=='undefined'&&INFO&&INFO[id])?INFO[id]:null; const ph=inf&&inf.imgs&&inf.imgs[0]?inf.imgs[0].url:(inf&&inf.img?inf.img:'');
   const note=(STAMPS[id]&&STAMPS[id].note)?('<span class="gsCNote">'+esc(STAMPS[id].note)+'</span>'):'';
   const art=ph?('<img src="'+esc(ph)+'" alt="" loading="lazy">'):('<span class="gsMotifBig">'+(SEAL_EMOJI[id]||'🗼')+'</span>');
-  return '<div class="gsCard'+(big?' big':'')+'" style="--r:'+stampRot(id)+'deg"><div class="gsArt">'+art+'<span class="gsVert">'+esc(nm)+'</span></div><div class="gsCap"><div class="gsCapMain"><span class="gsCName">'+esc(nm)+'</span><span class="gsCDate">'+stampDate(id)+'</span>'+note+'</div><span class="gsSeal">'+(SEAL_CH[id]||'印')+'</span></div></div>'; }
+  return '<div class="gsCard'+(big?' big':'')+'" style="--r:'+stampRot(id)+'deg"><div class="gsArt">'+art+'</div><div class="gsCap"><div class="gsCapMain"><span class="gsCName">'+esc(nm)+'</span><span class="gsCDate">'+stampDate(id)+'</span>'+note+'</div><span class="gsSeal">'+(SEAL_CH[id]||'印')+'</span></div></div>'; }
 function paintStampBtn(id){ const b=document.getElementById('stampBtn'); if(!b||!id) return; if(STAMPS[id]){ b.textContent='✓ '+T('stampedFmt').replace('{d}',stampDate(id)); b.classList.add('active'); } else { b.textContent=T('stampBtn'); b.classList.remove('active'); } }
 function renderGoshuin(){ const ids=spots.filter(sp=>sp&&sp.id).map(sp=>sp.id).concat(['hnd','nrt']);
   const n=ids.filter(id=>STAMPS[id]).length;
