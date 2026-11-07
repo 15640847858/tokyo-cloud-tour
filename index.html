@@ -469,7 +469,7 @@ header #langMenu{right:auto;min-width:172px}
   <section class="mod"><h2 id="hWxT">实时天气 · 东京</h2><div id="wxBody">正在获取天气…</div><div id="wxHomeLine"></div></section>
   <section class="mod"><h2 id="hSearchT">搜索</h2><input id="search" type="text" placeholder="搜索景点，如：迪士尼 / 银座"></section>
   <section class="mod"><h2 id="hSpotsT">景点介绍</h2><button id="favOnly" class="chip">只看收藏 ★</button><div id="spots"></div></section>
-  <section class="mod"><h2 id="hToursT">精选玩法</h2><button id="daytripBtn" class="route"><b>东京经典一日游</b>：浅草 → 晴空塔 → 上野 → 秋叶原 → 东京站 → 银座 → 东京塔 → 涩谷 → 明治神宫 → 新宿<small>开始播放：镜头逐站飞行导览</small></button><button class="route" data-tour="trendy"><b>东京潮流之旅</b>：原宿 → 涩谷 → 六本木 → 台场 → 丰洲<small>开始播放</small></button><button class="route" data-tour="night"><b>东京夜景之旅</b>：东京站 → 银座 → 东京塔 → 六本木 → 涩谷<small>开始播放（自动切换夜晚）</small></button><button class="route" data-tour="culture"><b>东京文化之旅</b>：浅草 → 上野 → 东京大学 → 皇居 → 明治神宫<small>开始播放</small></button><p class="about" id="discEl">路线与机场线路均为示意：地图距离经过压缩，仅用于可视化，不能作为实际导航距离；时间与票价为参考值。</p></section>
+  <section class="mod"><h2 id="hToursT">精选玩法</h2><button id="daytripBtn" class="route"><b>东京经典一日游</b>：谷中银座 → 浅草寺 → 东京晴空塔 → 上野公园 → 秋叶原 → 皇居 → 东京站 → 银座<small>开始播放（白天·晴）</small></button><button class="route" data-tour="trendy"><b>东京潮流之旅</b>：池袋 → 新宿 → 原宿 → 明治神宫 → 涩谷 → 六本木 → 东京塔 → 品川<small>开始播放（黄昏）</small></button><button class="route" data-tour="night"><b>东京夜景之旅</b>：国立竞技场 → 东京巨蛋 → 丰洲市场 → teamLab → 台场 → 横滨 → 稻城 → 迪士尼<small>开始播放（自动切换夜晚）</small></button><button class="route" data-tour="culture"><b>东京文化之旅</b>：东京大学 → 早稻田大学 → 吉祥寺 → 吉卜力美术馆 → 川越 → 春日部 → 富士山 → 镰仓高校前<small>开始播放（白天·雪景）</small></button><p class="about" id="discEl">路线与机场线路均为示意：地图距离经过压缩，仅用于可视化，不能作为实际导航距离；时间与票价为参考值。</p></section>
   <section class="mod"><h2 id="hGsT">御朱印护照</h2><p class="about" id="gsProg">已收集 0/24</p><button id="gsOpen" class="route"><b id="gsOpenB">打开护照</b><small id="gsOpenS">打开景点卡点「盖御朱印」，集齐 24 处朱印</small></button></section>
   <section class="mod"><h2 id="hAreasT">区域聚焦</h2><div class="areaBtns" id="areaBtns"></div></section>
   <section class="mod"><h2 id="hAboutT">关于云游东京</h2><p class="about" id="visitLine"></p><p class="about" id="aboutEl">真实地图与建筑数据来自 OpenStreetMap：市中心 14,000 栋建筑按真实轮廓生成，景点周边只保留高楼地标。景点照片来自 Wikimedia Commons，作者与授权标注在介绍卡内。<br>地图 © OpenStreetMap contributors<br>卫星影像 © Esri, Maxar, Earthstar Geographics<br>天空：three.js 官网示例 Sky</p><p class="about" id="modelCredit">明治神宫鸟居模型：Quaternius，CC0（经 Poly Pizza 取得）</p></section></div></aside>
@@ -482,9 +482,9 @@ header #langMenu{right:auto;min-width:172px}
 <div id="bldgStatus">正在加载真实建筑数据…</div>
 <div id="hint">拖动旋转 · 滚轮缩放 · 点击景点查看介绍</div>
 
-<script src="i18n_ui.js"></script>
+<script src="i18n_ui.js"></script><script src="narr_ui.js"></script>
 <script type="module">
-const BUILD='20261108.11';
+const BUILD='20261108.12';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Sky } from 'three/addons/objects/Sky.js';
@@ -862,7 +862,7 @@ if(innerWidth<=760) document.getElementById('panel').classList.add('hidden');
 document.getElementById('homeBtn').onclick=()=>{ flyHome(); clearSelection(); };
 
 // 一日经典游金色线路
-const dayIds=['sensoji','skytree','ueno','akiba','tokyost','ginza','tower','shibuya','meiji','shinjuku'];
+const dayIds=['yanaka','sensoji','skytree','ueno','akiba','palace','tokyost','ginza'];
 const dayPts=dayIds.map(id=>{ const s=spots.find(v=>v&&v.id===id); return new THREE.Vector3(s.x,0,s.z); });
 const dayMid=[]; for(let i=0;i<dayPts.length-1;i++){ dayMid.push(dayPts[i]); dayMid.push(dayPts[i].clone().lerp(dayPts[i+1],0.5).setY(2.2)); } dayMid.push(dayPts[dayPts.length-1]);
 const dayCurve=new THREE.CatmullRomCurve3(dayMid);
@@ -1106,10 +1106,10 @@ if(matchMedia('(pointer:coarse)').matches) setSheet('peek');
 document.addEventListener('keydown', e=>{ if(e.key==='Escape' && infoEl.style.display!=='none') closeCard(); });
 const stgBtn=document.getElementById('sheetToggle'); if(stgBtn) stgBtn.onclick=()=>{ if(matchMedia('(pointer:coarse)').matches){ setSheet(sheetState==='peek'?'half':'peek'); } else { infoEl.classList.toggle('cmp'); paintSheetToggle(); } };
 
-const TOURS={ classic:{name:'东京经典一日游', ids:dayIds},
-  trendy:{name:'东京潮流之旅', ids:['harajuku','shibuya','roppongi','odaiba','toyosu']},
-  night:{name:'东京夜景之旅', ids:['tokyost','ginza','tower','roppongi','shibuya']},
-  culture:{name:'东京文化之旅', ids:['sensoji','ueno','toudai','palace','meiji']} };
+const TOURS={ classic:{name:'东京经典一日游', ids:dayIds, dp:'day', wx:'clear'},
+  trendy:{name:'东京潮流之旅', ids:['ikebukuro','shinjuku','harajuku','meiji','shibuya','roppongi','tower','shinagawa'], dp:'dusk', wx:null},
+  night:{name:'东京夜景之旅', ids:['stadium','dome','toyosu','teamlab','odaiba','yokohama','inagi','disney'], dp:'night', wx:null},
+  culture:{name:'东京文化之旅', ids:['toudai','waseda','kichijoji','ghibli','kawagoe','kasukabe','fuji','kamakura'], dp:'day', wx:'snow'} };
 let TOUR=null, tourCurve=null;
 const tourbar=document.getElementById('tourbar');
 tourbar.innerHTML='<div class="tbTop"><div><div class="tbName" id="tbName"></div><div class="tbStop" id="tbStop"><span id="tbNarr"></span></div></div><div class="tbBtns"><button id="tbVoice">🔊</button><button id="tbPrev">'+T('tbPrev')+'</button><button id="tbPlay">'+T('pause')+'</button><button id="tbNext">'+T('tbNext')+'</button><button id="tbExit">'+T('tbExit')+'</button></div></div><div class="tbProg"><i id="tbProgFill"></i></div><div id="tbNarrText"></div>';
@@ -1121,14 +1121,14 @@ function goStop(i){ if(!TOUR) return; TOUR.idx=Math.max(0, Math.min(TOUR.ids.len
   narrCancel(); narrSchedule(sp.id); paintNarrText(sp.id); paintNarr(); }
 function startTour(key){ const TT=TOURS[key]; if(!TT) return;
   document.getElementById('panel').classList.add('hidden');
-  TOUR={key, ids:TT.ids, idx:0, playing:true, tAcc:0, dotU:0};
+  const _pw=(TOUR&&TOUR.savedWx!==undefined)?TOUR.savedWx:null; TOUR={key, ids:TT.ids, idx:0, playing:true, tAcc:0, dotU:0};
   tourCurve=tourPts(TT.ids); dayTube.geometry.dispose(); dayTube.geometry=new THREE.TubeGeometry(tourCurve,120,0.3,8);
   dayTube.visible=true; dayDot.visible=true; tourbar.style.display='block';
   document.getElementById('tbName').textContent=T('tourNames')[key]; document.getElementById('tbPlay').textContent=T('pause');
-  if(key==='night') setDaypart('night');
+  if(TT.dp) setDaypart(TT.dp); if(TT.wx){ TOUR.savedWx=(_pw!==null?_pw:wxMode); wxMode=TT.wx; renderWeatherFx(); paintWxBtn(); } else if(_pw!==null){ wxMode=_pw; renderWeatherFx(); paintWxBtn(); }
   document.querySelectorAll('[data-tour],#daytripBtn').forEach(b=>b.classList.toggle('active', (key==='classic'&&b.id==='daytripBtn')||b.dataset.tour===key));
   goStop(0); if(narrSupported&&narrOn){ try{ const uu=new SpeechSynthesisUtterance('。'); uu.volume=0; uu.rate=2; speechSynthesis.speak(uu); }catch(e){} } paintNarr(); }
-function stopTour(){ narrCancel(); TOUR=null; tourCurve=null; applyDpMode(); dayTube.visible=false; dayDot.visible=false; tourbar.style.display='none'; tourbar.style.bottom=''; tourbar.style.visibility='';
+function stopTour(){ narrCancel(); if(TOUR&&TOUR.savedWx!==undefined){ wxMode=TOUR.savedWx; renderWeatherFx(); paintWxBtn(); } TOUR=null; tourCurve=null; applyDpMode(); dayTube.visible=false; dayDot.visible=false; tourbar.style.display='none'; tourbar.style.bottom=''; tourbar.style.visibility='';
   document.querySelectorAll('[data-tour],#daytripBtn').forEach(b=>b.classList.remove('active')); }
 
 /* ===== tour narration (SpeechSynthesis, added 2026-11-08) ===== */
@@ -1137,7 +1137,7 @@ const narrSupported=('speechSynthesis' in window)&&('SpeechSynthesisUtterance' i
 let narrOn=true; try{ narrOn=localStorage.getItem('tt_narr')!=='0'; }catch(e){}
 const NARR_LANG={zh:'zh-CN',ja:'ja-JP',en:'en-US',ko:'ko-KR',hi:'hi-IN'};
 function narrBind(el, fn){ if(!el) return; let last=0; const h=e=>{ const n=Date.now(); if(n-last<650) return; last=n; fn(e); }; el.addEventListener('pointerdown',h); el.addEventListener('click',h); }
-function narrTextFor(id){ const U=window.I18NUI||{}; const S=U.str||{}; const v=(S[LANG]||{})['narr_'+id]||(S.zh||{})['narr_'+id]; if(v) return v; const c=(window.CONTENT||{})[id]; return c&&c.desc?c.desc:''; }
+function narrTextFor(id){ const NN=window.I18NNARR||{}; const nv=(NN[LANG]||{})[id]||(NN.zh||{})[id]; if(nv) return nv; const U=window.I18NUI||{}; const S=U.str||{}; const v=(S[LANG]||{})['narr_'+id]||(S.zh||{})['narr_'+id]; if(v) return v; const c=(window.CONTENT||{})[id]; return c&&c.desc?c.desc:''; }
 function narrVoicePick(){ try{ const vs=speechSynthesis.getVoices()||[]; const want=NARR_LANG[LANG]||'zh-CN'; return vs.find(v=>v.lang===want)||vs.find(v=>v.lang&&v.lang.indexOf(want.slice(0,2))===0)||null; }catch(e){ return null; } }
 function paintNarr(){ const b=document.getElementById('tbVoice'); let st=document.getElementById('tbNarr'); if(!st){ const tb=document.getElementById('tbStop'); if(tb){ st=document.createElement('span'); st.id='tbNarr'; tb.appendChild(st); } } if(b){ b.textContent=narrOn?T('narrOnLbl'):T('narrOffLbl'); b.title=T('narrBtnT'); b.style.display=narrSupported?'':'none'; } if(st){ st.textContent=NARR.diag||(!narrSupported?'':(!narrOn?T('narrOffS'):(NARR.paused?T('narrPausedS'):(NARR.speaking?T('narrPlaying'):'')))); } }
 function narrCancel(){ NARR.gen++; clearTimeout(NARR.timer); NARR.pending=false; NARR.speaking=false; NARR.paused=false; NARR.curId=null; NARR.diag=''; NARR.doneAt=0; const nt=document.getElementById('tbNarrText'); if(nt){ nt.textContent=''; nt.style.display='none'; } if(narrSupported){ try{ if(speechSynthesis.speaking||speechSynthesis.pending) speechSynthesis.cancel(); }catch(e){} } paintNarr(); }
@@ -1305,7 +1305,7 @@ function renderWelcome(){ ambSet('off'); window.__cur={type:'welcome'}; infoBody
 function renderTourBtns(){ const stopsOf=ids=>ids.map(id=>{ const sp=spots.find(v=>v&&v.id===id); return sp?sName(sp):id; }).join(' \u2192 '); const colon=LANG==='zh'?'\uFF1A':': ';
   const setB=(el,key,ids,playKey)=>{ if(el) el.innerHTML='<b>'+T('tourNames')[key]+'</b>'+colon+stopsOf(ids)+'<small>'+T(playKey)+'</small>'; };
   setB(document.getElementById('daytripBtn'),'classic',dayIds,'playClassic');
-  document.querySelectorAll('[data-tour]').forEach(b=>{ const k=b.dataset.tour; if(TOURS[k]) setB(b,k,TOURS[k].ids, k==='night'?'playNight':'play'); }); }
+  document.querySelectorAll('[data-tour]').forEach(b=>{ const k=b.dataset.tour; if(TOURS[k]) setB(b,k,TOURS[k].ids, ({trendy:'playTrendy',night:'playNight',culture:'playCulture'})[k]||'play'); }); }
 function renderAreas(){ const U=window.I18NUI; const labels=(U&&U.areas[LANG])||(U&&U.areas.zh); if(!labels) return; document.querySelectorAll('#areaBtns .areaBtn').forEach((b,i)=>{ if(labels[i]) b.textContent=labels[i]; }); }
 function renderSpotList(){ document.querySelectorAll('.spot').forEach(b=>{ const sp=spots.find(v=>v&&v.id===b.dataset.sid); if(sp){ b.textContent=sName(sp); b.dataset.names=namesOf(sp); } }); }
 async function applyLang(l){ LANG=l; try{ localStorage.setItem('tt_lang', l); }catch(e){}

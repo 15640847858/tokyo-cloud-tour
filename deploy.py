@@ -49,7 +49,7 @@ ASSETS = [("data/kaedena.jpg", "kaedena.jpg"), ("data/favicon.svg", "favicon.svg
 # i18n: UI dictionary script + per-language content files (globbed so new
 # languages are picked up automatically; each must stay under ~95KB)
 import glob as _glob
-for _p in sorted(_glob.glob(str(base / "data" / "info_*.json"))) + [str(base / "data" / "i18n_ui.js")]:
+for _p in sorted(_glob.glob(str(base / "data" / "info_*.json"))) + [str(base / "data" / "i18n_ui.js"), str(base / "data" / "narr_ui.js")]:
     ASSETS.append(("data/" + pathlib.Path(_p).name, pathlib.Path(_p).name))
 asset_refs = []
 import re as _re
