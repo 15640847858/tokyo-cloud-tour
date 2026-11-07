@@ -249,6 +249,107 @@ house.add(box(0.6,0.85,0.06, std({color:0x7a5230,roughness:0.9}), 0.3,0.42,0.87)
 [[-3.4,0.9],[0.4,0.9],[4.3,-0.9]].forEach((sp2,ix)=>{ g.add(box(1.15,0.95+ix*0.14,1.0, texMat(facadeTex(['#e9eef2','#f3e9d2','#e6f0e6'][ix])), sp2[0],0.62,sp2[1])); g.add(hipRoof(1.35,0.32,1.2, texMat(kawaraTex()), sp2[0],1.12+ix*0.14,sp2[1])); });
 g.add(tree(5.0,-3.6,0.95)); g.add(tree(-5.2,-0.6,1.0)); g.add(tree(4.8,1.8,0.9,pinkTree));
 people(g,9,-3.5,4.2,-0.6,1.6,0.32);
+} },
+{id:'kichijoji', name:'吉祥寺', x:0, z:0, h:2.8, desc:'东京人最想住的街区：井之头公园的天鹅船、SUNROAD 商店街、口琴横丁的小酒馆巷，也是去吉卜力美术馆的门户站。', make:g=>{
+g.add(box(11.5,0.3,10, std({color:0x74a75e,roughness:1}), 0,0.15,0));
+const pond=sph(2.3, M.water, -1.8,0.3,2.6, 1.35,0.09,0.95); g.add(pond);
+function swan(x,z,ry){ const sw=new THREE.Group(); sw.position.set(x,0.42,z); sw.rotation.y=ry; g.add(sw);
+  sw.add(sph(0.34, M.white, 0,0,0, 1.35,0.55,0.85));
+  const n1=cyl(0.045,0.05,0.42, M.white, 0.3,0,8); n1.position.y=0.28; n1.rotation.z=-0.5; sw.add(n1);
+  sw.add(sph(0.1, M.white, 0.44,0.5,0, 1,0.9,0.9));
+  const bk=cone(0.05,0.14, std({color:0xe8862e,roughness:0.7}), 0.55,0,6); bk.rotation.z=-1.5; bk.position.y=0.48; sw.add(bk); }
+swan(-2.4,2.2,0.6); swan(-0.9,3.3,-0.9);
+const stn=new THREE.Group(); stn.position.set(0.8,0.3,-4.1); g.add(stn);
+stn.add(box(6.2,1.5,1.5, texMat(facadeTex('#e9e2d2')), 0,0.75,0));
+stn.add(box(2.4,0.55,0.1, glowMat(signTex('吉祥寺駅','#14532d','#ffffff',false)), 0,1.1,0.77));
+const sun=new THREE.Group(); sun.position.set(-2.9,0.3,-1.5); sun.rotation.y=0.12; g.add(sun);
+[-1,1].forEach(sd=>{ for(let i=0;i<4;i++) sun.add(box(0.95,0.95,0.9, texMat(facadeTex(['#f2e3c8','#dce9f2','#f6d9d2','#e6f0da'][i])), sd*0.85,0.47,-1.5+i*1.0)); });
+sun.add(box(0.14,0.1,4.2, std({color:0x9fd8e8,roughness:0.25,metalness:0.3}), 0,1.32,0));
+sun.add(box(1.9,0.5,0.1, glowMat(signTex('サンロード','#7c2d12','#ffe9b0',false)), 0,0.95,2.16));
+const yok=new THREE.Group(); yok.position.set(3.3,0.3,-0.9); yok.rotation.y=-0.35; g.add(yok);
+for(let i=0;i<4;i++){ yok.add(box(0.8,0.85+((i*7)%3)*0.1,0.75, texMat(facadeTex(['#e8dcc4','#d8e2ea','#efe0cc','#e2d8ea'][i])), -1.2+i*0.82,0.42,0.5)); yok.add(box(0.8,0.85,0.75, texMat(facadeTex('#e5ddcf')), -1.2+i*0.82,0.42,-0.55)); }
+[[-0.8,0],[0.1,0],[1.0,0]].forEach(l=>{ const lt=sph(0.11, std({color:0xd23b3b,emissive:0xa01818,emissiveIntensity:0.8,roughness:0.5}), l[0],1.15,0, 1,1.25,1); yok.add(lt); });
+yok.add(box(1.6,0.4,0.08, glowMat(signTex('ハーモニカ横丁','#5b2100','#ffd9a0',false)), 0,0.9,0.95));
+g.add(tree(-4.9,3.9,1.1)); g.add(tree(3.4,4.2,1.0,pinkTree)); g.add(tree(5.1,2.4,0.95)); g.add(tree(-5.2,-0.4,1.0)); g.add(tree(1.8,-3.0,0.85));
+people(g,8,-3.8,4.0,-2.6,1.4,0.32);
+} },
+{id:'teamlab', name:'teamLab Planets', x:0, z:0, h:3.0, desc:'把身体浸进艺术里：脱鞋赤脚走过及膝的水面，锦鲤在腿边游动，无限水晶宇宙在头顶闪烁。外国游客人气第一梯队的沉浸式美术馆。', make:g=>{
+g.add(box(11.5,0.3,10, std({color:0x14171c,roughness:0.4,metalness:0.3}), 0,0.15,0));
+const pool=box(7.6,0.1,4.6, std({color:0x1b2a38,roughness:0.08,metalness:0.65}), 0.4,0.33,1.9); g.add(pool);
+const dotC=[0x53e9dc,0xff7ad9,0xffd76a,0x9fd0ff];
+for(let i=0;i<26;i++){ const dx=-3.0+((i*37)%70)/10, dz=0.2+((i*53)%34)/10;
+  g.add(sph(0.055, std({color:dotC[i%4],emissive:dotC[i%4],emissiveIntensity:1.6,roughness:0.3}), dx,0.42,dz, 1,0.6,1)); }
+const hall=new THREE.Group(); hall.position.set(0.3,0.3,-2.6); g.add(hall);
+hall.add(box(7.0,2.7,4.0, std({color:0x1a1d22,roughness:0.7}), 0,1.35,0));
+hall.add(box(3.9,0.6,0.12, glowMat(signTex('teamLab Planets','#0b0e13','#aef3ff',false)), 0,2.15,2.03));
+hall.add(box(1.5,1.6,0.1, std({color:0xdff6ff,emissive:0x9fd8ff,emissiveIntensity:1.2,roughness:0.2}), -1.2,0.8,2.03));
+hall.add(box(1.1,1.1,0.1, std({color:0xffe9a8,emissive:0xffc95e,emissiveIntensity:0.9,roughness:0.2}), 1.4,0.55,2.03));
+const wf=box(1.9,2.2,0.16, M.water, 3.1,1.1,1.2); wf.rotation.z=0.5; hall.add(wf);
+people(g,5,-2.6,2.8,1.2,3.4,0.4);
+const trk=new THREE.Group(); trk.position.set(-0.5,0.3,4.55); g.add(trk);
+trk.add(box(9.5,0.2,1.0, M.grey, 0,1.35,0));
+[-4,-1.4,1.4,4].forEach(x=>trk.add(box(0.16,1.3,0.16, M.grey, x,0.65,0)));
+const yt=new THREE.Group(); yt.position.set(-1.5,1.62,4.55); g.add(yt);
+yt.add(box(2.3,0.55,0.8, M.white, 0,0.27,0));
+yt.add(box(2.3,0.13,0.82, std({color:0x7fc4c9,roughness:0.5}), 0,0.42,0));
+g.add(tree(5.2,-4.2,0.9)); g.add(tree(-5.3,-4.0,0.95)); g.add(tree(5.3,3.4,0.85));
+} },
+{id:'kawagoe', name:'川越', x:0, z:0, h:3.6, desc:'「小江户」川越：藏造老街、时之钟和菓子屋横丁把江户到昭和的街景叠在一起，从池袋坐电车约 30 分钟的一日游小城。', make:g=>{
+g.add(box(11.5,0.3,10, texMat(paveTex(),{roughness:1}), 0,0.15,0));
+g.add(box(2.2,0.08,9.0, std({color:0x8f8a80,roughness:1}), 0,0.33,0));
+function kura(x,z,w,h,c){ const k=new THREE.Group(); k.position.set(x,0.3,z); g.add(k);
+  k.add(box(w,h,w*0.82, texMat(facadeTex(c)), 0,h/2,0));
+  k.add(hipRoof(w+0.35,h*0.34,w*0.82+0.3, texMat(kawaraTex()), 0,h,0));
+  k.add(box(w*0.34,h*0.4,0.08, M.dark, 0,h*0.52,w*0.42));
+  k.add(box(w*0.5,0.14,0.06, M.dark, 0,h*0.94,w*0.42));
+  return k; }
+kura(-2.2,-2.9,2.1,1.9,'#f0ead8'); kura(0.6,-3.0,1.8,1.7,'#e9e2cc'); kura(3.1,-2.9,2.0,2.0,'#f2ecdc');
+const ksign=kura(-3.9,0.6,1.7,1.55,'#eee6d0'); ksign.rotation.y=0.5;
+ksign.add(box(1.1,0.4,0.08, glowMat(signTex('龜屋','#1c1917','#f5eeda',false)), 0,1.05,0.72));
+kura(2.9,1.1,1.8,1.65,'#ece4ce').rotation.y=-0.4;
+const bell=new THREE.Group(); bell.position.set(1.7,0.3,-0.7); g.add(bell);
+bell.add(box(1.5,0.35,1.5, M.grey, 0,0.17,0));
+[[1.05,0.95],[0.85,0.9],[0.62,1.0]].forEach((t,ix)=>{ const y0=0.35+ix*0.92;
+  bell.add(box(t[0],t[1],t[0], std({color:0x4a3826,roughness:0.9}), 0,y0+t[1]/2,0));
+  bell.add(hipRoof(t[0]+0.42,0.3,t[0]+0.42, texMat(kawaraTex()), 0,y0+t[1],0)); });
+bell.add(box(0.34,0.4,0.06, M.dark, 0,2.62,0.32));
+bell.add(sph(0.11, std({color:0x8a6b34,metalness:0.6,roughness:0.4}), 0,2.6,0.3, 1,1.2,1));
+const candy=new THREE.Group(); candy.position.set(-3.3,0.3,3.3); candy.rotation.y=0.3; g.add(candy);
+for(let i=0;i<3;i++){ candy.add(box(1.05,0.9,0.95, texMat(facadeTex(['#f6e3c2','#dcebd8','#f2d5d5'][i])), -1.15+i*1.15,0.45,0));
+  const aw=box(1.1,0.06,0.5, std({color:[0xd23b3b,0x3f7fbf,0xe8a13a][i],roughness:0.8}), -1.15+i*1.15,0.98,0.55); aw.rotation.x=0.35; candy.add(aw); }
+const stick=cyl(0.07,0.07,1.1, std({color:0xd2691e,roughness:0.6}), -0.2,0.95,8); stick.position.y=0.85; stick.rotation.z=0.25; candy.add(stick);
+g.add(tree(5.2,-3.4,0.95)); g.add(tree(-5.3,-3.2,1.0)); g.add(tree(5.0,3.6,0.9));
+people(g,9,-1.0,1.0,-3.6,3.8,0.36);
+} },
+{id:'inagi', name:'稻城·读卖乐园', x:0, z:0, h:3.4, desc:'关东老牌游乐园读卖乐园（宝石灯饰名满关东）和 2026 年新开的宝可梦乐园 PokePark KANTO 所在的稻城市，稻城长沼站前还立着高达与 Scopedog 的等身雕像。', make:g=>{
+g.add(box(11.5,0.3,10, std({color:0x6f9a58,roughness:1}), 0,0.15,0));
+const wheel=new THREE.Group(); wheel.position.set(-3.1,0.3,-2.2); g.add(wheel);
+[-0.5,0.5].forEach(dx=>{ const leg=box(0.14,2.3,0.14, M.grey, dx,1.15,0); leg.rotation.z=dx*0.35; wheel.add(leg); });
+const wring=new THREE.Group(); wring.position.set(0,2.35,0); wheel.add(wring);
+for(let i=0;i<12;i++){ const a=i/12*Math.PI*2, sg=box(0.34,0.1,0.12, std({color:0xe8b4c8,roughness:0.5}), Math.cos(a)*1.25,Math.sin(a)*1.25,0); sg.rotation.z=a; wring.add(sg);
+  if(i%2===0) wring.add(box(0.2,0.24,0.18, std({color:[0x7fc4e8,0xf2d38a,0xa8d8a0][(i/2)%3],roughness:0.6}), Math.cos(a)*1.25,Math.sin(a)*1.25,0.12)); }
+wring.add(sph(0.16, std({color:0xffd76a,emissive:0xcf9a2e,emissiveIntensity:0.7}), 0,0,0.1, 1,1,0.6));
+ANIM.push(t=>{ wring.rotation.z=t*0.12; });
+const coaster=new THREE.Group(); coaster.position.set(2.2,0.3,-2.6); g.add(coaster);
+const up=box(3.4,0.12,0.3, M.white, -0.6,1.0,0); up.rotation.z=0.5; coaster.add(up);
+const dn=box(2.8,0.12,0.3, M.white, 1.8,0.7,0); dn.rotation.z=-0.42; coaster.add(dn);
+[-1.9,-0.4,1.1,2.6].forEach(x=>coaster.add(box(0.12,1.3,0.12, M.grey, x,0.65,0)));
+coaster.add(box(0.62,0.22,0.34, std({color:0xd23b3b,roughness:0.5}), -1.5,1.72,0));
+const hana=new THREE.Group(); hana.position.set(3.4,0.3,1.9); g.add(hana);
+hana.add(cyl(1.25,1.35,0.5, M.white, 0,0,18));
+hana.add(sph(1.22, M.glass, 0,0.5,0, 1,0.62,1));
+hana.add(box(1.5,0.36,0.08, glowMat(signTex('HANA・BIYORI','#14532d','#eaffea',false)), 0,0.42,1.3));
+const scope=new THREE.Group(); scope.position.set(-4.3,0.3,2.6); scope.rotation.y=0.5; g.add(scope);
+const olv=std({color:0x6b7248,roughness:0.6,metalness:0.3});
+scope.add(box(0.2,0.55,0.24, olv, -0.17,0.27,0)); scope.add(box(0.2,0.55,0.24, olv, 0.17,0.27,0));
+scope.add(box(0.62,0.6,0.42, olv, 0,0.85,0));
+scope.add(box(0.3,0.3,0.3, olv, 0,1.3,0));
+scope.add(sph(0.09, std({color:0xd23b3b,emissive:0xa01818,emissiveIntensity:0.9}), 0,1.32,0.16, 1,1,0.5));
+scope.add(box(0.24,0.44,0.14, olv, 0.42,0.95,-0.1));
+[[-1.2,2.8,0xffd76a],[0.8,3.6,0x7fe8dc],[4.9,-0.6,0xff9fd0]].forEach(tp=>{ g.add(tree(tp[0],tp[1],0.95));
+  for(let i2=0;i2<4;i2++) g.add(sph(0.05, std({color:tp[2],emissive:tp[2],emissiveIntensity:1.5}), tp[0]+Math.cos(i2*1.7)*0.4, 1.15+((i2*29)%40)/100, tp[1]+Math.sin(i2*1.7)*0.4, 1,1,1)); });
+g.add(tree(-5.2,-3.6,1.05,pinkTree)); g.add(tree(0.2,-4.3,0.9));
+people(g,8,-2.2,3.0,0.6,3.4,0.32);
 } }
 
 ];
