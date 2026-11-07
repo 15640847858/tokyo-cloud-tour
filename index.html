@@ -484,7 +484,7 @@ header #langMenu{right:auto;min-width:172px}
 
 <script src="i18n_ui.js"></script><script src="narr_ui.js"></script>
 <script type="module">
-const BUILD='20261108.16';
+const BUILD='20261108.17';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Sky } from 'three/addons/objects/Sky.js';
@@ -1145,7 +1145,7 @@ function narrChunks(txt){ const parts=[]; let cur=''; const punct='。！？!?�
 function narrSpeak(id){ if(!TOUR) return; try{ audioMuteOthers(); }catch(e){} try{ audioDuck(true); }catch(e){} if(!narrSupported){ NARR.doneAt=Date.now(); return; } if(!narrOn) return; const txt=narrTextFor(id); if(!txt){ NARR.doneAt=Date.now(); return; } const g=NARR.gen; const parts=narrChunks(txt);
   const finish=()=>{ if(g!==NARR.gen) return; NARR.speaking=false; NARR.paused=false; try{ audioDuck(false); }catch(e){} NARR.doneAt=Date.now(); if(TOUR) TOUR.tAcc=0; paintNarr(); };
   const playChunk=(idx)=>{ if(g!==NARR.gen||!TOUR) return; try{ const u=new SpeechSynthesisUtterance(parts[idx]); u.lang=NARR_LANG[LANG]||'zh-CN'; const _v=narrVoicePick(); if(_v){ u.voice=_v; if(idx===0) NARR.voiceName=_v.name+(_v.localService?'/L':'/N'); } else if(idx===0) NARR.voiceName='default'; u.rate=(LANG==='zh'?0.98:1); NARR.curId=id; u.onstart=()=>{ if(g!==NARR.gen) return; NARR.speaking=true; NARR.paused=false; if(idx===0) NARR.diag=''; paintNarr(); }; u.onend=()=>{ if(g!==NARR.gen) return; if(idx<parts.length-1) playChunk(idx+1); else finish(); }; u.onerror=(e)=>{ if(g!==NARR.gen) return; NARR.diag='TTS错误:'+((e&&e.error)||'unknown'); finish(); }; speechSynthesis.speak(u); if(idx===0){ setTimeout(()=>{ if(g!==NARR.gen||NARR.speaking) return; let nv=0; try{ nv=(speechSynthesis.getVoices()||[]).length; }catch(e){} let pf='?'; try{ pf=(speechSynthesis.paused?'P1':'P0')+'/'+(speechSynthesis.speaking?'S1':'S0'); }catch(e){} NARR.diag=T('narrMuteHint')+' · voices='+nv+' '+pf+' v='+(NARR.voiceName||'?'); try{ audioDuck(false); }catch(e){} NARR.doneAt=Date.now(); paintNarr(); },1500); } }catch(e){} };
-  try{ if(speechSynthesis.speaking||speechSynthesis.pending){ speechSynthesis.cancel(); setTimeout(()=>playChunk(0),160); } else playChunk(0); }catch(e){ playChunk(0); } }
+  try{ speechSynthesis.cancel(); }catch(e){} setTimeout(()=>playChunk(0),250); }
 function paintNarrText(id){ const el=document.getElementById('tbNarrText'); if(!el) return; if(!narrOn||!id){ el.textContent=''; el.style.display='none'; return; } const t=narrTextFor(id); el.textContent=t||''; el.style.display=t?'block':'none'; }
 function narrSchedule(id){ if(!narrOn) return; if(!narrSupported){ NARR.doneAt=Date.now(); return; } const g=NARR.gen; clearTimeout(NARR.timer); NARR.pending=true; NARR.timer=setTimeout(()=>{ NARR.pending=false; if(g===NARR.gen&&TOUR) narrSpeak(id); },1750); }
 function narrPause(){ clearTimeout(NARR.timer); NARR.pending=false; if(narrSupported&&NARR.speaking&&!NARR.paused){ try{ speechSynthesis.pause(); NARR.paused=true; }catch(e){} } paintNarr(); }
