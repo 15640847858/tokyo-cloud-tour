@@ -296,6 +296,12 @@ STR["ja"].update({"narrPlay":"▶ 解説を再生"})
 STR["en"].update({"narrPlay":"▶ Play narration"})
 STR["ko"].update({"narrPlay":"▶ 해설 재생"})
 STR["hi"].update({"narrPlay":"▶ विवरण चलाएँ"})
+
+STR["zh"].update({"narrOnLbl":"🗣 讲解：开","narrOffLbl":"🗣 讲解：关"})
+STR["ja"].update({"narrOnLbl":"🗣 解説：オン","narrOffLbl":"🗣 解説：オフ"})
+STR["en"].update({"narrOnLbl":"🗣 Voice: On","narrOffLbl":"🗣 Voice: Off"})
+STR["ko"].update({"narrOnLbl":"🗣 해설: 켬","narrOffLbl":"🗣 해설: 끔"})
+STR["hi"].update({"narrOnLbl":"🗣 विवरण: चालू","narrOffLbl":"🗣 विवरण: बंद"})
 out = {
  "str": STR,
  "names": {lang: dict(zip(IDS, vals)) for lang, vals in NAMES.items()},
