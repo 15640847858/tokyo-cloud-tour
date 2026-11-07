@@ -1,5 +1,7 @@
 import * as THREE from 'three';
-import { spots } from './builders.js';
+import { spots as _sb } from './builders.js';
+import { spots2 } from './builders2.js';
+const spots = _sb.concat(spots2);
 let audioT=null; export function setAudioT(fn){ audioT=fn; }
 const T=k=>audioT?audioT(k):k;
 let ambNight=false;
@@ -38,7 +40,7 @@ function audioResume(){ if(!bgmCtx) return; try{ if(navigator.audioSession) navi
 function bgmStart(){ if(!ensureAudio()) return false; audioResume(); bgmGain.gain.cancelScheduledValues(bgmCtx.currentTime); bgmGain.gain.setTargetAtTime(0.8, bgmCtx.currentTime, 0.6); if(!bgmTimer){ bgmBar=0; bgmNextT=bgmCtx.currentTime+0.1; bgmTimer=setInterval(()=>{ if(bgmNextT<bgmCtx.currentTime-0.2) bgmNextT=bgmCtx.currentTime+0.05; while(bgmNextT<bgmCtx.currentTime+0.8){ bgmScheduleBar(bgmBar, bgmNextT); bgmBar++; bgmNextT+=bgmBarLen(); } }, 300); } return true; }
 function bgmStop(){ if(bgmGain&&bgmCtx) bgmGain.gain.setTargetAtTime(0, bgmCtx.currentTime, 0.25); if(bgmTimer){ clearInterval(bgmTimer); bgmTimer=null; } setTimeout(()=>{ if(!bgmOn&&ambType==='off'&&bgmCtx){ bgmCtx.suspend(); if(bgmAudio) bgmAudio.pause(); } }, 900); }
 // ===== 景点环境音（全部 WebAudio 合成，随打开的景点切换）=====
-const AMB_TYPE={yokohama:'sea',dome:'crowd',stadium:'park',sensoji:'bell',meiji:'bell',kamakura:'cross',odaiba:'sea',toyosu:'sea',disney:'musicbox',hnd:'airport',nrt:'airport',ueno:'park',palace:'park',fuji:'wind',tokyost:'station',shinagawa:'station',ikebukuro:'stationX',shinjuku:'station',toudai:'library',waseda:'library',shibuya:'crowd',harajuku:'crowd',ginza:'crowd',roppongi:'crowd',akiba:'akiba'};
+const AMB_TYPE={yanaka:'park',yokohama:'sea',dome:'crowd',stadium:'park',sensoji:'bell',meiji:'bell',kamakura:'cross',odaiba:'sea',toyosu:'sea',disney:'musicbox',hnd:'airport',nrt:'airport',ueno:'park',palace:'park',fuji:'wind',tokyost:'station',shinagawa:'station',ikebukuro:'stationX',shinjuku:'station',toudai:'library',waseda:'library',shibuya:'crowd',harajuku:'crowd',ginza:'crowd',roppongi:'crowd',akiba:'akiba'};
 function ambTone(t, freq, vel, dur){ const o=bgmCtx.createOscillator(), gn=bgmCtx.createGain(); o.type='sine'; o.frequency.value=freq; gn.gain.setValueAtTime(0,t); gn.gain.linearRampToValueAtTime(vel, t+0.01); gn.gain.exponentialRampToValueAtTime(0.0001, t+dur); o.connect(gn); gn.connect(ambGain); o.start(t); o.stop(t+dur+0.05); }
 function ambBell(t){ [[1,0.16,7],[2.02,0.09,5],[2.74,0.06,3.6],[3.76,0.035,2.4],[5.4,0.015,1.4]].forEach(p=>ambTone(t, 196*p[0], p[1], p[2])); }
 function ambChime(t){ const notes=[1568,1760,2093,2349,2637]; const n=1+Math.floor(Math.random()*3); for(let i=0;i<n;i++) ambTone(t+i*0.14, notes[Math.floor(Math.random()*notes.length)], 0.028, 1.6); }
@@ -88,6 +90,7 @@ const SPOT_AUDIO={
  akiba:{ev:[['murmur',2.5,4.5],['blip',3,6],['beep',6,11],['steps',5,9],['car',10,16]], bed:{f:'bandpass',fq:580,q:0.6,g:0.055,lfo:0.09,ld:0.45}, vol:0.6, ref:6},
  odaiba:{ev:[['wave',2.5,5],['windS',4,7],['bird',5,10],['murmur',7,13]], bed:{f:'bandpass',fq:430,q:0.7,g:0.06,lfo:0.06,ld:0.6}, vol:0.6, ref:9},
  yokohama:{ev:[['wave',2.5,5],['windS',4,7],['bird',6,11],['murmur',8,14]], bed:{f:'bandpass',fq:450,q:0.7,g:0.055,lfo:0.06,ld:0.55}, vol:0.6, ref:9},
+ yanaka:{ev:[['murmur',5,9],['steps',5,9],['bird',6,11],['bell',26,44]], bed:{f:'bandpass',fq:520,q:0.7,g:0.04,lfo:0.06,ld:0.4}, vol:0.55, ref:7},
  toyosu:{ev:[['wave',3,6],['car',8,14],['windS',5,9],['hush',6,10]], bed:{f:'bandpass',fq:460,q:0.7,g:0.045,lfo:0.07,ld:0.45}, vol:0.53, ref:8},
  kamakura:{ev:[['cross',7,12],['wave',3,6],['bird',6,11]], bed:{f:'bandpass',fq:470,q:0.7,g:0.05,lfo:0.07,ld:0.5}, vol:0.58, ref:7},
  fuji:{ev:[['windS',3,6],['hush',9,16]], bed:{f:'bandpass',fq:640,q:0.7,g:0.065,lfo:0.05,ld:0.5}, vol:0.55, ref:12},

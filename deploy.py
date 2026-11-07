@@ -66,7 +66,7 @@ for src, name in ASSETS:
 # inline deployment payload hit the argv cap); each minified + uploaded by
 # digest like info.json, each kept under the ~95KB upload cap
 files_extra = []
-for _src, _name in (("builders_src.js", "builders.js"), ("airports_src.js", "airports.js"), ("audio_src.js", "audio.js")):
+for _src, _name in (("builders_src.js", "builders.js"), ("builders2_src.js", "builders2.js"), ("airports_src.js", "airports.js"), ("audio_src.js", "audio.js")):
     subprocess.run(["npx", "-y", "esbuild@0.20.2", str(base / _src), "--minify", "--charset=utf8",
                     "--outfile=/tmp/mod_min.js"], check=True, capture_output=True, text=True)
     subprocess.run(["node", "--check", "/tmp/mod_min.js"], check=True)
