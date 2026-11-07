@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { M, ANIM, box, cyl, cone, sph, beam, cnv, std, texMat, glowMat, facadeTex, glassTex, signTex, hipRoof, tree, pinkTree, treeMat, people, blink, kawaraTex } from './builders.js';
+import { M, ANIM, box, cyl, cone, sph, beam, cnv, std, texMat, glowMat, facadeTex, glassTex, signTex, hipRoof, tree, pinkTree, treeMat, people, blink, kawaraTex, paveTex } from './builders.js';
 
 // 第二批景点模块（builders.js 接近部署体积上限后拆分，index/audio 合并 spots+spots2）
 export const spots2 = [
@@ -179,4 +179,76 @@ people(g,6,-5.5,-1.5,3.5,6.5,0.35); } },
   people(g,2, 0.7,1.3, -3.6,-2.8, 1.25);
   g.add(tree(9.4,-6.3,1.1)); g.add(tree(-9.8,-5.4,1.0)); g.add(tree(-4.6,-6.5,0.9));
  } },
+{id:'ghibli', name:'三鹰之森吉卜力美术馆', x:0, z:0, h:3.2, desc:'宫崎骏亲自设计的美术馆，藏在井之头公园的绿荫里：彩色拼布外墙、旋转楼梯、屋顶花园里站着天空之城的机器人兵。完全预约制，现场买不到票。', make:g=>{
+g.add(box(11.5,0.3,10, std({color:0x7aa763,roughness:1}), 0,0.15,0));
+const pond=sph(1.5, M.water, -4.2,0.3,3.4, 1.25,0.1,0.9); g.add(pond);
+g.add(box(4.5,0.06,1.1, std({color:0xd8cbb2,roughness:1}), 0.6,0.32,2.6));
+const cream=texMat(facadeTex('#f3e5cf'));
+const mus=new THREE.Group(); mus.position.set(0.5,0.3,-1.0); g.add(mus);
+mus.add(box(4.6,1.5,3.2, cream, 0,0.75,0));
+mus.add(box(3.9,1.25,2.7, cream, -0.2,2.1,0));
+const patchC=['#e8a2b4','#f2d38a','#a8c8a0','#9db8d6'];
+patchC.forEach((c,i)=>mus.add(box(0.85,1.0,0.06, std({color:c,roughness:0.85}), -1.7+i*1.05,0.8,1.63)));
+[[2.0,0.9],[-1.2,2.15],[0.6,2.15]].forEach(w=>mus.add(box(0.5,0.62,0.06, std({color:0xffca7a,emissive:0xcf8a2e,emissiveIntensity:0.55,roughness:0.4}), w[0],w[1],1.38)));
+const twr=cyl(0.85,0.95,2.7, cream, -2.6,0,14); mus.add(twr);
+mus.add(cone(1.15,0.8, texMat(kawaraTex()), -2.6,0,12,3.1));
+const st=cyl(0.55,0.62,3.6, std({color:0xe6d7bd,roughness:0.9}), 2.65,0,12); mus.add(st);
+for(let k=0;k<5;k++){ const sb=box(0.5,0.09,0.34, M.dark, 2.65+Math.cos(k*1.15)*0.72, 0.6+k*0.55, Math.sin(k*1.15)*0.72); sb.rotation.y=-k*1.15; mus.add(sb); }
+mus.add(cone(0.8,0.6, texMat(kawaraTex()), 2.65,0,10,3.9));
+mus.add(hipRoof(4.9,0.75,3.5, texMat(kawaraTex()), 0,1.5,0));
+mus.add(box(3.4,0.14,2.2, std({color:0x6f9a58,roughness:1}), -0.2,2.8,0));
+const botM=std({color:0x59614f,roughness:0.55,metalness:0.45});
+const bot=new THREE.Group(); bot.position.set(-0.7,2.87,-0.3); mus.add(bot);
+bot.add(box(0.16,0.62,0.2, botM, -0.16,0.31,0)); bot.add(box(0.16,0.62,0.2, botM, 0.16,0.31,0));
+bot.add(box(0.56,0.78,0.34, botM, 0,0.98,0));
+const armL=box(0.13,1.05,0.16, botM, -0.48,0.85,0); armL.rotation.z=0.16; bot.add(armL);
+const armR=box(0.13,1.05,0.16, botM, 0.48,0.85,0); armR.rotation.z=-0.16; bot.add(armR);
+bot.add(box(0.36,0.34,0.32, botM, 0,1.56,0));
+bot.add(box(0.6,0.3,0.1, glowMat(signTex('ジブリ美術館','#5b4636','#ffe9b0',false)), 0,2.05,1.78));
+const booth=new THREE.Group(); booth.position.set(2.2,0.3,2.4); g.add(booth);
+booth.add(box(1.15,1.15,0.9, std({color:0xe9dcc0,roughness:0.9}), 0,0.57,0));
+booth.add(box(0.7,0.6,0.06, M.dark, 0,0.68,0.47));
+const toto=sph(0.26, std({color:0x5d707e,roughness:0.8}), 0,0.66,0.44, 1,1.1,0.4); booth.add(toto);
+booth.add(hipRoof(1.4,0.4,1.1, texMat(kawaraTex()), 0,1.15,0));
+const cafe=new THREE.Group(); cafe.position.set(-3.4,0.3,0.9); g.add(cafe);
+cafe.add(box(2.3,1.1,1.9, M.white, 0,0.55,0));
+cafe.add(hipRoof(2.6,0.6,2.2, std({color:0xd97c2e,roughness:0.8}), 0,1.1,0));
+cafe.add(box(1.5,0.34,0.08, glowMat(signTex('麦わらぼうし','#7c2d12','#fff7e0',false)), 0,0.95,0.97));
+[-1.9,1.9].forEach(x=>mus.add(box(0.28,0.8,0.1, std({color:0x4d7c43,roughness:1}), x,1.1,1.64)));
+g.add(tree(-4.6,-3.4,1.15)); g.add(tree(4.9,-3.8,1.05)); g.add(tree(4.4,3.6,0.95,pinkTree)); g.add(tree(-5.0,0.4,1.0)); g.add(tree(2.8,-4.3,0.9));
+people(g,7,-2.5,3.5,1.8,3.2,0.32);
+} },
+{id:'kasukabe', name:'春日部', x:0, z:0, h:3.4, desc:'《蜡笔小新》的故乡：春日部站东口有野原一家铜像，站前的伊藤洋华堂就是动画里「佐藤九日堂」的原型，还有一座能参观的「地下神殿」防洪设施。', make:g=>{
+g.add(box(11.5,0.3,10, texMat(paveTex(),{roughness:1}), 0,0.15,0));
+const store=new THREE.Group(); store.position.set(-1.4,0.3,-2.4); g.add(store);
+store.add(box(6.6,3.3,3.4, texMat(facadeTex('#eef0f2')), 0,1.65,0));
+store.add(box(6.7,0.5,3.5, std({color:0x2456a6,roughness:0.6}), 0,3.5,0));
+store.add(box(6.7,0.16,3.5, std({color:0xd23b3b,roughness:0.6}), 0,3.2,0));
+store.add(box(3.6,0.62,0.1, glowMat(signTex('イトーヨーカドー','#ffffff','#d23b3b',false)), 0,2.6,1.73));
+store.add(box(2.6,0.9,0.08, M.glass, 0,0.5,1.73));
+const stn=new THREE.Group(); stn.position.set(1.6,0.3,3.1); g.add(stn);
+stn.add(box(5.8,1.35,1.7, texMat(facadeTex('#e8e2d4')), 0,0.67,0));
+stn.add(box(2.2,0.55,0.1, glowMat(signTex('春日部駅','#1f3a5f','#ffffff',false)), 0,1.05,0.87));
+stn.add(box(8.6,0.22,1.15, M.grey, 0,1.62,-0.4));
+[-3.6,-1.2,1.2,3.6].forEach(x=>stn.add(box(0.18,1.5,0.18, M.grey, x,0.75,-0.4)));
+const train=new THREE.Group(); train.position.set(-3.2,1.78,2.7); g.add(train);
+for(let cix=0;cix<3;cix++){ const car=new THREE.Group(); car.position.x=cix*1.55; train.add(car);
+  car.add(box(1.45,0.62,0.85, M.white, 0,0.31,0));
+  car.add(box(1.45,0.14,0.87, std({color:0x2456a6,roughness:0.5}), 0,0.5,0));
+  car.add(box(1.45,0.1,0.87, std({color:0xd23b3b,roughness:0.5}), 0,0.13,0)); }
+ANIM.push(t=>{ train.position.x=-3.4+((t*0.55)%7.4); });
+const bz=std({color:0x8a6b34,roughness:0.38,metalness:0.65});
+const stat=new THREE.Group(); stat.position.set(2.9,0.3,0.7); g.add(stat);
+stat.add(box(0.95,0.42,0.6, M.grey, 0,0.21,0));
+stat.add(sph(0.17, bz, -0.2,0.78,0, 1,1.15,1)); stat.add(box(0.3,0.4,0.2, bz, -0.2,0.5,0));
+stat.add(sph(0.13, bz, 0.22,0.68,0, 1,1.1,1)); stat.add(box(0.22,0.28,0.16, bz, 0.22,0.44,0));
+const house=new THREE.Group(); house.position.set(-4.5,0.3,2.6); g.add(house);
+house.add(box(2.0,1.25,1.7, texMat(facadeTex('#f6e8d8')), 0,0.62,0));
+house.add(hipRoof(2.3,0.6,2.0, std({color:0xb34a3a,roughness:0.85}), 0,1.25,0));
+house.add(box(0.6,0.85,0.06, std({color:0x7a5230,roughness:0.9}), 0.3,0.42,0.87));
+[[-3.4,0.9],[0.4,0.9],[4.3,-0.9]].forEach((sp2,ix)=>{ g.add(box(1.15,0.95+ix*0.14,1.0, texMat(facadeTex(['#e9eef2','#f3e9d2','#e6f0e6'][ix])), sp2[0],0.62,sp2[1])); g.add(hipRoof(1.35,0.32,1.2, texMat(kawaraTex()), sp2[0],1.12+ix*0.14,sp2[1])); });
+g.add(tree(5.0,-3.6,0.95)); g.add(tree(-5.2,-0.6,1.0)); g.add(tree(4.8,1.8,0.9,pinkTree));
+people(g,9,-3.5,4.2,-0.6,1.6,0.32);
+} }
+
 ];

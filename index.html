@@ -599,14 +599,14 @@ let CONTENT={};
 function locInf(id){ const b=INFO[id]; if(!b) return null; if(LANG==='zh') return b; const c=CONTENT[id]; if(!c) return b; return Object.assign({}, b, {facts:c.facts||b.facts, hist:c.hist||b.hist, now:c.now||b.now, details:(c.details&&c.details.length?c.details:b.details)}); }
 function locMeta(id){ if(LANG!=='zh'&&CONTENT[id]&&CONTENT[id].meta) return CONTENT[id].meta; return META[id]; }
 function locDesc(s){ if(LANG!=='zh'&&CONTENT[s.id]&&CONTENT[s.id].desc) return CONTENT[s.id].desc; return s.desc; }
-async function ensureContent(){ if(LANG==='zh'){ CONTENT={}; return; } if(CONTENT.__lang===LANG) return; try{ const files=(LANG==='hi')?['info_hi_1.json','info_hi_2.json','info_hi_3.json']:['info_'+LANG+'.json']; const j={}; for(const f of files){ const r=await fetch(f); Object.assign(j, await r.json()); } j.__lang=LANG; CONTENT=j; }catch(e){ CONTENT={__lang:LANG}; } }
-const GEO={dome:[139.7516,35.7056],stadium:[139.7145,35.6777],skytree:[139.811,35.710], sensoji:[139.797,35.715], tower:[139.745,35.659], shibuya:[139.701,35.659], shinjuku:[139.700,35.690], akiba:[139.771,35.698], ueno:[139.774,35.714], palace:[139.753,35.686], tokyost:[139.767,35.681], meiji:[139.699,35.676], odaiba:[139.774,35.627], roppongi:[139.729,35.660], ikebukuro:[139.711,35.729], shinagawa:[139.739,35.628], ginza:[139.764,35.672], harajuku:[139.703,35.671], toyosu:[139.790,35.646], disney:[139.880,35.632], toudai:[139.762,35.7128], waseda:[139.7192,35.709], fuji:[138.7274,35.3608], kamakura:[139.5033,35.3071], yokohama:[139.638,35.4547], yanaka:[139.7707,35.7272]};
-const OFF={ginza:[1.8,2.8], tokyost:[2.4,-0.8], palace:[-3,-1.4], tower:[-1.4,2.6], sensoji:[1.2,1.6], ueno:[-1.6,0.6], akiba:[1,2], harajuku:[2,1.8], meiji:[-1.2,0], odaiba:[0,1.6], toyosu:[1.2,1.2], skytree:[1.6,0], toudai:[-6.5,0], waseda:[-6.5,0], fuji:[226,-82], kamakura:[21.4,-85.3]};
+async function ensureContent(){ if(LANG==='zh'){ CONTENT={}; return; } if(CONTENT.__lang===LANG) return; try{ const SH={ja:2,en:2,ko:2,hi:3}; const files=Array.from({length:SH[LANG]||1},(_,i)=>'info_'+LANG+'_'+(i+1)+'.json'); const j={}; for(const f of files){ const r=await fetch(f); Object.assign(j, await r.json()); } j.__lang=LANG; CONTENT=j; }catch(e){ CONTENT={__lang:LANG}; } }
+const GEO={dome:[139.7516,35.7056],stadium:[139.7145,35.6777],skytree:[139.811,35.710], sensoji:[139.797,35.715], tower:[139.745,35.659], shibuya:[139.701,35.659], shinjuku:[139.700,35.690], akiba:[139.771,35.698], ueno:[139.774,35.714], palace:[139.753,35.686], tokyost:[139.767,35.681], meiji:[139.699,35.676], odaiba:[139.774,35.627], roppongi:[139.729,35.660], ikebukuro:[139.711,35.729], shinagawa:[139.739,35.628], ginza:[139.764,35.672], harajuku:[139.703,35.671], toyosu:[139.790,35.646], disney:[139.880,35.632], toudai:[139.762,35.7128], waseda:[139.7192,35.709], fuji:[138.7274,35.3608], kamakura:[139.5033,35.3071], yokohama:[139.638,35.4547], yanaka:[139.7707,35.7272], ghibli:[139.5703,35.6962], kasukabe:[139.7526,35.9753]};
+const OFF={ginza:[1.8,2.8], tokyost:[2.4,-0.8], palace:[-3,-1.4], tower:[-1.4,2.6], sensoji:[1.2,1.6], ueno:[-1.6,0.6], akiba:[1,2], harajuku:[2,1.8], meiji:[-1.2,0], odaiba:[0,1.6], toyosu:[1.2,1.2], skytree:[1.6,0], toudai:[-6.5,0], waseda:[-6.5,0], fuji:[226,-82], kamakura:[21.4,-85.3], kasukabe:[36.6,61.5]};
 spots.forEach(sp=>{ const a=proj(GEO[sp.id][0], GEO[sp.id][1]); const o=OFF[sp.id]||[0,0]; sp.x=a[0]+o[0]; sp.z=a[1]+o[1]; });
 const pickables=[];
 const SPOT_GROUPS={};
 spots.forEach(s=>{
-  const g=new THREE.Group(); g.position.set(s.x,0,s.z); g.scale.setScalar((s.id==='disney'||s.id==='sensoji'||s.id==='fuji'||s.id==='kamakura')?0.68:0.59);
+  const g=new THREE.Group(); g.position.set(s.x,0,s.z); g.scale.setScalar((s.id==='disney'||s.id==='sensoji'||s.id==='fuji'||s.id==='kamakura'||s.id==='kasukabe')?0.68:0.59);
   const inner=new THREE.Group(); s.make(inner); g.add(inner); g.userData.inner=inner;
   const lb=label(sName(s), 0.95); lb.position.y=s.h+2; g.add(lb); g.userData.labelSprite=lb;
   g.userData.spot=s; g.traverse(o=>{o.userData.spot=s;}); scene.add(g); pickables.push(g); SPOT_GROUPS[s.id]=g;
@@ -616,7 +616,7 @@ spots.forEach(s=>{
 // 互相让开（单点最大位移 14 个世界单位，2026-11-06 应用户要求拉开间距），富士山为示意点不参与
 (function(){
   const items=[];
-  spots.forEach(sp=>{ if(sp.id==='fuji'||sp.id==='kamakura') return; const g=SPOT_GROUPS[sp.id]; if(!g) return;
+  spots.forEach(sp=>{ if(sp.id==='fuji'||sp.id==='kamakura'||sp.id==='kasukabe') return; const g=SPOT_GROUPS[sp.id]; if(!g) return;
     g.updateMatrixWorld(true); const bb=new THREE.Box3();
     g.traverse(o=>{ if(o.isMesh){ const mb=new THREE.Box3().setFromObject(o); if(!mb.isEmpty()) bb.union(mb); } });
     if(bb.isEmpty()) return;
@@ -708,7 +708,7 @@ function closeCard(){ infoEl.style.display='none'; infoEl.classList.remove('hasS
 const cardXBtn=document.getElementById('cardX'); if(cardXBtn) cardXBtn.onclick=()=>closeCard();
 const colBtn=document.getElementById('cardCollapse'); if(colBtn) colBtn.onclick=()=>{ if(matchMedia('(pointer:coarse)').matches) setSheet('peek'); else infoEl.classList.add('cmp'); };
 let INFO={};
-Promise.all([fetch('info.json').then(r=>r.json()).catch(()=>({})), fetch('info2.json').then(r=>r.json()).catch(()=>({}))]).then(([ia,ib])=>{ INFO=Object.assign({}, ia, ib); if(typeof renderGoshuin==='function') renderGoshuin(); });const META={yanaka:['日暮里站 / 千駄木站','建议停留 2 小时'], dome:['水道桥站 / 后乐园站','建议停留 2–3 小时'], stadium:['国立竞技场站 / 千駄ヶ谷站','建议停留 1.5 小时'], yokohama:['港未来站 / 樱木町站','建议停留半天'],
+Promise.all([fetch('info.json').then(r=>r.json()).catch(()=>({})), fetch('info2.json').then(r=>r.json()).catch(()=>({}))]).then(([ia,ib])=>{ INFO=Object.assign({}, ia, ib); if(typeof renderGoshuin==='function') renderGoshuin(); });const META={ghibli:['三鹰站 / 吉祥寺站','建议停留 半天'], kasukabe:['春日部站','建议停留 半天'], yanaka:['日暮里站 / 千駄木站','建议停留 2 小时'], dome:['水道桥站 / 后乐园站','建议停留 2–3 小时'], stadium:['国立竞技场站 / 千駄ヶ谷站','建议停留 1.5 小时'], yokohama:['港未来站 / 樱木町站','建议停留半天'],
  skytree:['押上站（晴空塔站）','建议停留 1.5–2 小时'], sensoji:['浅草站','建议停留 2–3 小时'], tower:['赤羽桥站 / 大门站','建议停留 1.5 小时'],
  shibuya:['涩谷站','建议停留 2 小时'], shinjuku:['新宿站','建议停留半天'], akiba:['秋叶原站','建议停留 2–3 小时'],
  ueno:['上野站','建议停留半天'], palace:['东京站 / 二重桥前站','建议停留 1.5 小时'], tokyost:['东京站','建议停留 1 小时'],
@@ -753,10 +753,10 @@ async function loadWx(){ const el=document.getElementById('wxBody'); if(!el) ret
 let homeWx=null;
 function paintHomeLine(){ const el=document.getElementById('wxHomeLine'); if(!el) return; if(!homeWx){ el.textContent=''; return; } const w=wxOf(homeWx.code); const tkDay=new Date(Date.now()+9*3600*1000).getUTCDate(); el.textContent=T('wxLineFmt').replace('{t}',homeWx.t).replace('{c}',w[1]).replace('{col}', T(tkDay%2===0?'skyBlue':'skyPurple')); }
 loadWx();
-const BEST={yanaka:'sunset',yokohama:'night',dome:'night',stadium:'day',skytree:'night',tower:'night',sensoji:'morning',shibuya:'night',shinjuku:'night',akiba:'night',ueno:'day',palace:'day',tokyost:'night',meiji:'morning',odaiba:'sunset',roppongi:'night',ikebukuro:'night',shinagawa:'all',ginza:'night',harajuku:'day',toyosu:'morning',disney:'night',hnd:'all',nrt:'all',toudai:'day',waseda:'day',fuji:'sunset',kamakura:'sunset'};
+const BEST={ghibli:'day',kasukabe:'day',yanaka:'sunset',yokohama:'night',dome:'night',stadium:'day',skytree:'night',tower:'night',sensoji:'morning',shibuya:'night',shinjuku:'night',akiba:'night',ueno:'day',palace:'day',tokyost:'night',meiji:'morning',odaiba:'sunset',roppongi:'night',ikebukuro:'night',shinagawa:'all',ginza:'night',harajuku:'day',toyosu:'morning',disney:'night',hnd:'all',nrt:'all',toudai:'day',waseda:'day',fuji:'sunset',kamakura:'sunset'};
 const BEST_ICON={night:'🌙',sunset:'🌇',morning:'🌅',day:'☀️',all:'🕐'};
-const GMAPS={yanaka:'Yanaka Ginza',yokohama:'Yokohama Minato Mirai',dome:'Tokyo Dome',stadium:'Japan National Stadium',skytree:'Tokyo Skytree', sensoji:'Senso-ji Temple Asakusa', tower:'Tokyo Tower', shibuya:'Shibuya Crossing', shinjuku:'Shinjuku Tokyo', akiba:'Akihabara Tokyo', ueno:'Ueno Park Tokyo', palace:'Tokyo Imperial Palace', tokyost:'Tokyo Station', meiji:'Meiji Jingu Shrine', odaiba:'Odaiba Tokyo', roppongi:'Roppongi Hills', ikebukuro:'Sunshine City Ikebukuro', shinagawa:'Shinagawa Station', ginza:'Ginza Tokyo', harajuku:'Takeshita Street Harajuku', toyosu:'Toyosu Market', disney:'Tokyo Disneyland', toudai:'University of Tokyo Hongo Campus', waseda:'Waseda University', fuji:'Mount Fuji Kawaguchiko', kamakura:'Kamakurakokomae Station', hnd:'Haneda Airport', nrt:'Narita International Airport'};
-const STQ={yanaka:['日暮里駅','千駄木駅'], yokohama:['みなとみらい駅','桜木町駅'], dome:['水道橋駅','後楽園駅'], stadium:['国立競技場駅','千駄ヶ谷駅'], skytree:['押上駅'], sensoji:['浅草駅'], tower:['赤羽橋駅','大門駅'], shibuya:['渋谷駅'], shinjuku:['新宿駅'], akiba:['秋葉原駅'], ueno:['上野駅'], palace:['東京駅','二重橋前駅'], tokyost:['東京駅'], meiji:['原宿駅','明治神宮前駅'], odaiba:['台場駅'], roppongi:['六本木駅'], ikebukuro:['池袋駅'], shinagawa:['品川駅'], ginza:['銀座駅'], harajuku:['原宿駅'], toyosu:['豊洲駅'], disney:['舞浜駅'], toudai:['本郷三丁目駅','東大前駅'], waseda:['早稲田駅'], fuji:['河口湖駅'], kamakura:['鎌倉高校前駅']};
+const GMAPS={ghibli:'Ghibli Museum Mitaka',kasukabe:'Kasukabe Station',yanaka:'Yanaka Ginza',yokohama:'Yokohama Minato Mirai',dome:'Tokyo Dome',stadium:'Japan National Stadium',skytree:'Tokyo Skytree', sensoji:'Senso-ji Temple Asakusa', tower:'Tokyo Tower', shibuya:'Shibuya Crossing', shinjuku:'Shinjuku Tokyo', akiba:'Akihabara Tokyo', ueno:'Ueno Park Tokyo', palace:'Tokyo Imperial Palace', tokyost:'Tokyo Station', meiji:'Meiji Jingu Shrine', odaiba:'Odaiba Tokyo', roppongi:'Roppongi Hills', ikebukuro:'Sunshine City Ikebukuro', shinagawa:'Shinagawa Station', ginza:'Ginza Tokyo', harajuku:'Takeshita Street Harajuku', toyosu:'Toyosu Market', disney:'Tokyo Disneyland', toudai:'University of Tokyo Hongo Campus', waseda:'Waseda University', fuji:'Mount Fuji Kawaguchiko', kamakura:'Kamakurakokomae Station', hnd:'Haneda Airport', nrt:'Narita International Airport'};
+const STQ={ghibli:['三鷹駅','吉祥寺駅'], kasukabe:['春日部駅'], yanaka:['日暮里駅','千駄木駅'], yokohama:['みなとみらい駅','桜木町駅'], dome:['水道橋駅','後楽園駅'], stadium:['国立競技場駅','千駄ヶ谷駅'], skytree:['押上駅'], sensoji:['浅草駅'], tower:['赤羽橋駅','大門駅'], shibuya:['渋谷駅'], shinjuku:['新宿駅'], akiba:['秋葉原駅'], ueno:['上野駅'], palace:['東京駅','二重橋前駅'], tokyost:['東京駅'], meiji:['原宿駅','明治神宮前駅'], odaiba:['台場駅'], roppongi:['六本木駅'], ikebukuro:['池袋駅'], shinagawa:['品川駅'], ginza:['銀座駅'], harajuku:['原宿駅'], toyosu:['豊洲駅'], disney:['舞浜駅'], toudai:['本郷三丁目駅','東大前駅'], waseda:['早稲田駅'], fuji:['河口湖駅'], kamakura:['鎌倉高校前駅']};
 function metaHtml(s){ const m=locMeta(s.id); if(!m) return '';
   const wrap=(label,q)=>'<a class="stlink" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q)+'">'+label+'</a>';
   let linked;
@@ -873,7 +873,7 @@ renderer.domElement.addEventListener('pointerup', e=>{
 });
 
 // 区域聚焦
-const AREAS=[['新宿 · 原宿','shinjuku',54],['涩谷','shibuya',46],['浅草 · 上野 · 东大','sensoji',52],['东京站 · 银座','tokyost',48],['六本木 · 东京塔','roppongi',48],['台场 · 丰洲','odaiba',54],['池袋 · 早稻田','ikebukuro',46],['迪士尼度假区','disney',58],['富士山','fuji',66],['镰仓高校前','kamakura',62],['横滨港未来','yokohama',64]];
+const AREAS=[['新宿 · 原宿','shinjuku',54],['涩谷','shibuya',46],['浅草 · 上野 · 东大','sensoji',52],['东京站 · 银座','tokyost',48],['六本木 · 东京塔','roppongi',48],['台场 · 丰洲','odaiba',54],['池袋 · 早稻田','ikebukuro',46],['迪士尼度假区','disney',58],['富士山','fuji',66],['镰仓高校前','kamakura',62],['横滨港未来','yokohama',64],['三鹰 · 吉卜力','ghibli',56],['春日部','kasukabe',60]];
 const areaEl=document.getElementById('areaBtns');
 AREAS.forEach((a,ai)=>{ const b=document.createElement('button'); b.className='areaBtn'; b.textContent=(window.I18NUI&&I18NUI.areas[LANG]&&I18NUI.areas[LANG][ai])||a[0];
   b.onclick=()=>{ const sp=spots.find(x=>x&&x.id===a[1]); if(sp){ flyTo(sp.x, sp.z, a[2], a[2]*0.6); } if(innerWidth<=760) document.getElementById('panel').classList.add('hidden'); };
@@ -1163,8 +1163,8 @@ function stampDate(id){ return (STAMPS[id]&&STAMPS[id].d)?STAMPS[id].d:''; }
 function saveStamps(){ try{ localStorage.setItem('tt_stamps', JSON.stringify(STAMPS)); }catch(e){} }
 function stampRot(id){ let h=0; for(let i=0;i<id.length;i++) h=(h*31+id.charCodeAt(i))>>>0; return (h%5)-2; }
 function gsNameCls(nm){ if(/[぀-ヿ一-鿿가-힣]/.test(nm)) return nm.length>5?'gsName long':'gsName'; return 'gsName h'; }
-const SEAL_EMOJI={tower:'🗼',skytree:'📡',sensoji:'🏮',shibuya:'🐕',shinjuku:'🌃',akiba:'🎮',ueno:'🐼',palace:'🏯',tokyost:'🚉',meiji:'⛩️',odaiba:'🎡',roppongi:'🌆',ikebukuro:'🦉',shinagawa:'🚄',ginza:'🛍️',harajuku:'🎀',toyosu:'🐟',disney:'🏰',hnd:'✈️',nrt:'🛫',toudai:'🎓',waseda:'📚',fuji:'🗻',kamakura:'🚃'};
-const SEAL_CH={tower:'塔',skytree:'空',sensoji:'寺',shibuya:'谷',shinjuku:'宿',akiba:'叶',ueno:'野',palace:'居',tokyost:'京',meiji:'宫',odaiba:'台',roppongi:'木',ikebukuro:'袋',shinagawa:'川',ginza:'座',harajuku:'原',toyosu:'洲',disney:'梦',hnd:'羽',nrt:'成',toudai:'大',waseda:'稲',fuji:'山',kamakura:'仓'};
+const SEAL_EMOJI={tower:'🗼',skytree:'📡',sensoji:'🏮',shibuya:'🐕',shinjuku:'🌃',akiba:'🎮',ueno:'🐼',palace:'🏯',tokyost:'🚉',meiji:'⛩️',odaiba:'🎡',roppongi:'🌆',ikebukuro:'🦉',shinagawa:'🚄',ginza:'🛍️',harajuku:'🎀',toyosu:'🐟',disney:'🏰',hnd:'✈️',nrt:'🛫',toudai:'🎓',waseda:'📚',fuji:'🗻',kamakura:'🚃',ghibli:'🎬',kasukabe:'🖍️'};
+const SEAL_CH={tower:'塔',skytree:'空',sensoji:'寺',shibuya:'谷',shinjuku:'宿',akiba:'叶',ueno:'野',palace:'居',tokyost:'京',meiji:'宫',odaiba:'台',roppongi:'木',ikebukuro:'袋',shinagawa:'川',ginza:'座',harajuku:'原',toyosu:'洲',disney:'梦',hnd:'羽',nrt:'成',toudai:'大',waseda:'稲',fuji:'山',kamakura:'仓',ghibli:'森',kasukabe:'春'};
 function stampHtml(id,big){ const nm=sName(id); const inf=(typeof INFO!=='undefined'&&INFO&&INFO[id])?INFO[id]:null; const ph=inf&&inf.imgs&&inf.imgs[0]?inf.imgs[0].url:(inf&&inf.img?inf.img:'');
   const note=(STAMPS[id]&&STAMPS[id].note)?('<span class="gsCNote">'+esc(STAMPS[id].note)+'</span>'):'';
   const art=ph?('<img src="'+esc(ph)+'" alt="" loading="lazy">'):('<span class="gsMotifBig">'+(SEAL_EMOJI[id]||'🗼')+'</span>');
