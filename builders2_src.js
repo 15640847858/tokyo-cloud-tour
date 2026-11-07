@@ -75,7 +75,7 @@ for(let i=0;i<5;i++){ const a=i*0.42, tx=Math.sin(a)*1.15, tz=-Math.cos(a)*1.15+
 // —— 谷中灵园一角（西北角，樱花树 + 墓石）——
 const cm=new THREE.Group(); cm.position.set(-5.1,0,-3.5); g.add(cm);
 for(let r2=0;r2<3;r2++) for(let c2=0;c2<4;c2++) cm.add(box(0.15,0.3+((r2+c2)%2)*0.08,0.09, M.grey, -0.75+c2*0.42, 0.32, -0.5+r2*0.45));
-const pnk=pinkTree(-0.2,-1.0,1.15); cm.add(pnk);
+const pnk=tree(-0.2,-1.0,1.15,pinkTree); cm.add(pnk);
 people(g,8,-2.8,2.6,-0.9,0.9,0.32);
 } }
 
