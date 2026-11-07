@@ -302,6 +302,12 @@ STR["ja"].update({"narrOnLbl":"🗣 解説：オン","narrOffLbl":"🗣 解説�
 STR["en"].update({"narrOnLbl":"🗣 Voice: On","narrOffLbl":"🗣 Voice: Off"})
 STR["ko"].update({"narrOnLbl":"🗣 해설: 켬","narrOffLbl":"🗣 해설: 끔"})
 STR["hi"].update({"narrOnLbl":"🗣 विवरण: चालू","narrOffLbl":"🗣 विवरण: बंद"})
+
+STR["zh"].update({"narrMuteHint":"没声音？请关掉手机的静音开关再试"})
+STR["ja"].update({"narrMuteHint":"音が出ない場合は、本体の消音スイッチをオフにしてみてください"})
+STR["en"].update({"narrMuteHint":"No sound? Try turning off the phone's silent switch"})
+STR["ko"].update({"narrMuteHint":"소리가 없으면 기기의 무음 스위치를 꺼보세요"})
+STR["hi"].update({"narrMuteHint":"आवाज़ नहीं आ रही? फ़ोन का साइलेंट स्विच बंद करके देखें"})
 out = {
  "str": STR,
  "names": {lang: dict(zip(IDS, vals)) for lang, vals in NAMES.items()},
