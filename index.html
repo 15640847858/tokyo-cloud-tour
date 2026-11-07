@@ -484,7 +484,7 @@ header #langMenu{right:auto;min-width:172px}
 
 <script src="i18n_ui.js"></script><script src="narr_ui.js"></script>
 <script type="module">
-const BUILD='20261108.18';
+const BUILD='20261108.19';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Sky } from 'three/addons/objects/Sky.js';
@@ -1127,12 +1127,12 @@ function startTour(key){ const TT=TOURS[key]; if(!TT) return;
   document.getElementById('tbName').textContent=T('tourNames')[key]; document.getElementById('tbPlay').textContent=T('pause');
   if(TT.dp) setDaypart(TT.dp); if(TT.wx){ TOUR.savedWx=(_pw!==null?_pw:wxMode); wxMode=TT.wx; renderWeatherFx(); paintWxBtn(); } else if(_pw!==null){ wxMode=_pw; renderWeatherFx(); paintWxBtn(); }
   document.querySelectorAll('[data-tour],#daytripBtn').forEach(b=>b.classList.toggle('active', (key==='classic'&&b.id==='daytripBtn')||b.dataset.tour===key));
-  goStop(0); paintNarr(); }
+  goStop(0); if(narrOn&&narrSupported&&!NARR.unlocked){ clearTimeout(NARR.timer); NARR.pending=false; narrSpeakNow(TOUR.ids[0]); } paintNarr(); }
 function stopTour(){ narrCancel(); if(TOUR&&TOUR.savedWx!==undefined){ wxMode=TOUR.savedWx; renderWeatherFx(); paintWxBtn(); } TOUR=null; tourCurve=null; applyDpMode(); dayTube.visible=false; dayDot.visible=false; tourbar.style.display='none'; tourbar.style.bottom=''; tourbar.style.visibility='';
   document.querySelectorAll('[data-tour],#daytripBtn').forEach(b=>b.classList.remove('active')); }
 
 /* ===== tour narration (SpeechSynthesis, added 2026-11-08) ===== */
-const NARR={gen:0, speaking:false, paused:false, pending:false, curId:null, timer:0, diag:'', doneAt:0, voiceName:''};
+const NARR={gen:0, speaking:false, paused:false, pending:false, curId:null, timer:0, diag:'', doneAt:0, voiceName:'', unlocked:false};
 const narrSupported=('speechSynthesis' in window)&&('SpeechSynthesisUtterance' in window);
 let narrOn=false; /* narration is opt-in (user rule 2026-11-08): default OFF on every load; the tour-bar toggle turns it on for the session */
 const NARR_LANG={zh:'zh-CN',ja:'ja-JP',en:'en-US',ko:'ko-KR',hi:'hi-IN'};
@@ -1146,12 +1146,13 @@ function narrSpeak(id){ if(!TOUR) return; try{ audioMuteOthers(); }catch(e){} tr
   const finish=()=>{ if(g!==NARR.gen) return; NARR.speaking=false; NARR.paused=false; try{ audioDuck(false); }catch(e){} NARR.doneAt=Date.now(); if(TOUR) TOUR.tAcc=0; paintNarr(); };
   const playChunk=(idx)=>{ if(g!==NARR.gen||!TOUR) return; try{ const u=new SpeechSynthesisUtterance(parts[idx]); u.lang=NARR_LANG[LANG]||'zh-CN'; const _v=narrVoicePick(); if(_v){ u.voice=_v; if(idx===0) NARR.voiceName=_v.name+(_v.localService?'/L':'/N'); } else if(idx===0) NARR.voiceName='default'; u.rate=(LANG==='zh'?0.98:1); NARR.curId=id; u.onstart=()=>{ if(g!==NARR.gen) return; NARR.speaking=true; NARR.paused=false; if(idx===0) NARR.diag=''; paintNarr(); }; u.onend=()=>{ if(g!==NARR.gen) return; if(idx<parts.length-1) playChunk(idx+1); else finish(); }; u.onerror=(e)=>{ if(g!==NARR.gen) return; NARR.diag='TTS错误:'+((e&&e.error)||'unknown'); finish(); }; speechSynthesis.speak(u); if(idx===0){ setTimeout(()=>{ if(g!==NARR.gen||NARR.speaking) return; let nv=0; try{ nv=(speechSynthesis.getVoices()||[]).length; }catch(e){} let pf='?'; try{ pf=(speechSynthesis.paused?'P1':'P0')+'/'+(speechSynthesis.speaking?'S1':'S0'); }catch(e){} NARR.diag=T('narrMuteHint')+' · voices='+nv+' '+pf+' v='+(NARR.voiceName||'?'); try{ audioDuck(false); }catch(e){} NARR.doneAt=Date.now(); paintNarr(); },1500); } }catch(e){} };
   try{ speechSynthesis.cancel(); }catch(e){} setTimeout(()=>playChunk(0),250); }
+function narrSpeakNow(id){ NARR.unlocked=true; narrSpeak(id); }
 function paintNarrText(id){ const el=document.getElementById('tbNarrText'); if(!el) return; if(!narrOn||!id){ el.textContent=''; el.style.display='none'; return; } const t=narrTextFor(id); el.textContent=t||''; el.style.display=t?'block':'none'; }
 function narrSchedule(id){ if(!narrOn) return; if(!narrSupported){ NARR.doneAt=Date.now(); return; } const g=NARR.gen; clearTimeout(NARR.timer); NARR.pending=true; NARR.timer=setTimeout(()=>{ NARR.pending=false; if(g===NARR.gen&&TOUR) narrSpeak(id); },1750); }
 function narrPause(){ clearTimeout(NARR.timer); NARR.pending=false; if(narrSupported&&NARR.speaking&&!NARR.paused){ try{ speechSynthesis.pause(); NARR.paused=true; }catch(e){} } paintNarr(); }
-function narrResume(){ if(TOUR){ TOUR.stopAt=Date.now(); if(NARR.doneAt) NARR.doneAt=Date.now(); } if(!narrSupported||!narrOn) return; if(NARR.paused){ try{ speechSynthesis.resume(); NARR.paused=false; }catch(e){} paintNarr(); return; } if(TOUR&&TOUR.playing&&!NARR.speaking&&!NARR.pending){ const id=TOUR.ids[TOUR.idx]; if(narrTextFor(id)) narrSpeak(id); } }
+function narrResume(){ if(TOUR){ TOUR.stopAt=Date.now(); if(NARR.doneAt) NARR.doneAt=Date.now(); } if(!narrSupported||!narrOn) return; if(NARR.paused){ try{ speechSynthesis.resume(); NARR.paused=false; }catch(e){} paintNarr(); return; } if(TOUR&&TOUR.playing&&!NARR.speaking&&!NARR.pending){ const id=TOUR.ids[TOUR.idx]; if(narrTextFor(id)) narrSpeakNow(id); } }
 if(narrSupported){ try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=()=>{ try{ speechSynthesis.getVoices(); }catch(e){} }; }catch(e){} }
-function narrVoiceTap(){ narrOn=!narrOn; try{ localStorage.setItem('tt_narr', narrOn?'1':'0'); }catch(e){} if(!narrOn){ narrCancel(); if(TOUR) TOUR.stopAt=Date.now(); } else { try{ audioMuteOthers(); }catch(e){} if(TOUR){ paintNarrText(TOUR.ids[TOUR.idx]); narrSpeak(TOUR.ids[TOUR.idx]); } } paintNarr(); }
+function narrVoiceTap(){ narrOn=!narrOn; try{ localStorage.setItem('tt_narr', narrOn?'1':'0'); }catch(e){} if(!narrOn){ narrCancel(); if(TOUR) TOUR.stopAt=Date.now(); } else { try{ audioMuteOthers(); }catch(e){} if(TOUR){ paintNarrText(TOUR.ids[TOUR.idx]); narrSpeakNow(TOUR.ids[TOUR.idx]); } } paintNarr(); }
 try{ setAudioOnHook(()=>{ if(narrOn){ narrOn=false; try{ localStorage.setItem('tt_narr','0'); }catch(e){} narrCancel(); paintNarr(); } }); }catch(e){}
 try{ const _as=audioGetState(); if(narrOn&&(_as.bgm||_as.amb)){ narrOn=false; try{ localStorage.setItem('tt_narr','0'); }catch(e){} } }catch(e){}
 paintNarr();
