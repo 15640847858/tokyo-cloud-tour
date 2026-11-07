@@ -194,7 +194,7 @@
 .gsBox h3{color:#e6c887;margin:0;font-size:16.5px}
 #gsClose{width:34px;height:34px;border-radius:50%;font-size:16px;flex:none}
 .gsSub{display:none}
-.gsGrid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(4,1fr);gap:8px;margin-top:10px}
+.gsGrid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:1fr;gap:8px;margin-top:10px}
 .gsCell{background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.22);border-radius:8px;display:flex;align-items:center;justify-content:center;padding:4px;box-sizing:border-box;min-width:0;min-height:0;overflow:hidden}
 .gsCell.got{background:#f3ead2;border:1px solid #d8c9a3;padding:3px}
 .gsCell .gsCard{width:100%;height:100%;box-shadow:0 0 0 2px #fdf8ee,0 0 0 3px rgba(176,141,79,.5)}
@@ -206,9 +206,10 @@
 .gsCell .gsSeal{width:15px;height:15px;font-size:10px}
 .gsCell .gsArt::after{inset:3px}
 .gsCell.got{cursor:pointer}
-.gsTodo{display:block;text-align:center;color:rgba(255,255,255,.55);font-size:11px;line-height:1.35;padding:2px}
-.gsTodoM{display:block;font-size:14px;opacity:.55;margin-bottom:2px}
-@media(max-width:760px){.gsGrid{grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(6,1fr);gap:6px}}
+.gsTodo{display:flex;align-items:center;justify-content:center;text-align:center;padding:4px;width:100%;height:100%;box-sizing:border-box}
+.gsTodoN{font-family:'Ma Shan Zheng','Kaiti SC','STKaiti',serif;font-size:19px;line-height:1.3;letter-spacing:.06em;color:rgba(232,201,138,.5);text-shadow:0 1px 8px rgba(0,0,0,.35)}
+@media(max-width:760px){.gsTodoN{font-size:15px}}
+@media(max-width:760px){.gsGrid{grid-template-columns:repeat(4,1fr);gap:6px}}
 @media(min-width:761px){#setMod{display:block}}
 #wToast{position:fixed;left:50%;bottom:calc(52px + env(safe-area-inset-bottom));transform:translate(-50%,18px);width:min(92vw,430px);background:rgba(10,17,30,.84);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(230,200,135,.45);border-radius:16px;padding:13px 38px 16px 16px;color:#f3ead2;z-index:44;opacity:0;pointer-events:none;transition:opacity .45s ease,transform .45s ease;box-shadow:0 10px 34px rgba(0,0,0,.42)}
 #wToast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
@@ -1281,7 +1282,7 @@ function renderGoshuin(){ const ids=spots.filter(sp=>sp&&sp.id).map(sp=>sp.id).c
   set('hGsT',T('goshuin')); set('gsTitle',T('goshuin')+' · '+n+'/'+ids.length); set('gsOpenB',T('stampOpen')); set('gsOpenS',T('stampHint').replace('{t}',ids.length));
   set('gsProg',T('stampProgress').replace('{n}',n).replace('{t}',ids.length));
   const grid=document.getElementById('gsGrid'); if(!grid) return;
-  grid.innerHTML=ids.map(id=> STAMPS[id] ? '<div class="gsCell got" data-sid="'+id+'">'+stampHtml(id,false)+'</div>' : '<div class="gsCell"><div class="gsTodo"><span class="gsTodoM">'+(SEAL_EMOJI[id]||'')+'</span>'+esc(sName(id))+'</div></div>').join('');
+  grid.innerHTML=ids.map(id=> STAMPS[id] ? '<div class="gsCell got" data-sid="'+id+'">'+stampHtml(id,false)+'</div>' : '<div class="gsCell"><div class="gsTodo"><span class="gsTodoN">'+esc(sName(id))+'</span></div></div>').join('');
   grid.querySelectorAll('.gsCell.got').forEach(c=>{ c.onclick=()=>openGsEdit(c.dataset.sid); }); }
 let gsEditId=null;
 function openGsEdit(id){ if(!STAMPS[id]) return; gsEditId=id; document.getElementById('gsEditStamp').innerHTML=stampHtml(id,true); const inp=document.getElementById('gsNoteIn'); inp.value=STAMPS[id].note||''; inp.placeholder=T('notePh'); document.getElementById('gsSaveBtn').textContent=T('gsSave'); document.getElementById('gsDelBtn').textContent=T('gsDel'); document.getElementById('gsEdit').style.display='flex'; }
