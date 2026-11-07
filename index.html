@@ -171,17 +171,17 @@
 .gsCard{--r:0deg;transform:rotate(var(--r));width:150px;height:192px;background:#fdf8ee;border:1.5px solid #b08d4f;border-radius:6px;box-shadow:0 0 0 3px #fdf8ee,0 0 0 4.5px rgba(176,141,79,.55),0 12px 26px rgba(0,0,0,.35);display:flex;flex-direction:column;overflow:hidden;position:relative;box-sizing:border-box}
 .gsArt{position:relative;flex:1;min-height:0;background:linear-gradient(160deg,#aecfe8,#e9f2e2 55%,#f7e3bd);overflow:hidden}
 .gsArt img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.18) contrast(1.06) brightness(1.03)}
-.gsArt::after{content:'';position:absolute;inset:5px;border:1px solid rgba(253,248,238,.8);pointer-events:none}
 .gsMotifBig{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:46px}
 .gsVert{position:absolute;top:9px;right:8px;writing-mode:vertical-rl;font-family:'Ma Shan Zheng','Caveat',cursive;font-size:17px;letter-spacing:2px;color:#c73e2c;text-shadow:0 0 7px rgba(253,248,238,.95),0 0 3px rgba(253,248,238,.95);max-height:80%;overflow:hidden;z-index:2}
-.gsCap{display:flex;align-items:center;gap:6px;padding:6px 8px 7px;background:#fdf8ee}
+.gsCap{display:flex;align-items:center;gap:6px;padding:6px 32px 7px 8px;background:#fdf8ee}
 .gsCapMain{flex:1;min-width:0}
 .gsCName{display:block;font-family:'Ma Shan Zheng','Caveat',cursive;font-size:10px;color:#33405c;line-height:1.12;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gsCDate{display:block;font-size:9px;color:#9a8a68;letter-spacing:1.2px;margin-top:1px;font-family:sans-serif}
 .gsCNote{display:block;font-size:10.5px;color:#8a6d3b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
-.gsSeal{flex:none;width:22px;height:22px;background:#c73e2c;color:#fdf6e9;font-family:"Hiragino Mincho ProN","YuMincho",serif;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;border-radius:3px;transform:rotate(3deg);opacity:.94}
-.gsCard.big{width:212px;height:268px}
+.gsSeal{position:absolute;right:6px;bottom:6px;z-index:3;width:22px;height:22px;background:#c73e2c;color:#fdf6e9;font-family:"Hiragino Mincho ProN","YuMincho",serif;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;border-radius:3px;transform:rotate(3deg);opacity:.94}
+.gsCard.big{width:228px;height:288px}
 .gsCard.big .gsCName{font-size:12px}
+.gsCard.big .gsCap{padding-right:44px}
 .gsCard.big .gsVert{font-size:23px}
 .gsCard.big .gsCDate{font-size:11px}
 .gsCard.big .gsCNote{font-size:13px}
@@ -202,7 +202,7 @@
 .geRow{display:flex;gap:8px;margin-top:12px}
 .geRow button{flex:1;padding:9px 4px;font-size:13.5px}
 #gsDelBtn{color:#ff9a8a;border-color:rgba(255,154,138,.45)}
-#gsEditClose{position:absolute;top:8px;right:8px;width:32px;height:32px;border-radius:50%;font-size:14px}
+#gsEditClose{position:absolute;top:6px;right:6px;width:34px;height:34px;border-radius:0;font-size:18px;background:none!important;background-color:transparent!important;border:none!important;box-shadow:none!important;color:#e6c887;font-weight:700;text-shadow:0 1px 7px rgba(0,0,0,.65);cursor:pointer;line-height:1;padding:0}
 #gsModal{position:fixed;inset:0;background:rgba(5,10,20,.74);display:none;align-items:center;justify-content:center;z-index:60;padding:10px}
 .gsBox{width:min(96vw,560px);height:min(93dvh,780px);display:flex;flex-direction:column;background:rgba(15,25,45,.96);border:1px solid rgba(230,200,135,.35);border-radius:16px;padding:12px;backdrop-filter:blur(14px);box-sizing:border-box}
 .gsHead{display:flex;justify-content:space-between;align-items:center;flex:none}
@@ -211,15 +211,14 @@
 .gsSub{display:none}
 .gsGrid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:1fr;gap:8px;margin-top:10px}
 .gsCell{background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.22);border-radius:8px;display:flex;align-items:center;justify-content:center;padding:4px;box-sizing:border-box;min-width:0;min-height:0;overflow:hidden}
-.gsCell.got{background:#f3ead2;border:1px solid #d8c9a3;padding:3px}
+.gsCell.got{background:#f3ead2;border:1px solid #d8c9a3;padding:2px}
 .gsCell .gsCard{width:100%;height:100%;box-shadow:0 0 0 2px #fdf8ee,0 0 0 3px rgba(176,141,79,.5)}
-.gsCell .gsCap{padding:3px 5px 4px;gap:4px}
+.gsCell .gsCap{padding:2px 22px 3px 5px;gap:4px}
 .gsCell .gsCName{font-size:8px}
 .gsCell .gsCDate{font-size:7px;margin-top:0}
 .gsCell .gsCNote{display:none}
 .gsCell .gsVert{font-size:10.5px;top:5px;right:4px}
-.gsCell .gsSeal{width:15px;height:15px;font-size:10px}
-.gsCell .gsArt::after{inset:3px}
+.gsCell .gsSeal{width:15px;height:15px;font-size:10px;right:4px;bottom:4px}
 .gsCell.got{cursor:pointer}
 .gsTodo{display:flex;align-items:center;justify-content:center;text-align:center;padding:4px;width:100%;height:100%;box-sizing:border-box}
 .gsTodoN{font-family:'Ma Shan Zheng','Kaiti SC','STKaiti',serif;font-size:19px;line-height:1.3;letter-spacing:.06em;color:rgba(232,201,138,.5);text-shadow:0 1px 8px rgba(0,0,0,.35)}
@@ -493,14 +492,14 @@ header #langMenu{right:auto;min-width:172px}
 <div id="pcModal"><div class="pcBox"><img id="pcImg" alt="postcard"><div class="pcRow"><a id="pcSave" download="tokyo-postcard.png">保存图片</a><button id="pcClose" aria-label="close">×</button></div><p id="pcHint">也可以长按图片保存到相册</p></div></div>
 <div id="cfModal"><div class="cfBox"><p id="cfMsg"></p><div class="cfBtns"><button id="cfCancel" class="cfBtn"></button><button id="cfOk" class="cfBtn danger"></button></div></div></div>
 <div id="gsModal"><div class="gsBox"><div class="gsHead"><h3 id="gsTitle">御朱印护照</h3><button id="gsClose" aria-label="close">×</button></div><p class="gsSub" id="gsSub"></p><div class="gsGrid" id="gsGrid"></div></div></div>
-<div id="gsEdit"><div class="geBox"><div id="gsEditStamp"></div><input id="gsNoteIn" maxlength="24" autocomplete="off"><div class="geRow"><button id="gsSaveBtn">保存</button><button id="gsDelBtn">删除这枚章</button></div><button id="gsEditClose" aria-label="close">✕</button></div></div>
+<div id="gsEdit"><div class="geBox"><div id="gsEditStamp"></div><input id="gsNoteIn" maxlength="24" autocomplete="off"><div class="geRow"><button id="gsSaveBtn">保存</button><button id="gsDelBtn">删除这枚章</button></div><button id="gsEditClose" aria-label="close">×</button></div></div>
 <div id="sheetShade"></div><section id="info"><div id="sheetHandle"></div><div id="sheetPeek"></div><button id="cardCollapse" aria-label="收起">⌄</button><button id="cardX" aria-label="关闭">×</button><div id="stampFx"></div><div id="infoBody"><h3>欢迎云游东京</h3><p>拖动旋转、滚轮缩放。点击地图上的立体景点查看介绍，地图上彩色的发光线路是机场进城的推荐走法，线路上的光点是列车前进的方向。</p><div class="meta">成田机场距离已压缩显示，否则市中心景点会小得看不清。</div></div></section>
 <div id="bldgStatus">正在加载真实建筑数据…</div>
 <div id="hint">拖动旋转 · 滚轮缩放 · 点击景点查看介绍</div>
 
 <script src="i18n_ui.js"></script><script src="narr_ui.js"></script>
 <script type="module">
-const BUILD='20261108.24';
+const BUILD='20261108.25';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Sky } from 'three/addons/objects/Sky.js';
