@@ -21,7 +21,19 @@ subprocess.run(["npx", "-y", "esbuild@0.20.2", "/tmp/app_src.mjs", "--minify", "
                 "--outfile=/tmp/app_min.mjs"], check=True, capture_output=True, text=True)
 minjs = pathlib.Path("/tmp/app_min.mjs").read_text()
 subprocess.run(["node", "--check", "/tmp/app_min.mjs"], check=True)
-deploy_html = html[:mm.start(1)] + minjs + html[mm.end(1):]
+# the inline module outgrew the create_deployment argv cap: ship it as an
+# external main.js uploaded by digest (same pattern as builders/audio);
+# index.html keeps a tiny <script src> shell
+_minjs_blob = pathlib.Path("/tmp/app_min.mjs").read_bytes()
+assert len(_minjs_blob) < 98000, "main.js too big for digest upload: %d" % len(_minjs_blob)
+_minjs_dg = hashlib.sha1(_minjs_blob).hexdigest()
+_upm = {"xVercelDigest": _minjs_dg, "contentLength": len(_minjs_blob),
+        "requestBody": base64.b64encode(_minjs_blob).decode()}
+_rm = subprocess.run(["/opt/hatch/bin/vercel", "call-tool", "--name", "upload_file",
+                      "--arguments-json", json.dumps(_upm)], capture_output=True, text=True, timeout=180)
+print("module upload main.js rc:", _rm.returncode, "bytes:", len(_minjs_blob))
+MAINJS_REF = {"file": "main.js", "sha": _minjs_dg, "size": len(_minjs_blob)}
+deploy_html = html[:mm.start()] + '<script type="module" src="main.js"></script>' + html[mm.end():]
 print("deploy html bytes:", len(deploy_html.encode()))
 
 # info.json outgrew the single-argument upload cap (~128KB): the master file
@@ -88,6 +100,7 @@ files = [{"file": "index.html", "data": deploy_html, "encoding": "utf-8"},
          {"file": "info.json", "sha": digest, "size": len(info)},
          {"file": "info2.json", "sha": digest2, "size": len(info2)},
 ]
+files.append(MAINJS_REF)
 files.extend(files_extra)
 files.extend(asset_refs)
 for name, m in sorted(manifest.items()):
