@@ -474,7 +474,7 @@ header #langMenu{right:auto;min-width:172px}
   <section class="mod"><h2 id="hAreasT">区域聚焦</h2><div class="areaBtns" id="areaBtns"></div></section>
   <section class="mod"><h2 id="hAboutT">关于云游东京</h2><p class="about" id="visitLine"></p><p class="about" id="aboutEl">真实地图与建筑数据来自 OpenStreetMap：市中心 14,000 栋建筑按真实轮廓生成，景点周边只保留高楼地标。景点照片来自 Wikimedia Commons，作者与授权标注在介绍卡内。<br>地图 © OpenStreetMap contributors<br>卫星影像 © Esri, Maxar, Earthstar Geographics<br>天空：three.js 官网示例 Sky</p><p class="about" id="modelCredit">明治神宫鸟居模型：Quaternius，CC0（经 Poly Pizza 取得）</p></section></div></aside>
 <div id="flashFx"></div>
-<div id="statusbar"><span id="sbClock">东京 --:--</span><span id="sbWx"></span><span id="sbMode">白天</span><span id="sbBuild" style="opacity:.55;font-size:10px"></span></div><div id="tourbar"></div>
+<div id="statusbar"><span id="sbClock">东京 --:--</span><span id="sbWx"></span><span id="sbMode">白天</span></div><div id="tourbar"></div>
 <div id="pcModal"><div class="pcBox"><img id="pcImg" alt="postcard"><div class="pcRow"><a id="pcSave" download="tokyo-postcard.png">保存图片</a><button id="pcClose" aria-label="close">×</button></div><p id="pcHint">也可以长按图片保存到相册</p></div></div>
 <div id="gsModal"><div class="gsBox"><div class="gsHead"><h3 id="gsTitle">御朱印护照</h3><button id="gsClose" aria-label="close">×</button></div><p class="gsSub" id="gsSub"></p><div class="gsGrid" id="gsGrid"></div></div></div>
 <div id="gsEdit"><div class="geBox"><div id="gsEditStamp"></div><input id="gsNoteIn" maxlength="24" autocomplete="off"><div class="geRow"><button id="gsSaveBtn">保存</button><button id="gsDelBtn">删除这枚章</button></div><button id="gsEditClose" aria-label="close">✕</button></div></div>
@@ -484,9 +484,7 @@ header #langMenu{right:auto;min-width:172px}
 
 <script src="i18n_ui.js"></script>
 <script type="module">
-const BUILD='20261108.9';
-try{ const _sbe=document.getElementById('sbBuild'); if(_sbe) _sbe.textContent='v'+BUILD; }catch(e){}
-try{ fetch('build.txt',{cache:'no-store'}).then(r=>r.ok?r.text():null).then(t=>{ if(t&&t.trim()&&t.trim()!==BUILD){ try{ if(sessionStorage.getItem('tt_brel')!==BUILD){ sessionStorage.setItem('tt_brel',BUILD); location.replace(location.pathname+'?v='+BUILD+location.hash); } }catch(e){} } }).catch(()=>{}); }catch(e){}
+const BUILD='20261108.10';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Sky } from 'three/addons/objects/Sky.js';
@@ -1114,7 +1112,7 @@ const TOURS={ classic:{name:'东京经典一日游', ids:dayIds},
   culture:{name:'东京文化之旅', ids:['sensoji','ueno','toudai','palace','meiji']} };
 let TOUR=null, tourCurve=null;
 const tourbar=document.getElementById('tourbar');
-tourbar.innerHTML='<div class="tbTop"><div><div class="tbName" id="tbName"></div><div class="tbStop" id="tbStop"><span id="tbNarr"></span></div></div><div class="tbBtns"><button id="tbNarrPlay"></button><button id="tbVoice">🔊</button><button id="tbPrev">'+T('tbPrev')+'</button><button id="tbPlay">'+T('pause')+'</button><button id="tbNext">'+T('tbNext')+'</button><button id="tbExit">'+T('tbExit')+'</button></div></div><div class="tbProg"><i id="tbProgFill"></i></div><div id="tbNarrText"></div>';
+tourbar.innerHTML='<div class="tbTop"><div><div class="tbName" id="tbName"></div><div class="tbStop" id="tbStop"><span id="tbNarr"></span></div></div><div class="tbBtns"><button id="tbVoice">🔊</button><button id="tbPrev">'+T('tbPrev')+'</button><button id="tbPlay">'+T('pause')+'</button><button id="tbNext">'+T('tbNext')+'</button><button id="tbExit">'+T('tbExit')+'</button></div></div><div class="tbProg"><i id="tbProgFill"></i></div><div id="tbNarrText"></div>';
 function tourPts(ids){ const pts=ids.map(id=>{ const sp=spots.find(v=>v&&v.id===id); return new THREE.Vector3(sp.x,0,sp.z); }); const mid=[]; for(let i=0;i<pts.length-1;i++){ mid.push(pts[i]); mid.push(pts[i].clone().lerp(pts[i+1],0.5).setY(2.2)); } mid.push(pts[pts.length-1]); return new THREE.CatmullRomCurve3(mid); }
 function goStop(i){ if(!TOUR) return; TOUR.idx=Math.max(0, Math.min(TOUR.ids.length-1, i)); TOUR.tAcc=0;
   const sp=spots.find(v=>v&&v.id===TOUR.ids[TOUR.idx]); selectGroup(SPOT_GROUPS[sp.id]); showInfo(sp);
@@ -1141,7 +1139,7 @@ const NARR_LANG={zh:'zh-CN',ja:'ja-JP',en:'en-US',ko:'ko-KR',hi:'hi-IN'};
 function narrBind(el, fn){ if(!el) return; let last=0; const h=e=>{ const n=Date.now(); if(n-last<650) return; last=n; fn(e); }; el.addEventListener('pointerdown',h); el.addEventListener('click',h); }
 function narrTextFor(id){ const U=window.I18NUI||{}; const S=U.str||{}; const v=(S[LANG]||{})['narr_'+id]||(S.zh||{})['narr_'+id]; if(v) return v; const c=(window.CONTENT||{})[id]; return c&&c.desc?c.desc:''; }
 function narrVoicePick(){ try{ const vs=speechSynthesis.getVoices()||[]; const want=NARR_LANG[LANG]||'zh-CN'; return vs.find(v=>v.lang===want)||vs.find(v=>v.lang&&v.lang.indexOf(want.slice(0,2))===0)||null; }catch(e){ return null; } }
-function paintNarr(){ const pb=document.getElementById('tbNarrPlay'); if(pb){ pb.textContent=T('narrPlay'); pb.style.display=narrSupported?'':'none'; } const b=document.getElementById('tbVoice'); let st=document.getElementById('tbNarr'); if(!st){ const tb=document.getElementById('tbStop'); if(tb){ st=document.createElement('span'); st.id='tbNarr'; tb.appendChild(st); } } if(b){ b.textContent=narrOn?T('narrOnLbl'):T('narrOffLbl'); b.title=T('narrBtnT'); b.style.display=narrSupported?'':'none'; } if(st){ st.textContent=NARR.diag||(!narrSupported?'':(!narrOn?T('narrOffS'):(NARR.paused?T('narrPausedS'):(NARR.speaking?T('narrPlaying'):'')))); } }
+function paintNarr(){ const b=document.getElementById('tbVoice'); let st=document.getElementById('tbNarr'); if(!st){ const tb=document.getElementById('tbStop'); if(tb){ st=document.createElement('span'); st.id='tbNarr'; tb.appendChild(st); } } if(b){ b.textContent=narrOn?T('narrOnLbl'):T('narrOffLbl'); b.title=T('narrBtnT'); b.style.display=narrSupported?'':'none'; } if(st){ st.textContent=NARR.diag||(!narrSupported?'':(!narrOn?T('narrOffS'):(NARR.paused?T('narrPausedS'):(NARR.speaking?T('narrPlaying'):'')))); } }
 function narrCancel(){ NARR.gen++; clearTimeout(NARR.timer); NARR.pending=false; NARR.speaking=false; NARR.paused=false; NARR.curId=null; NARR.diag=''; const nt=document.getElementById('tbNarrText'); if(nt){ nt.textContent=''; nt.style.display='none'; } if(narrSupported){ try{ if(speechSynthesis.speaking||speechSynthesis.pending) speechSynthesis.cancel(); }catch(e){} } paintNarr(); }
 function narrChunks(txt){ const parts=[]; let cur=''; const punct='。！？!?；;…'; for(const ch of txt){ cur+=ch; if((punct.indexOf(ch)>=0&&cur.length>=8)||cur.length>=60){ parts.push(cur); cur=''; } } if(cur) parts.push(cur); return parts.length?parts:[txt]; }
 function narrSpeak(id){ if(!narrSupported||!narrOn||!TOUR) return; const txt=narrTextFor(id); if(!txt) return; const g=NARR.gen; const parts=narrChunks(txt);
@@ -1152,12 +1150,11 @@ function paintNarrText(id){ const el=document.getElementById('tbNarrText'); if(!
 function narrSchedule(id){ if(!narrSupported||!narrOn) return; const g=NARR.gen; clearTimeout(NARR.timer); NARR.pending=true; NARR.timer=setTimeout(()=>{ NARR.pending=false; if(g===NARR.gen&&TOUR) narrSpeak(id); },1750); }
 function narrPause(){ clearTimeout(NARR.timer); NARR.pending=false; if(narrSupported&&NARR.speaking&&!NARR.paused){ try{ speechSynthesis.pause(); NARR.paused=true; }catch(e){} } paintNarr(); }
 function narrResume(){ if(!narrSupported||!narrOn) return; if(NARR.paused){ try{ speechSynthesis.resume(); NARR.paused=false; }catch(e){} paintNarr(); return; } if(TOUR&&TOUR.playing&&!NARR.speaking&&!NARR.pending){ const id=TOUR.ids[TOUR.idx]; if(narrTextFor(id)) narrSpeak(id); } }
-function narrPlayTap(){ if(!TOUR) return; if(!narrOn){ narrOn=true; try{ localStorage.setItem('tt_narr','1'); }catch(e){} } NARR.gen++; clearTimeout(NARR.timer); NARR.pending=false; NARR.speaking=false; NARR.paused=false; NARR.diag=''; paintNarrText(TOUR.ids[TOUR.idx]); narrSpeak(TOUR.ids[TOUR.idx]); paintNarr(); }
 document.addEventListener('pointerdown',()=>{ if(narrSupported&&TOUR&&TOUR.playing&&!NARR.paused){ try{ if(speechSynthesis.paused) speechSynthesis.resume(); }catch(e){} } },true);
 if(narrSupported){ try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=()=>{ try{ speechSynthesis.getVoices(); }catch(e){} }; }catch(e){} }
 function narrVoiceTap(){ narrOn=!narrOn; try{ localStorage.setItem('tt_narr', narrOn?'1':'0'); }catch(e){} if(!narrOn) narrCancel(); else if(TOUR){ paintNarrText(TOUR.ids[TOUR.idx]); narrSpeak(TOUR.ids[TOUR.idx]); } paintNarr(); }
 paintNarr();
-(function(){ const bar=document.getElementById('tourbar'); if(!bar) return; let lP=0,lV=0; bar.addEventListener('pointerdown',e=>{ const t=e.target; if(!t||!t.id) return; const n=Date.now(); if(t.id==='tbNarrPlay'){ if(n-lP<650) return; lP=n; t.classList.add('tbHit'); setTimeout(()=>t.classList.remove('tbHit'),220); narrPlayTap(); } else if(t.id==='tbVoice'){ if(n-lV<650) return; lV=n; t.classList.add('tbHit'); setTimeout(()=>t.classList.remove('tbHit'),220); narrVoiceTap(); } },true); })();
+(function(){ const bar=document.getElementById('tourbar'); if(!bar) return; let lV=0; bar.addEventListener('pointerdown',e=>{ const t=e.target; if(!t||!t.id||t.id!=='tbVoice') return; const n=Date.now(); if(n-lV<650) return; lV=n; t.classList.add('tbHit'); setTimeout(()=>t.classList.remove('tbHit'),220); narrVoiceTap(); },true); })();
 function tourPauseRead(){ if(TOUR && TOUR.playing){ TOUR.playing=false; TOUR.readPause=true; TOUR.tAcc=0; const bp=document.getElementById('tbPlay'); if(bp) bp.textContent=T('resume'); } }
 function tourResumeRead(){ if(TOUR && TOUR.readPause){ TOUR.readPause=false; TOUR.playing=true; TOUR.tAcc=0; const bp=document.getElementById('tbPlay'); if(bp) bp.textContent=T('pause'); } }
 window.tickTour=dt=>{ if(!TOUR||!tourCurve) return; TOUR.dotU=(TOUR.dotU+dt*0.03)%1; dayDot.position.copy(tourCurve.getPointAt(TOUR.dotU));
