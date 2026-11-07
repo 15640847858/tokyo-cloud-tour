@@ -484,7 +484,7 @@ header #langMenu{right:auto;min-width:172px}
 
 <script src="i18n_ui.js"></script><script src="narr_ui.js"></script>
 <script type="module">
-const BUILD='20261108.17';
+const BUILD='20261108.18';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Sky } from 'three/addons/objects/Sky.js';
@@ -1134,7 +1134,7 @@ function stopTour(){ narrCancel(); if(TOUR&&TOUR.savedWx!==undefined){ wxMode=TO
 /* ===== tour narration (SpeechSynthesis, added 2026-11-08) ===== */
 const NARR={gen:0, speaking:false, paused:false, pending:false, curId:null, timer:0, diag:'', doneAt:0, voiceName:''};
 const narrSupported=('speechSynthesis' in window)&&('SpeechSynthesisUtterance' in window);
-let narrOn=true; try{ narrOn=localStorage.getItem('tt_narr')!=='0'; }catch(e){}
+let narrOn=false; /* narration is opt-in (user rule 2026-11-08): default OFF on every load; the tour-bar toggle turns it on for the session */
 const NARR_LANG={zh:'zh-CN',ja:'ja-JP',en:'en-US',ko:'ko-KR',hi:'hi-IN'};
 function narrBind(el, fn){ if(!el) return; let last=0; const h=e=>{ const n=Date.now(); if(n-last<650) return; last=n; fn(e); }; el.addEventListener('pointerdown',h); el.addEventListener('click',h); }
 function narrTextFor(id){ const NN=window.I18NNARR||{}; const nv=(NN[LANG]||{})[id]||(NN.zh||{})[id]; if(nv) return nv; const U=window.I18NUI||{}; const S=U.str||{}; const v=(S[LANG]||{})['narr_'+id]||(S.zh||{})['narr_'+id]; if(v) return v; const c=(window.CONTENT||{})[id]; return c&&c.desc?c.desc:''; }
