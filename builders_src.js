@@ -1259,4 +1259,4 @@ function buildCity(scene, d, sr, isNight){
   }
 }
 
-export { M, ANIM, RND, label, spots, box, cyl, cone, sph, beam, ring, tor, cnv, std, texMat, glowMat, facadeTex, glassTex, signTex, hipRoof, tree, pinkTree, treeMat, people, blink , buildCity };
+export { M, ANIM, RND, label, spots, box, cyl, cone, sph, beam, ring, tor, cnv, std, texMat, glowMat, facadeTex, glassTex, signTex, hipRoof, tree, pinkTree, treeMat, people, blink , buildCity, kawaraTex };
