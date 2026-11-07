@@ -172,6 +172,19 @@ function disneyTex(){ const t=cnv(1024,828,(g)=>{ const SX=1024/26, SZ=828/21; c
   g.fillRect(X(-2.6), Z(8.2), X(2.6)-X(-2.6), Z(10.5)-Z(8.2));
   g.strokeStyle='rgba(120,90,50,0.35)'; g.lineWidth=3; g.beginPath(); g.arc(X(0), Z(1.8), 100, 0, 7); g.stroke(); });
   t.colorSpace=THREE.SRGBColorSpace; return t; }
+function lanternTex(){ const t=cnv(256,256,(g)=>{ g.fillStyle='#c22424'; g.fillRect(0,0,256,256);
+  for(let x=0;x<256;x+=16){ g.fillStyle='rgba(120,10,10,0.35)'; g.fillRect(x,0,3,256); g.fillStyle='rgba(255,120,110,0.20)'; g.fillRect(x+4,0,3,256); }
+  g.fillStyle='#1c1c20'; g.fillRect(0,0,256,26); g.fillRect(0,230,256,26);
+  g.fillStyle='#c8a24a'; g.fillRect(0,26,256,5); g.fillRect(0,225,256,5); });
+  t.colorSpace=THREE.SRGBColorSpace; return t; }
+function sensoGroundTex(){ const t=cnv(768,912,(g)=>{ const SX=768/13, SZ=912/15.5; const X=v=>(v+6.5)*SX, Z=v=>(v+7.75)*SZ;
+  g.fillStyle='#a49a86'; g.fillRect(0,0,768,912);
+  for(let y=0;y<15;y++) for(let x=0;x<13;x++){ g.fillStyle=(x+y)%2?'#9d927c':'#aaa088'; g.fillRect(x*SX+2, y*SZ+2, SX-4, SZ-4); }
+  for(let i=0;i<2200;i++){ g.fillStyle=Math.random()>0.5?'rgba(255,255,255,0.05)':'rgba(40,34,24,0.06)'; g.fillRect(Math.random()*768, Math.random()*912, 3, 3); }
+  g.fillStyle='#b3a78d'; g.fillRect(X(-1.9), Z(-1.2), X(1.9)-X(-1.9), Z(7.75)-Z(-1.2));
+  g.fillStyle='#b8ab90'; g.fillRect(X(-4.6), Z(-7.75), X(4.6)-X(-4.6), Z(-1.2)-Z(-7.75));
+  g.fillStyle='rgba(90,80,60,0.5)'; for(let z=-7;z<7.6;z+=1.05){ g.fillRect(X(-1.9), Z(z), X(1.9)-X(-1.9), 2); } });
+  t.colorSpace=THREE.SRGBColorSpace; return t; }
 const spots=[
  {id:'skytree', name:'东京晴空塔', x:16, z:-14, h:22.5, desc:'高 634 米的电波塔，塔身从三角形底座向上逐渐变圆是它的标志，登上展望台可以俯瞰整个东京，天气好时能看到富士山。', make:g=>{
   const lod=new THREE.LOD();
@@ -221,31 +234,93 @@ const spots=[
   g.add(box(3.2,0.9,1.6, texMat(facadeTex('#c9d1d9')), 0,0.45,5.6));
   g.add(box(2.2,0.55,0.14, glowMat(signTex('押上駅','#334155','#ffffff',false)), 0,0.6,6.44));
   g.add(tree(3.4,4.4,0.9)); g.add(tree(-3.6,4.2,0.8)); g.add(tree(4.2,-3.4,0.85)); } },
- {id:'sensoji', name:'浅草寺', x:13, z:-19, h:8, desc:'东京最古老的寺庙：先穿过挂着大红灯笼的雷门，沿仲见世商店街走到本堂，旁边就是五重塔，适合穿和服慢慢逛。', make:g=>{ const roofT=texMat(kawaraTex()); const stone=std({color:0xcfc4a5,roughness:1}); g.add(box(11,0.3,13.5,texMat(paveTex(),{roughness:1}),0,0.15,0.4));
-const wood=std({color:0x6b4423,roughness:0.9});
-function templeRoof(w,d,x,y,z){ g.add(hipRoof(w,0.85,d,roofT,x,y,z)); g.add(hipRoof(w*0.62,0.6,d*0.62,roofT,x,y+0.8,z)); }
-const gate=new THREE.Group(); gate.position.set(0,0,5.4); g.add(gate);
-[-1.9,1.9].forEach(x=>{ const pl=cyl(0.34,0.4,3.4,M.red,x,0,10); gate.add(pl); });
-gate.add(box(5.7,0.32,2.3,roofT,0,3.5,0)); const gr=hipRoof(5.9,1.05,2.7,roofT,0,3.6,0); gate.add(gr);
-const lan=sph(0.95, std({color:0xd92323,roughness:0.55}), 0,1.95,0, 1,1.28,1); gate.add(lan);
-const band=cyl(0.98,0.98,0.2,M.dark,0,0,20); band.position.y=1.95; gate.add(band);
-gate.add(box(1.4,0.26,0.3,M.gold,0,3.18,0)); gate.add(box(1.4,0.26,0.3,M.gold,0,0.74,0));
-gate.add(box(0.9,1.1,0.14, glowMat(signTex('雷門','#1f2937','#fbbf24',false)), 0,2.6,1.18));
-for(let i=0;i<4;i++){ const z=3.3-i*1.75; [-2.3,2.3].forEach(x=>{ g.add(box(1.8,1.45,1.5, i%2?M.white:std({color:0xf3e5cf,roughness:0.9}), x,0.72,z)); const aw=box(1.95,0.1,1.15, i%2?M.red:M.blue, x,1.6,z+0.25); aw.rotation.x=0.28; g.add(aw); }); }
-const hz=new THREE.Group(); hz.position.set(0,0,-2.7); g.add(hz);
-[-2.2,2.2].forEach(x=>hz.add(cyl(0.36,0.42,2.6,M.red,x,0,10)));
-hz.add(box(5.9,1.5,2, M.red, 0,3.2,0)); hz.add(box(6.4,0.3,2.5,roofT,0,4.05,0)); const hr=hipRoof(6.2,1,2.9,roofT,0,4.15,0); hz.add(hr);
-const lan2=sph(0.7, std({color:0xd92323,roughness:0.55}), 0,1.5,0, 1,1.25,1); hz.add(lan2);
-const hall=new THREE.Group(); hall.position.set(0.6,0,-5.6); g.add(hall);
-const twt=templeWallTex(); hall.add(box(6.2,2.3,3.6, texMat(twt,{bumpMap:twt,bumpScale:0.08}), 0,1.15,0)); hall.add(box(6.2,0.8,3.6, M.red, 0,0.4,0));
-const hr2=hipRoof(7.4,1.5,4.8,roofT,0,2.3,0); hall.add(hr2); const hr3=hipRoof(4.6,0.9,3,roofT,0,3.7,0); hall.add(hr3);
-hall.add(box(1.8,0.3,0.3,M.gold,0,4.75,0));
-const pg=new THREE.Group(); pg.position.set(-3.7,0,-4.9); g.add(pg);
-let pw=1.8; for(let i=0;i<5;i++){ pg.add(box(pw,0.6,pw,M.red,0,0.32+i*0.98,0)); pg.add(hipRoof(pw+0.8,0.4,pw+0.8,roofT,0,0.66+i*0.98,0)); pw*=0.85; }
-const spire=cyl(0.04,0.07,1.7,M.gold,0,0,8); spire.position.y=5.6; pg.add(spire);
-[6.15,6.42,6.66].forEach(y=>pg.add(ring(0.2,y,M.gold)));
-[[-3.1,3.4],[3.1,3.4],[-3.1,-0.6],[3.1,-0.6]].forEach(q=>{ const sl=new THREE.Group(); sl.position.set(q[0],0.3,q[1]); sl.add(box(0.16,0.8,0.16,stone,0,0.4,0)); sl.add(box(0.42,0.14,0.42,stone,0,0.86,0)); sl.add(box(0.3,0.3,0.3,stone,0,1.08,0)); sl.add(hipRoof(0.55,0.22,0.55,roofT,0,1.22,0)); g.add(sl); });
-g.add(tree(4.6,-4.6,1,pinkTree)); g.add(tree(-4.8,-1.4,0.9,pinkTree)); g.add(tree(4.8,0.6,0.85)); people(g,10,-1.4,1.4,-1.6,4.6,0.3); } },
+ {id:'sensoji', name:'浅草寺', x:13, z:-19, h:8, desc:'东京最古老的寺庙：先穿过挂着大红灯笼的雷门，沿仲见世商店街走到宝藏门和本堂，五重塔立在本堂西南侧，适合穿和服慢慢逛。', make:g=>{ const roofT=texMat(kawaraTex()); const stone=std({color:0xcfc4a5,roughness:1}); const redM=std({color:0xb02a1e,roughness:0.5}); const darkWood=std({color:0x4a3421,roughness:0.9});
+g.add(box(13.6,0.28,16.1, std({color:0x8a8069,roughness:1}), 0,0.14,0.3));
+const gnd=new THREE.Mesh(new THREE.PlaneGeometry(13,15.5), texMat(sensoGroundTex(),{roughness:1})); gnd.rotation.x=-Math.PI/2; gnd.position.set(0,0.3,0.3); g.add(gnd);
+function lantern(r,h){ const pts=[]; [[0.03,0],[0.34,0.03],[0.55,0.2],[0.64,0.48],[0.6,0.75],[0.36,0.93],[0.03,0.97]].forEach(([px,py])=>pts.push(new THREE.Vector2(px*r/0.64, py*h/0.97))); const m=new THREE.Mesh(new THREE.LatheGeometry(pts,18), texMat(lanternTex(),{roughness:0.6})); return m; }
+function slan(x,z){ const gr=new THREE.Group(); gr.position.set(x,0.3,z); gr.add(cyl(0.05,0.07,0.85, stone, 0,0,8)); gr.add(box(0.24,0.26,0.24, stone, 0,1.0,0)); gr.add(cone(0.24,0.2, stone, 0,0,4,1.24)); g.add(gr); }
+// ===== Kaminarimon =====
+const km=new THREE.Group(); km.position.set(0,0.3,6.1); g.add(km);
+[-1.55,1.55].forEach(x=>{ [-0.55,0.55].forEach(z=>km.add(cyl(0.21,0.25,3.0, redM, x,z,10))); });
+km.add(box(4.6,0.34,1.7, redM, 0,2.35,0)); km.add(box(4.6,0.3,1.7, redM, 0,3.0,0));
+[-1.55,-0.5,0.5,1.55].forEach(x=>km.add(box(0.34,0.3,1.5, redM, x,2.68,0)));
+km.add(hipRoof(5.6,1.0,2.6, roofT, 0,3.15,0));
+km.add(box(1.5,0.24,0.34, M.gold, 0,4.32,0));
+const kmLan=lantern(1.0,1.55); kmLan.position.y=0.55; km.add(kmLan);
+km.add(cyl(0.3,0.3,0.1, M.gold, 0,0,14)).children;
+const kmBase=km.children[km.children.length-1]; kmBase.position.y=0.5;
+km.add(box(1.7,0.5,0.14, glowMat(signTex('風雷神門','#1f2937','#fbbf24',false)), 0,2.68,0.92));
+[-2.35,2.35].forEach((x,i)=>{ km.add(box(0.85,1.7,0.9, redM, x,0.85,0)); km.add(box(0.6,1.05,0.14, i?std({color:0x3f6212,roughness:0.7}):std({color:0x9e2b25,roughness:0.7}), x,0.95,0.5)); const hd=sph(0.17, std({color:0xd9b38c,roughness:0.7}), x,1.85,0.5); km.add(hd); });
+// ===== Nakamise =====
+const shopNames=['人形焼','雷おこし','せんべい','扇子','風鈴','手ぬぐい','浴衣'];
+const shopTones=['#efe6d0','#e8dcc8','#dfe3e6','#efe0ce','#e6d5c0','#eef0e9','#ead9c2'];
+for(let i=0;i<7;i++){ [-1,1].forEach(sd=>{ const sz2=4.35-i*0.78, sh=1.12+HASH(i*3.7+sd*1.3)*0.3;
+  g.add(box(1.35,sh,0.68, texMat(facadeTex(shopTones[(i+(sd>0?2:0))%7])), sd*2.15,sh/2+0.3,sz2));
+  const rf=box(1.5,0.06,0.95, roofT, sd*2.15,sh+0.42,sz2); rf.rotation.z=sd*-0.13; g.add(rf);
+  g.add(box(0.95,0.42,0.05, M.glass, sd*1.78,0.62,sz2));
+  g.add(box(0.8,0.3,0.04, std({color:[0x9e2b25,0x1e3a5f,0x7c3aed,0x0f766e][(i+(sd>0?1:0))%4],roughness:0.85}), sd*1.76,1.02,sz2));
+  g.add(box(1.05,0.4,0.1, glowMat(signTex(shopNames[(i+(sd>0?3:0))%7],'#374151','#ffffff',false)), sd*2.15,sh+0.08,sz2-sd*0));
+  if(i%2===0){ const sl=lantern(0.16,0.3); sl.position.set(sd*1.7,1.05,sz2+0.3); g.add(sl); }
+}); }
+people(g,12,-0.8,0.8,0.2,4.4,0.32);
+// ===== Hozomon =====
+const hz=new THREE.Group(); hz.position.set(0,0.3,-1.7); g.add(hz);
+[-2.0,2.0].forEach(x=>hz.add(cyl(0.27,0.32,2.9, redM, x,0,10)));
+hz.add(box(5.6,0.5,1.9, redM, 0,1.35,0));
+hz.add(box(5.6,1.15,1.7, std({color:0x8e241a,roughness:0.6}), 0,2.15,0));
+hz.add(box(5.7,0.35,2.0, M.white, 0,2.85,0));
+hz.add(hipRoof(6.6,1.15,3.0, roofT, 0,3.0,0));
+hz.add(hipRoof(5.9,0.5,2.4, roofT, 0,2.35,-0.2));
+const hzLan=lantern(0.72,1.1); hzLan.position.y=0.35; hz.add(hzLan);
+[-2.85,2.85].forEach(x=>{ hz.add(box(0.8,1.6,0.8, redM, x,0.8,0)); hz.add(box(0.52,1.0,0.12, std({color:0x6b5a2e,roughness:0.65,metalness:0.3}), x,0.95,0.46)); });
+const waraji=tor(0.55,0.17, std({color:0xc9a86a,roughness:1}), 1.9,1.5,-1.02); waraji.scale.y=1.35; hz.add(waraji);
+// ===== Plaza + jokoro + temizuya =====
+const jk=new THREE.Group(); jk.position.set(0,0.3,-3.3); g.add(jk);
+jk.add(cyl(0.44,0.5,0.62, std({color:0x5c5148,roughness:0.45,metalness:0.55}), 0,0,14));
+jk.add(cyl(0.56,0.56,0.1, std({color:0x4a423a,roughness:0.5,metalness:0.5}), 0,0,14)).children;
+jk.children[jk.children.length-1].position.y=0.85;
+jk.add(cone(0.5,0.3, std({color:0x4a423a,roughness:0.5,metalness:0.5}), 0,0,12,1.05));
+const smokeM=std({color:0xe8ecf0,roughness:1,transparent:true,opacity:0.3});
+const smokes=[];
+[0,1,2].forEach(i=>{ const sm=sph(0.16+i*0.05, smokeM, (i-1)*0.1, 1.35+i*0.3, 0); jk.add(sm); smokes.push(sm); });
+ANIM.push(t=>{ smokes.forEach((sm,i)=>{ sm.position.y=1.3+i*0.3+Math.sin(t*0.7+i*2.1)*0.07; sm.scale.setScalar(1+0.15*Math.sin(t*0.5+i)); }); });
+const tm=new THREE.Group(); tm.position.set(3.3,0.3,-3.1); g.add(tm);
+[-0.55,0.55].forEach(x=>{ [-0.45,0.45].forEach(z=>tm.add(cyl(0.05,0.05,1.05, darkWood, x,z,6))); });
+tm.add(hipRoof(1.7,0.5,1.4, roofT, 0,1.05,0));
+tm.add(box(1.15,0.3,0.8, stone, 0,0.32,0));
+slan(-2.6,-2.6); slan(2.6,-2.6); slan(-2.6,-4.3); slan(2.6,-4.3); slan(-1.6,5.2); slan(1.6,5.2);
+// ===== Hondo (main hall) =====
+const hall=new THREE.Group(); hall.position.set(0,0.3,-5.5); g.add(hall);
+hall.add(box(8.0,0.5,5.4, stone, 0,0.25,0));
+[-2.2,0,2.2].forEach(sx=>hall.add(box(1.15,0.16,0.5, stone, sx,0.58,2.5)));
+const twt=templeWallTex(); hall.add(box(6.9,2.1,3.9, texMat(twt,{bumpMap:twt,bumpScale:0.08}), 0,1.55,0));
+hall.add(box(7.0,0.55,4.0, redM, 0,0.78,0));
+[-2.7,-1.35,0,1.35,2.7].forEach(px=>hall.add(cyl(0.11,0.11,1.9, redM, px,1.85,8)));
+hall.add(box(6.9,0.28,0.3, darkWood, 0,2.68,1.98));
+const hrMain=hipRoof(8.6,1.85,5.6, roofT, 0,2.6,0); hall.add(hrMain);
+hall.add(hipRoof(5.4,1.15,3.4, roofT, 0,4.3,0));
+hall.add(box(2.4,0.26,0.3, M.gold, 0,5.55,0));
+[-3.9,3.9].forEach(x=>{ const og=box(0.4,0.42,0.3, roofT, x,4.35,1.9); og.rotation.z=(x>0?-1:1)*0.4; hall.add(og); });
+const hallLan=lantern(0.62,0.95); hallLan.position.set(0,1.15,2.15); hall.add(hallLan);
+hall.add(box(1.6,0.45,0.12, glowMat(signTex('浅草寺','#7f1d1d','#ffd9a0',false)), 0,2.25,2.02));
+[-3.3,3.3].forEach(rx=>{ for(let k=0;k<4;k++) hall.add(cyl(0.035,0.035,0.55, redM, rx,0.85,2.2-k*0.001)); });
+// ===== Five-story pagoda (SW of hall) =====
+const pg=new THREE.Group(); pg.position.set(-4.6,0.3,-3.6); g.add(pg);
+pg.add(box(2.3,0.4,2.3, stone, 0,0.2,0));
+let pw=1.62;
+for(let i=0;i<5;i++){ const ty=0.4+i*1.28;
+  pg.add(box(pw,0.92,pw, redM, 0,ty+0.46,0));
+  pg.add(box(pw+0.14,0.16,pw+0.14, M.white, 0,ty+0.98,0));
+  pg.add(hipRoof(pw+0.85,0.42,pw+0.85, roofT, 0,ty+1.02,0));
+  pg.add(box(0.2,0.4,0.05, M.dark, 0,ty+0.5,pw/2+0.01));
+  pw*=0.86; }
+const sorin=cyl(0.03,0.05,1.5, M.gold, 0,0,8); sorin.position.y=7.55; pg.add(sorin);
+[6.95,7.14,7.33,7.52,7.71].forEach(y=>pg.add(ring(0.17,y,M.gold)));
+const jewel=sph(0.09, M.gold, 0,8.38,0); pg.add(jewel);
+// ===== Perimeter walls + trees =====
+[-5.9,5.9].forEach(wx=>{ g.add(box(0.22,1.0,10.5, M.white, wx,0.8,-0.9)); g.add(hipRoof(0.5,0.3,10.7, roofT, wx,1.3,-0.9)); });
+g.add(tree(-5.2,-5.9,1.15, darkGreen)); g.add(tree(5.3,-5.6,1.05, darkGreen)); g.add(tree(-5.3,1.8,0.95, darkGreen)); g.add(tree(5.4,4.6,1.0));
+people(g,8,-1,1,-2.2,-3.9,0.32); } },
  {id:'tower', name:'东京塔', x:-3, z:9, h:15, desc:'高 333 米的红色铁塔，红白相间的钢架是它的标志（和实物一样的配色），夜晚点灯后尤其漂亮，塔下和两个展望台都值得一看。', make:g=>{
   const tO=std({color:0xe0401c, roughness:0.5, metalness:0.2});
   const tW=std({color:0xf3efe6, roughness:0.5, metalness:0.2});
