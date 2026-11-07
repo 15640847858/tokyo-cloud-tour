@@ -439,7 +439,7 @@ header #langMenu{right:auto;min-width:172px}
   <section class="mod"><h2 id="hToursT">精选玩法</h2><button id="daytripBtn" class="route"><b>东京经典一日游</b>：浅草 → 晴空塔 → 上野 → 秋叶原 → 东京站 → 银座 → 东京塔 → 涩谷<small>开始播放：镜头逐站飞行导览</small></button><button class="route" data-tour="trendy"><b>东京潮流之旅</b>：原宿 → 涩谷 → 六本木 → 台场 → 丰洲<small>开始播放</small></button><button class="route" data-tour="night"><b>东京夜景之旅</b>：东京站 → 银座 → 东京塔 → 六本木 → 涩谷<small>开始播放（自动切换夜晚）</small></button><button class="route" data-tour="culture"><b>东京文化之旅</b>：浅草 → 上野 → 东京大学 → 皇居 → 明治神宫<small>开始播放</small></button><p class="about" id="discEl">路线与机场线路均为示意：地图距离经过压缩，仅用于可视化，不能作为实际导航距离；时间与票价为参考值。</p></section>
   <section class="mod"><h2 id="hGsT">御朱印护照</h2><p class="about" id="gsProg">已收集 0/24</p><button id="gsOpen" class="route"><b id="gsOpenB">打开护照</b><small id="gsOpenS">打开景点卡点「盖御朱印」，集齐 24 处朱印</small></button></section>
   <section class="mod"><h2 id="hAreasT">区域聚焦</h2><div class="areaBtns" id="areaBtns"></div></section>
-  <section class="mod"><h2 id="hAboutT">关于云游东京</h2><p class="about" id="visitLine"></p><p class="about" id="aboutEl">真实地图与建筑数据来自 OpenStreetMap：市中心 14,000 栋建筑按真实轮廓生成，景点周边只保留高楼地标。景点照片来自 Wikimedia Commons，作者与授权标注在介绍卡内。<br>地图 © OpenStreetMap contributors<br>卫星影像 © Esri, Maxar, Earthstar Geographics<br>天空：three.js 官网示例 Sky</p><p class="about" id="modelCredit">东京塔 3D 模型：© Kenta Imai，CC BY 3.0（经 Poly Pizza 取得，本站仅提取塔身部分）<br>Tokyo Tower 3D model by Kenta Imai, CC BY 3.0, via Poly Pizza (tower only)<br>明治神宫鸟居模型：Quaternius，CC0（经 Poly Pizza 取得）</p></section></div></aside>
+  <section class="mod"><h2 id="hAboutT">关于云游东京</h2><p class="about" id="visitLine"></p><p class="about" id="aboutEl">真实地图与建筑数据来自 OpenStreetMap：市中心 14,000 栋建筑按真实轮廓生成，景点周边只保留高楼地标。景点照片来自 Wikimedia Commons，作者与授权标注在介绍卡内。<br>地图 © OpenStreetMap contributors<br>卫星影像 © Esri, Maxar, Earthstar Geographics<br>天空：three.js 官网示例 Sky</p><p class="about" id="modelCredit">明治神宫鸟居模型：Quaternius，CC0（经 Poly Pizza 取得）</p></section></div></aside>
 <div id="flashFx"></div>
 <div id="statusbar"><span id="sbClock">东京 --:--</span><span id="sbWx"></span><span id="sbMode">白天</span></div><div id="tourbar"></div>
 <div id="pcModal"><div class="pcBox"><img id="pcImg" alt="postcard"><div class="pcRow"><a id="pcSave" download="tokyo-postcard.png">保存图片</a><button id="pcClose" aria-label="close">×</button></div><p id="pcHint">也可以长按图片保存到相册</p></div></div>
@@ -643,25 +643,8 @@ spots.forEach(s=>{
 const TOWER_MATS=[];
 function applyTowerNight(){ TOWER_MATS.forEach(m=>{ if(m.emissive){ m.emissive.setHex(night?0xa84800:0x000000); if('emissiveIntensity' in m) m.emissiveIntensity = night?1.15:1.0; } }); if(window.towerLight) towerLight.intensity = night?340:0; }
 if(!window.towerLight){ const pl=new THREE.PointLight(0xff7a26, 0, 62, 1.6); pl.position.set(0,9.5,0); SPOT_GROUPS['tower'].add(pl); window.towerLight=pl; }
-// 东京塔：授权模型替换 — 模型 © Kenta Imai, CC BY 3.0，经 Poly Pizza 取得
-// (poly.pizza/m/frPqTFGeRNM)，原作含塔身与周边楼群，本站仅提取塔身。
-// GLB 共 188,500 字节，超过单文件上传上限，按 buildings.bin 先例分 3 片
-// （tt0.bin/tt1.bin/tt2.bin，见 data/split_glb.py）上传，运行时拼装后解析。
-// 加载成功才替换程序化塔；失败则保留原造型。夜景辉光由 towerLight 点光源延续。
-(function(){ const tg=SPOT_GROUPS['tower']; if(!tg||!tg.userData.inner) return; const inner=tg.userData.inner;
-  Promise.all(['tt0.bin','tt1.bin','tt2.bin'].map(u=>fetch(u).then(r=>{ if(!r.ok) throw new Error(u); return r.arrayBuffer(); }))).then(parts=>{
-    const total=parts.reduce((a,p)=>a+p.byteLength,0); const buf=new Uint8Array(total); let off=0;
-    parts.forEach(p=>{ buf.set(new Uint8Array(p),off); off+=p.byteLength; });
-    new GLTFLoader().parse(buf.buffer, '', gltf=>{
-      const m=gltf.scene; const bb=new THREE.Box3().setFromObject(m); const size=bb.getSize(new THREE.Vector3());
-      if(!size.y){ window.__towerModel='fallback-procedural'; return; }
-      const s=15.1/size.y; m.scale.setScalar(s);
-      m.position.set(-(bb.min.x+size.x/2)*s, -bb.min.y*s, -(bb.min.z+size.z/2)*s);
-      m.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.userData.spot=tg.userData.spot; } });
-      inner.clear(); inner.add(m); window.__towerModel='kenta-ccby';
-    }, ()=>{ window.__towerModel='fallback-procedural'; });
-  }).catch(()=>{ window.__towerModel='fallback-procedural'; });
-})();
+// 东京塔模型替换已于 2026-11-07 撤下（用户反馈镂空钢塔优于体素塔）：线上恢复
+// builders_src.js 的程序化格构塔（塔尖已补全为续接格构＋天线桅杆）。
 // 明治神宫大鸟居：CC0 模型替换 — Torii Gate © Quaternius, CC0，经 Poly Pizza
 // 取得 (poly.pizza/m/7SyXZ62xR5)。仅替换鸟居部件，其余场景不变；失败保留原鸟居。
 (function(){ const mg=SPOT_GROUPS['meiji']; if(!mg||!mg.userData.inner) return; const inner=mg.userData.inner;

@@ -349,9 +349,27 @@ people(g,8,-1,1,-2.2,-3.9,0.32); } },
   md.add(box(2.75,0.2,2.75, tO, 0,0.62,0));
   const td=cyl(0.8,0.87,0.8, deckGlass, 0,0, 20); td.position.y=10.95; g.add(td);
   const tdr=cyl(0.9,0.9,0.13, tO); tdr.position.y=11.4; g.add(tdr);
-  const m1=cyl(0.085,0.11,1.3, tO); m1.position.y=12.05; g.add(m1);
-  const m2=cyl(0.06,0.085,1.1, tW); m2.position.y=13.2; g.add(m2);
-  const m3=cyl(0.035,0.06,1.2, tO); m3.position.y=14.3; g.add(m3);
+  // Top Deck 以上：格构继续收分至约 290m（13.2）成小截面塔尖段，再接天线桅杆
+  const upBase=11.35, upTop=13.2, UL=6, upCols=[tO,tO,tW,tO,tW,tO];
+  const upHW=t=>0.115+(0.44-0.115)*Math.pow(1-t,1.15);
+  for(let l=0;l<UL;l++){ const t0=l/UL, t1=(l+1)/UL, y0=upBase+(upTop-upBase)*t0, y1=upBase+(upTop-upBase)*t1, m=upCols[l], w0=upHW(t0), w1=upHW(t1), lr=0.05-l*0.0035;
+    for(let sx of [-1,1]) for(let sz of [-1,1]) g.add(beam(sx*w0,y0,sz*w0, sx*w1,y1,sz*w1, m, lr));
+    for(let sgn of [-1,1]){
+      g.add(beam(-w0,y0,sgn*w0, w1,y1,sgn*w1, m, 0.02)); g.add(beam(w0,y0,sgn*w0, -w1,y1,sgn*w1, m, 0.02));
+      g.add(beam(sgn*w0,y0,-w0, sgn*w1,y1,w1, m, 0.02)); g.add(beam(sgn*w0,y0,w0, sgn*w1,y1,-w1, m, 0.02));
+    }
+    g.add(beam(-w1,y1,-w1, w1,y1,-w1, m, 0.03)); g.add(beam(-w1,y1,w1, w1,y1,w1, m, 0.03)); g.add(beam(-w1,y1,-w1, -w1,y1,w1, m, 0.03)); g.add(beam(w1,y1,-w1, w1,y1,w1, m, 0.03));
+  }
+  g.add(beam(0,upBase,0, 0,upTop,0, tO, 0.028));
+  const upCap=cyl(0.30,0.34,0.1, tO); upCap.position.y=upTop+0.05; g.add(upCap);
+  const mast1=cyl(0.055,0.078,0.85, tO); mast1.position.y=13.72; g.add(mast1);
+  const ring1=cyl(0.17,0.17,0.045, tW); ring1.position.y=13.95; g.add(ring1);
+  const col1=cyl(0.10,0.10,0.07, tW); col1.position.y=14.14; g.add(col1);
+  g.add(beam(-0.27,14.2,0, 0.27,14.2,0, tO, 0.018));
+  const mast2=cyl(0.028,0.052,0.8, tW); mast2.position.y=14.52; g.add(mast2);
+  const ring2=cyl(0.13,0.13,0.04, tO); ring2.position.y=14.48; g.add(ring2);
+  g.add(beam(0,14.66,-0.2, 0,14.66,0.2, tW, 0.015));
+  const tip=cyl(0.006,0.02,0.3, tO); tip.position.y=14.97; g.add(tip);
   const bc=sph(0.12, new THREE.MeshBasicMaterial({color:0xff2222}), 0,15.05,0); g.add(bc);
   const zj=new THREE.Group(); zj.position.set(4.3,0.3,3.7); zj.rotation.y=-0.35; g.add(zj);
   zj.add(box(2.5,1.5,1.6, M.white, 0,0.75,-1.1)); zj.add(hipRoof(3.0,1.0,2.1, texMat(kawaraTex()), 0,1.5,-1.1));

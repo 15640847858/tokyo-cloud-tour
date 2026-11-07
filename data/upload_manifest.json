@@ -30,17 +30,5 @@
  "bldg7.bin": {
   "sha": "bb3727b8ec77c4b2628f98f88bf5760628376266",
   "size": 48044
- },
- "tt0.bin": {
-  "sha": "bf157e80cad4a0534d28d2ebbc5e8d9fb005c4f7",
-  "size": 65536
- },
- "tt1.bin": {
-  "sha": "965b408b1744450e99fc0441cc17d4f1b6b7fe37",
-  "size": 65536
- },
- "tt2.bin": {
-  "sha": "88e8ffa64bc5aa41b5efea32f46bbbb7faf33c13",
-  "size": 57428
  }
 }
