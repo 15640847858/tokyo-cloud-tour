@@ -377,6 +377,12 @@ header .sub, #hint{ text-shadow:0 1px 3px rgba(5,10,20,.65), 0 0 10px rgba(5,10,
 
 /* ===== card glass: translucent theme (final override) ===== */
 #info{background:radial-gradient(130% 95% at 12% 0%,rgba(230,200,135,.16),rgba(230,200,135,0) 55%),linear-gradient(160deg,rgba(43,40,33,.52),rgba(17,16,14,.60));border:1px solid rgba(230,200,135,.42);-webkit-backdrop-filter:blur(24px) saturate(1.45);backdrop-filter:blur(24px) saturate(1.45);box-shadow:0 22px 55px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,238,200,.12)}
+
+/* ===== chevron: no circle bg; expanded-state collapse button ===== */
+#sheetPeek .pkChev{background:transparent;border:none;box-shadow:none;border-radius:0}
+#cardCollapse{display:none;position:absolute;top:10px;right:52px;z-index:22;width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(7,11,20,.5);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#fff;font-size:15px;cursor:pointer;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+#info.st-half #cardCollapse,#info.st-full #cardCollapse{display:flex}
+@media(min-width:761px){ #info.hasSpot:not(.cmp) #cardCollapse{display:flex} }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <script type="importmap">
@@ -405,7 +411,7 @@ header .sub, #hint{ text-shadow:0 1px 3px rgba(5,10,20,.65), 0 0 10px rgba(5,10,
 <div id="pcModal"><div class="pcBox"><img id="pcImg" alt="postcard"><div class="pcRow"><a id="pcSave" download="tokyo-postcard.png">保存图片</a><button id="pcClose" aria-label="close">×</button></div><p id="pcHint">也可以长按图片保存到相册</p></div></div>
 <div id="gsModal"><div class="gsBox"><div class="gsHead"><h3 id="gsTitle">御朱印护照</h3><button id="gsClose" aria-label="close">×</button></div><p class="gsSub" id="gsSub"></p><div class="gsGrid" id="gsGrid"></div></div></div>
 <div id="gsEdit"><div class="geBox"><div id="gsEditStamp"></div><input id="gsNoteIn" maxlength="24" autocomplete="off"><div class="geRow"><button id="gsSaveBtn">保存</button><button id="gsDelBtn">删除这枚章</button></div><button id="gsEditClose" aria-label="close">✕</button></div></div>
-<div id="sheetShade"></div><section id="info"><div id="sheetHandle"></div><div id="sheetPeek"></div><button id="cardX" aria-label="关闭">×</button><div id="stampFx"></div><div id="infoBody"><h3>欢迎云游东京</h3><p>拖动旋转、滚轮缩放。点击地图上的立体景点查看介绍，地图上彩色的发光线路是机场进城的推荐走法，线路上的光点是列车前进的方向。</p><div class="meta">成田机场距离已压缩显示，否则市中心景点会小得看不清。</div></div></section>
+<div id="sheetShade"></div><section id="info"><div id="sheetHandle"></div><div id="sheetPeek"></div><button id="cardCollapse" aria-label="收起">⌄</button><button id="cardX" aria-label="关闭">×</button><div id="stampFx"></div><div id="infoBody"><h3>欢迎云游东京</h3><p>拖动旋转、滚轮缩放。点击地图上的立体景点查看介绍，地图上彩色的发光线路是机场进城的推荐走法，线路上的光点是列车前进的方向。</p><div class="meta">成田机场距离已压缩显示，否则市中心景点会小得看不清。</div></div></section>
 <div id="bldgStatus">正在加载真实建筑数据…</div>
 <div id="hint">拖动旋转 · 滚轮缩放 · 点击景点查看介绍</div>
 
@@ -648,6 +654,7 @@ const infoEl=document.getElementById('info');
 const infoBody=document.getElementById('infoBody');
 function closeCard(){ infoEl.style.display='none'; infoEl.classList.remove('hasSpot','cmp'); const pkc=document.getElementById('sheetPeek'); if(pkc) pkc.innerHTML=''; const sh2=document.getElementById('sheetShade'); if(sh2) sh2.classList.remove('on'); clearStampFx(); stopCar(); ambSet('off'); clearSelection(); window.__cur={type:'welcome'}; const tb=document.getElementById('tourbar'); if(tb) tb.style.bottom=''; };
 const cardXBtn=document.getElementById('cardX'); if(cardXBtn) cardXBtn.onclick=()=>closeCard();
+const colBtn=document.getElementById('cardCollapse'); if(colBtn) colBtn.onclick=()=>{ if(matchMedia('(pointer:coarse)').matches) setSheet('peek'); else infoEl.classList.add('cmp'); };
 let INFO={};
 Promise.all([fetch('info.json').then(r=>r.json()).catch(()=>({})), fetch('info2.json').then(r=>r.json()).catch(()=>({}))]).then(([ia,ib])=>{ INFO=Object.assign({}, ia, ib); if(typeof renderGoshuin==='function') renderGoshuin(); });const META={dome:['水道桥站 / 后乐园站','建议停留 2–3 小时'], stadium:['国立竞技场站 / 千駄ヶ谷站','建议停留 1.5 小时'], 
  skytree:['押上站（晴空塔站）','建议停留 1.5–2 小时'], sensoji:['浅草站','建议停留 2–3 小时'], tower:['赤羽桥站 / 大门站','建议停留 1.5 小时'],
