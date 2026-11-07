@@ -190,6 +190,12 @@
 #stampFx .gsCard{animation:slam .5s cubic-bezier(.2,2.4,.4,1)}
 @keyframes slam{0%{transform:scale(2.7) rotate(var(--r));opacity:0}55%{opacity:1}100%{transform:scale(1) rotate(var(--r));opacity:1}}
 #gsEdit{position:fixed;inset:0;background:rgba(5,10,20,.76);display:none;align-items:center;justify-content:center;z-index:61;padding:16px}
+#cfModal{position:fixed;inset:0;background:rgba(5,10,20,.55);display:none;align-items:center;justify-content:center;z-index:70;padding:16px}
+.cfBox{background:linear-gradient(160deg,rgba(38,34,28,.92),rgba(18,20,30,.94));border:1px solid rgba(230,200,135,.45);border-radius:18px;box-shadow:0 18px 50px rgba(0,0,0,.5);padding:22px 20px 18px;width:min(320px,86vw);text-align:center;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+#cfMsg{color:#f2e9d5;font-size:15.5px;line-height:1.55;margin:0 0 18px}
+.cfBtns{display:flex;gap:10px}
+.cfBtn{flex:1;padding:11px 0;border-radius:999px;font-size:14.5px;cursor:pointer;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.06);color:#e8e2d2}
+.cfBtn.danger{border-color:rgba(255,122,96,.55);background:rgba(255,90,70,.12);color:#ff9d8a;font-weight:700}
 .geBox{width:min(92vw,320px);background:rgba(15,25,45,.96);border:1px solid rgba(230,200,135,.35);border-radius:16px;padding:16px;text-align:center;box-sizing:border-box;position:relative}
 .geBox .gsCard{margin:2px auto 0}
 #gsNoteIn{width:100%;margin-top:12px;background:rgba(255,255,255,.08);border:1px solid rgba(230,200,135,.35);border-radius:9px;color:#fff;padding:9px 11px;font-size:16px;box-sizing:border-box}
@@ -485,6 +491,7 @@ header #langMenu{right:auto;min-width:172px}
 <div id="flashFx"></div>
 <div id="statusbar"><span id="sbClock">东京 --:--</span><span id="sbWx"></span><span id="sbMode">白天</span></div><div id="tourbar"></div>
 <div id="pcModal"><div class="pcBox"><img id="pcImg" alt="postcard"><div class="pcRow"><a id="pcSave" download="tokyo-postcard.png">保存图片</a><button id="pcClose" aria-label="close">×</button></div><p id="pcHint">也可以长按图片保存到相册</p></div></div>
+<div id="cfModal"><div class="cfBox"><p id="cfMsg"></p><div class="cfBtns"><button id="cfCancel" class="cfBtn"></button><button id="cfOk" class="cfBtn danger"></button></div></div></div>
 <div id="gsModal"><div class="gsBox"><div class="gsHead"><h3 id="gsTitle">御朱印护照</h3><button id="gsClose" aria-label="close">×</button></div><p class="gsSub" id="gsSub"></p><div class="gsGrid" id="gsGrid"></div></div></div>
 <div id="gsEdit"><div class="geBox"><div id="gsEditStamp"></div><input id="gsNoteIn" maxlength="24" autocomplete="off"><div class="geRow"><button id="gsSaveBtn">保存</button><button id="gsDelBtn">删除这枚章</button></div><button id="gsEditClose" aria-label="close">✕</button></div></div>
 <div id="sheetShade"></div><section id="info"><div id="sheetHandle"></div><div id="sheetPeek"></div><button id="cardCollapse" aria-label="收起">⌄</button><button id="cardX" aria-label="关闭">×</button><div id="stampFx"></div><div id="infoBody"><h3>欢迎云游东京</h3><p>拖动旋转、滚轮缩放。点击地图上的立体景点查看介绍，地图上彩色的发光线路是机场进城的推荐走法，线路上的光点是列车前进的方向。</p><div class="meta">成田机场距离已压缩显示，否则市中心景点会小得看不清。</div></div></section>
@@ -493,7 +500,7 @@ header #langMenu{right:auto;min-width:172px}
 
 <script src="i18n_ui.js"></script><script src="narr_ui.js"></script>
 <script type="module">
-const BUILD='20261108.20';
+const BUILD='20261108.21';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Sky } from 'three/addons/objects/Sky.js';
@@ -1309,7 +1316,13 @@ let gsEditId=null;
 function openGsEdit(id){ if(!STAMPS[id]) return; gsEditId=id; document.getElementById('gsEditStamp').innerHTML=stampHtml(id,true); const inp=document.getElementById('gsNoteIn'); inp.value=STAMPS[id].note||''; inp.placeholder=T('notePh'); document.getElementById('gsSaveBtn').textContent=T('gsSave'); document.getElementById('gsDelBtn').textContent=T('gsDel'); document.getElementById('gsEdit').style.display='flex'; }
 function closeGsEdit(){ document.getElementById('gsEdit').style.display='none'; gsEditId=null; }
 document.getElementById('gsSaveBtn').onclick=()=>{ if(!gsEditId||!STAMPS[gsEditId]) return; STAMPS[gsEditId].note=document.getElementById('gsNoteIn').value.trim().slice(0,24); saveStamps(); renderGoshuin(); closeGsEdit(); };
-document.getElementById('gsDelBtn').onclick=()=>{ if(!gsEditId) return; if(!confirm(T('gsDelConfirm'))) return; const id=gsEditId; delete STAMPS[id]; saveStamps(); renderGoshuin(); if(window.__cur&&window.__cur.s&&window.__cur.s.id===id) paintStampBtn(id); closeGsEdit(); };
+let cfResolve=null;
+function cfConfirm(msg){ return new Promise(res=>{ cfResolve=res; document.getElementById('cfMsg').textContent=msg; document.getElementById('cfOk').textContent=T('cfOk'); document.getElementById('cfCancel').textContent=T('cfCancel'); document.getElementById('cfModal').style.display='flex'; }); }
+function cfDone(v){ document.getElementById('cfModal').style.display='none'; if(cfResolve){ const r=cfResolve; cfResolve=null; r(v); } }
+document.getElementById('cfOk').onclick=()=>cfDone(true);
+document.getElementById('cfCancel').onclick=()=>cfDone(false);
+document.getElementById('cfModal').addEventListener('click', e=>{ if(e.target.id==='cfModal') cfDone(false); });
+document.getElementById('gsDelBtn').onclick=async()=>{ if(!gsEditId) return; if(!await cfConfirm(T('gsDelConfirm'))) return; const id=gsEditId; delete STAMPS[id]; saveStamps(); renderGoshuin(); if(window.__cur&&window.__cur.s&&window.__cur.s.id===id) paintStampBtn(id); closeGsEdit(); };
 document.getElementById('gsEditClose').onclick=closeGsEdit;
 document.getElementById('gsEdit').addEventListener('click', e=>{ if(e.target.id==='gsEdit') closeGsEdit(); });
 let stampFxTimer=null;
