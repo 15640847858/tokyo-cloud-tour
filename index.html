@@ -77,6 +77,15 @@
 .pScroll{overflow-y:auto;flex:1;min-height:0}
   #panel .mod:first-child h2{padding-right:36px}
   #search{width:100%;padding:8px 11px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:#fff;font-size:13px;margin-bottom:10px;outline:none}
+  .spotTools{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+  .searchWrap{position:relative;flex:1}
+  .searchWrap #search{margin-bottom:0;padding-right:32px}
+  #searchX{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;border:none;background:rgba(255,255,255,.14);color:#e8e2d2;font-size:12px;line-height:1;cursor:pointer;display:none;padding:0}
+  #searchX.on{display:block}
+  #favOnly{flex:none}
+  #spotHits{font-size:12px;color:#e6c887;margin:0 2px 8px;display:none}
+  .spotGrp{font-size:11px;font-weight:700;letter-spacing:.14em;color:rgba(230,200,135,.78);margin:12px 2px 7px}
+  .spotGrpWrap:first-child .spotGrp{margin-top:0}
   #search::placeholder{color:rgba(255,255,255,.55)}
   #bldgStatus{position:fixed;left:50%;transform:translateX(-50%);bottom:36px;font-size:12px;background:rgba(10,17,32,.75);padding:5px 12px;border-radius:999px;z-index:9}
   #hint{position:fixed;left:50%;transform:translateX(-50%);bottom:12px;font-size:12px;opacity:.75;z-index:9;white-space:nowrap}
@@ -468,8 +477,7 @@ header #langMenu{right:auto;min-width:172px}
 <aside id="panel"><button id="panelClose" aria-label="关闭菜单">×</button>
   <div class="pScroll"><section class="mod" id="setMod"><h2 id="hSetT">设置</h2><div class="setGrid" id="setGrid"></div></section>
   <section class="mod"><h2 id="hWxT">实时天气 · 东京</h2><div id="wxBody">正在获取天气…</div><div id="wxHomeLine"></div></section>
-  <section class="mod"><h2 id="hSearchT">搜索</h2><input id="search" type="text" placeholder="搜索景点，如：迪士尼 / 银座"></section>
-  <section class="mod"><h2 id="hSpotsT">景点介绍</h2><button id="favOnly" class="chip">只看收藏 ★</button><div id="spots"></div></section>
+  <section class="mod"><h2 id="hSpotsT">景点介绍</h2><div class="spotTools"><div class="searchWrap"><input id="search" type="text" placeholder="搜索景点，如：迪士尼 / 银座"><button id="searchX" aria-label="clear">✕</button></div><button id="favOnly" class="chip">只看收藏 ★</button></div><div id="spotHits"></div><div id="spots"></div></section>
   <section class="mod"><h2 id="hToursT">精选玩法</h2><button id="daytripBtn" class="route"><b>东京经典一日游</b>：谷中银座 → 浅草寺 → 东京晴空塔 → 上野公园 → 秋叶原 → 皇居 → 东京站 → 银座<small>开始播放（白天·晴）</small></button><button class="route" data-tour="trendy"><b>东京潮流之旅</b>：池袋 → 新宿 → 原宿 → 明治神宫 → 涩谷 → 六本木 → 东京塔 → 品川<small>开始播放（黄昏）</small></button><button class="route" data-tour="night"><b>东京夜景之旅</b>：国立竞技场 → 东京巨蛋 → 丰洲市场 → teamLab → 台场 → 横滨 → 稻城 → 迪士尼<small>开始播放（自动切换夜晚）</small></button><button class="route" data-tour="culture"><b>东京文化之旅</b>：东京大学 → 早稻田大学 → 吉祥寺 → 吉卜力美术馆 → 川越 → 春日部 → 富士山 → 镰仓高校前<small>开始播放（白天·雪景）</small></button><p class="about" id="discEl">路线与机场线路均为示意：地图距离经过压缩，仅用于可视化，不能作为实际导航距离；时间与票价为参考值。</p></section>
   <section class="mod"><h2 id="hGsT">御朱印护照</h2><p class="about" id="gsProg">已收集 0/24</p><button id="gsOpen" class="route"><b id="gsOpenB">打开护照</b><small id="gsOpenS">打开景点卡点「盖御朱印」，集齐 24 处朱印</small></button></section>
   <section class="mod"><h2 id="hAreasT">区域聚焦</h2><div class="areaBtns" id="areaBtns"></div></section>
@@ -485,7 +493,7 @@ header #langMenu{right:auto;min-width:172px}
 
 <script src="i18n_ui.js"></script><script src="narr_ui.js"></script>
 <script type="module">
-const BUILD='20261108.19';
+const BUILD='20261108.20';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Sky } from 'three/addons/objects/Sky.js';
@@ -735,7 +743,18 @@ routes.forEach((r,idx)=>{
   routeObjs.push({curve,mat,dot,offset:idx*0.17});
 });
 const spotsEl=document.getElementById('spots');
-spots.forEach(s=>{ const b=document.createElement('button'); b.className='spot'; b.dataset.sid=s.id; b.textContent=sName(s); b.dataset.names=namesOf(s); b.onclick=()=>{ selectGroup(SPOT_GROUPS[s.id]); showInfo(s); if(innerWidth<=760) document.getElementById('panel').classList.add('hidden'); }; spotsEl.appendChild(b); });
+const SPOT_GROUPS_LIST=[['gDowntown',['skytree','tower','tokyost','palace','ginza','roppongi','dome','stadium','shinagawa']],['gShitamachi',['sensoji','ueno','yanaka','akiba','toudai','waseda']],['gWest',['shibuya','shinjuku','ikebukuro','harajuku','meiji','kichijoji']],['gBay',['odaiba','toyosu','teamlab','disney','yokohama']],['gSuburb',['fuji','kamakura','ghibli','kasukabe','kawagoe','inagi']]];
+function mkSpotBtn(sp){ const b=document.createElement('button'); b.className='spot'; b.dataset.sid=sp.id; b.textContent=sName(sp); b.dataset.names=namesOf(sp); if(FAVS.has(sp.id)) b.classList.add('fav'); return b; }
+function buildSpotList(){ if(!spotsEl) return; const byId={}; spots.forEach(sp=>{ byId[sp.id]=sp; }); spotsEl.innerHTML='';
+  const grp=(key,btns)=>{ if(!btns.length) return; const w=document.createElement('div'); w.className='spotGrpWrap'; const h=document.createElement('div'); h.className='spotGrp'; h.textContent=T(key); w.appendChild(h); btns.forEach(b=>w.appendChild(b)); spotsEl.appendChild(w); };
+  grp('gFavs', spots.filter(sp=>FAVS.has(sp.id)).map(mkSpotBtn));
+  SPOT_GROUPS_LIST.forEach(([key,ids])=>grp(key, ids.map(id=>byId[id]).filter(Boolean).map(mkSpotBtn)));
+  const am=allSpotsMap(); grp('gAirport', ['hnd','nrt'].map(id=>am[id]).filter(Boolean).map(mkSpotBtn)); }
+function applySpotFilter(){ const inp=document.getElementById('search'); const q=(inp?inp.value:'').trim().toLowerCase(); const filtering=!!q||favOnlyOn; let n=0;
+  document.querySelectorAll('#spots .spotGrpWrap').forEach(w=>{ let c=0; w.querySelectorAll('.spot').forEach(b=>{ const vis=(!favOnlyOn||FAVS.has(b.dataset.sid))&&(!q||(b.dataset.names||b.textContent).toLowerCase().includes(q)); b.style.display=vis?'':'none'; if(vis){ c++; n++; } }); w.style.display=c?'':'none'; const h=w.querySelector('.spotGrp'); if(h) h.style.display=filtering?'none':''; });
+  const hits=document.getElementById('spotHits'); if(hits){ hits.style.display=filtering?'block':'none'; if(filtering) hits.textContent=T('spotHits').replace('{n}',n); }
+  const sx=document.getElementById('searchX'); if(sx) sx.classList.toggle('on', !!q); }
+spotsEl.addEventListener('click', e=>{ const b=e.target.closest('.spot'); if(!b) return; const sp=allSpotsMap()[b.dataset.sid]; if(!sp) return; selectGroup(SPOT_GROUPS[sp.id]||sp); showInfo(sp); if(innerWidth<=760) document.getElementById('panel').classList.add('hidden'); });
 
 const infoEl=document.getElementById('info');
 const infoBody=document.getElementById('infoBody');
@@ -856,7 +875,10 @@ function selectRoute(i){
 }
 
 // 搜索、菜单、全景
-document.getElementById('search').addEventListener('input', e=>{ const q=e.target.value.trim(); document.querySelectorAll('.spot').forEach(b=>{ b.style.display=(!q||(b.dataset.names||b.textContent).toLowerCase().includes(q.toLowerCase()))?'':'none'; }); });
+const searchEl=document.getElementById('search');
+searchEl.addEventListener('input', applySpotFilter);
+searchEl.addEventListener('keydown', e=>{ if(e.key==='Enter'){ const b=document.querySelector('#spots .spot:not([style*="none"])'); if(b) b.click(); } });
+document.getElementById('searchX').onclick=()=>{ searchEl.value=''; applySpotFilter(); searchEl.focus(); };
 document.getElementById('menuBtn').onclick=()=>document.getElementById('panel').classList.toggle('hidden');
 document.getElementById('panelClose').onclick=()=>document.getElementById('panel').classList.add('hidden');
 if(innerWidth<=760) document.getElementById('panel').classList.add('hidden');
@@ -1009,11 +1031,10 @@ window.setLoad(45,T('sbReady'));
 (function(){ const tick=()=>{ const el=document.getElementById('sbClock'); if(el){ try{ el.textContent=T('tokyo')+' '+new Intl.DateTimeFormat(LOCALES[LANG],{timeZone:'Asia/Tokyo',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date()); }catch(e){} } }; window.__tickClock=tick; tick(); setInterval(tick, 30000); })();
 
 const FAVS=new Set((()=>{ try{ return JSON.parse(localStorage.getItem('tt_favs')||'[]'); }catch(e){ return []; } })());
-function paintFavs(){ document.querySelectorAll('.spot').forEach(b=>b.classList.toggle('fav', FAVS.has(b.dataset.sid))); }
-paintFavs();
+function paintFavs(){ buildSpotList(); applySpotFilter(); }
 let favOnlyOn=false;
-document.getElementById('favOnly').onclick=e=>{ favOnlyOn=!favOnlyOn; e.currentTarget.classList.toggle('on', favOnlyOn);
-  document.querySelectorAll('.spot').forEach(b=>{ b.style.display=(favOnlyOn&&!FAVS.has(b.dataset.sid))?'none':''; }); };
+document.getElementById('favOnly').onclick=e=>{ favOnlyOn=!favOnlyOn; e.currentTarget.classList.toggle('on', favOnlyOn); applySpotFilter(); };
+paintFavs();
 
 const SHEET_STATES=['hide','peek','half','full']; let sheetState='peek';
 function setSheet(st){ sheetState=st; infoEl.classList.remove('st-peek','st-half','st-full','st-hide'); infoEl.classList.add('st-'+st);
@@ -1316,8 +1337,9 @@ async function applyLang(l){ LANG=l; try{ localStorage.setItem('tt_lang', l); }c
   const setT=(id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
   setT('brandEl',T('brand')); setT('ldLogo',T('brand')); setT('subEl',T('subtitle'));
   setT('menuBtn',T('menu')); setT('homeBtn',T('home')); setT('rotateBtn',T('rotate'));
-  setT('hSetT',T('settings')); setT('hWxT',T('wxTitle')); setT('hSearchT',T('search')); setT('hSpotsT',T('spotsTitle')); setT('hToursT',T('toursTitle')); setT('hAreasT',T('areasTitle')); setT('hAboutT',T('aboutTitle'));
+  setT('hSetT',T('settings')); setT('hWxT',T('wxTitle')); setT('hSpotsT',T('spotsTitle')); setT('hToursT',T('toursTitle')); setT('hAreasT',T('areasTitle')); setT('hAboutT',T('aboutTitle'));
   const si=document.getElementById('search'); if(si) si.placeholder=T('searchPh');
+  buildSpotList(); applySpotFilter();
   setT('favOnly',T('favOnly')); setT('discEl',T('disclaimer'));
   const ab=document.getElementById('aboutEl'); if(ab) ab.innerHTML=T('aboutHtml');
   paintVisit();
