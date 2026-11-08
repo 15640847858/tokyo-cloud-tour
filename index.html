@@ -96,6 +96,8 @@
   #spSearchX{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;border:none;background:rgba(255,255,255,.14);color:#e8e2d2;font-size:12px;line-height:1;cursor:pointer;display:none;padding:0}
   #spSearchX.on{display:block}
   #tourModal .spBox{height:auto;max-height:93dvh}
+  #discEl{font-size:11px;line-height:1.6;color:rgba(219,231,245,.55);text-align:left;margin:10px 2px 0}
+  #discEl::before{content:'※ ';color:#e6c887;font-weight:700}
   .spotGrp{font-size:11px;font-weight:700;letter-spacing:.14em;color:rgba(230,200,135,.78);margin:12px 2px 7px}
   .spotGrpWrap:first-child .spotGrp{margin-top:0}
   #search::placeholder{color:rgba(255,255,255,.55)}
@@ -513,7 +515,7 @@ header #langMenu{right:auto;min-width:172px}
 
 <script src="i18n_ui.js"></script><script src="narr_ui.js"></script><script src="news.js"></script>
 <script type="module">
-const BUILD='20261108.36';
+const BUILD='20261108.37';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Sky } from 'three/addons/objects/Sky.js';
