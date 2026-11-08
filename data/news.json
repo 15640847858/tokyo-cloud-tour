@@ -1,0 +1,49 @@
+{
+ "date": "2026-11-08",
+ "updated": "15:49",
+ "items": [
+  {
+   "id": "nhk-1",
+   "level": "news",
+   "cat": null,
+   "title": "東京五輪 競泳銀の本多灯選手 危険運転傷害の罪で在宅起訴",
+   "desc": "",
+   "source": "NHK",
+   "time": "08-07 19:53",
+   "spotId": null,
+   "url": "http://www3.nhk.or.jp/news/html/20260807/k10015199211000.html",
+   "expires": null
+  },
+  {
+   "id": "nhk-2",
+   "level": "news",
+   "cat": null,
+   "title": "東京都の最低賃金 10月から時給1280円に引き上げへ",
+   "desc": "",
+   "source": "NHK",
+   "time": "08-05 19:03",
+   "spotId": null,
+   "url": "http://www3.nhk.or.jp/news/html/20260805/k10015197351000.html",
+   "expires": null
+  },
+  {
+   "id": "nhk-3",
+   "level": "news",
+   "cat": null,
+   "title": "東京 多摩動物公園 ライオン3頭が相次ぎ死ぬ 熱中症か",
+   "desc": "",
+   "source": "NHK",
+   "time": "08-03 22:50",
+   "spotId": null,
+   "url": "http://www3.nhk.or.jp/news/html/20260803/k10015195441000.html",
+   "expires": null
+  }
+ ],
+ "yesterday": [],
+ "notes": [
+  "JMA: 东京地方当前无发表中的警报/注意报（数据时间 2026-05-28T10:16:00+09:00），不生成气象条目",
+  "NHK: 东京相关头条 3 条",
+  "JR东日本: 抓取失败（HTTP Error 403: Forbidden），traffic 留空，不编造",
+  "晴空塔: 活动页未可靠匹配到今日点灯日程，跳过不编造"
+ ]
+}

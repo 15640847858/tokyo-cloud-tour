@@ -497,9 +497,9 @@ header #langMenu{right:auto;min-width:172px}
 <div id="bldgStatus">正在加载真实建筑数据…</div>
 <div id="hint">拖动旋转 · 滚轮缩放 · 点击景点查看介绍</div>
 
-<script src="i18n_ui.js"></script><script src="narr_ui.js"></script>
+<script src="i18n_ui.js"></script><script src="narr_ui.js"></script><script src="news.js"></script>
 <script type="module">
-const BUILD='20261108.33';
+const BUILD='20261108.34';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Sky } from 'three/addons/objects/Sky.js';
@@ -1400,7 +1400,7 @@ async function applyLang(l){ LANG=l; try{ localStorage.setItem('tt_lang', l); }c
   const tp1=document.getElementById('tbPrev'); if(tp1) tp1.textContent=T('tbPrev');
   const tp2=document.getElementById('tbNext'); if(tp2) tp2.textContent=T('tbNext');
   const tp3=document.getElementById('tbExit'); if(tp3) tp3.textContent=T('tbExit');
-  renderTourBtns(); renderAreas(); renderSpotList(); paintWxBtn(); paintGroundBtn(); paintBgmBtn(); paintCardBtn(); paintHomeLine(); renderGoshuin(); try{ paintGuideBtn(); if(window.__gd&&window.__gd.open) paintGuide(); }catch(e){}
+  renderTourBtns(); renderAreas(); renderSpotList(); paintWxBtn(); paintGroundBtn(); paintBgmBtn(); paintCardBtn(); paintHomeLine(); renderGoshuin(); if(window.TokyoNews) TokyoNews.paint(); try{ paintGuideBtn(); if(window.__gd&&window.__gd.open) paintGuide(); }catch(e){}
   await ensureContent();
   Object.keys(SPOT_GROUPS).forEach(id=>{ const g=SPOT_GROUPS[id], sp=g.userData.spot, lb=g.userData.labelSprite; if(sp&&lb){ const nl=label(sName(sp),0.95); lb.material.map=nl.material.map; lb.material.needsUpdate=true; lb.scale.copy(nl.scale); } });
   if(window.__tickClock) window.__tickClock();
@@ -1432,6 +1432,14 @@ syncLangBtn();
 layoutControls();
 document.getElementById('langSel').addEventListener('change', e=>{ applyLang(e.target.value); syncLangBtn(); });
 setAudioT(T); applyLang(LANG); syncLangBtn();
+
+/* 「今日东京」每日告示：独立模块 news.js，加载失败不影响其他功能 */
+if(window.TokyoNews) TokyoNews.init({
+  T:T, lang:()=>LANG,
+  spotPos:id=>{ const g=pickables.find(v=>v.userData.spot&&v.userData.spot.id===id); if(!g) return null; const s=g.userData.spot; return {x:g.position.x, z:g.position.z, h:((s.h||12)+3)*(g.scale?g.scale.x:1)}; },
+  flySpot:id=>{ const sp=allSpotsMap()[id]; if(!sp) return; selectGroup(SPOT_GROUPS[id]||sp); showInfo(sp); if(innerWidth<=760){ const p=document.getElementById('panel'); if(p) p.classList.add('hidden'); } },
+  project:(x,y,z)=>{ const v=new THREE.Vector3(x,y,z).project(camera); return {x:(v.x*0.5+0.5)*innerWidth, y:(-v.y*0.5+0.5)*innerHeight, visible:v.z<1}; }
+});
 
 animate();
 

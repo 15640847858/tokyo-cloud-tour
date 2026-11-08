@@ -57,7 +57,7 @@ for _blob, _dg in ((info, digest), (info2, digest2)):
 
 # extra static assets (e.g. user-supplied photos) deployed alongside the site;
 # each must be uploaded by digest and referenced in every deployment
-ASSETS = [("data/kaedena.jpg", "kaedena.jpg"), ("data/favicon.svg", "favicon.svg"), ("data/apple-touch-icon.png", "apple-touch-icon.png"), ("data/favicon-32.png", "favicon-32.png"), ("data/torii_quaternius.glb", "torii_quaternius.glb")]
+ASSETS = [("data/kaedena.jpg", "kaedena.jpg"), ("data/favicon.svg", "favicon.svg"), ("data/apple-touch-icon.png", "apple-touch-icon.png"), ("data/favicon-32.png", "favicon-32.png"), ("data/torii_quaternius.glb", "torii_quaternius.glb"), ("data/news.json", "news.json")]
 # i18n: UI dictionary script + per-language content files (globbed so new
 # languages are picked up automatically; each must stay under ~95KB)
 import glob as _glob
@@ -82,7 +82,7 @@ for src, name in ASSETS:
 # inline deployment payload hit the argv cap); each minified + uploaded by
 # digest like info.json, each kept under the ~95KB upload cap
 files_extra = []
-for _src, _name in (("builders_src.js", "builders.js"), ("builders2_src.js", "builders2.js"), ("airports_src.js", "airports.js"), ("audio_src.js", "audio.js")):
+for _src, _name in (("builders_src.js", "builders.js"), ("builders2_src.js", "builders2.js"), ("airports_src.js", "airports.js"), ("audio_src.js", "audio.js"), ("news_src.js", "news.js")):
     subprocess.run(["npx", "-y", "esbuild@0.20.2", str(base / _src), "--minify", "--charset=utf8",
                     "--outfile=/tmp/mod_min.js"], check=True, capture_output=True, text=True)
     subprocess.run(["node", "--check", "/tmp/mod_min.js"], check=True)

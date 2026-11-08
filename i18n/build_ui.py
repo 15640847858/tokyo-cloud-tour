@@ -323,6 +323,13 @@ STR["en"].update({"playClassic":"Start: daytime, clear skies — the camera flie
 STR["ko"].update({"playClassic":"시작 재생: 낮·맑음, 카메라가 정거장마다 날아갑니다","playTrendy":"시작 재생 (황혼으로 자동 전환)","playCulture":"시작 재생 (낮 · 설경)"})
 STR["hi"].update({"playClassic":"शुरू करें: दिन · साफ़, कैमरा हर स्टॉप पर उड़ता है","playTrendy":"शुरू करें (संध्या में स्वतः बदलता है)","playCulture":"शुरू करें (दिन · बर्फ़ का दृश्य)"})
 
+# --- 今日东京 daily news bulletin (added 2026-11-08) ---
+STR["zh"].update({"newsTitle":"今日东京","newsUpdated":"更新 {t}","newsFly":"飞过去","newsYesterday":"昨日东京","newsCountFmt":"共 {n} 条","newsLv_alert":"警报","newsLv_traffic":"交通","newsLv_event":"今日限定","newsLv_news":"大事","newsFlash":"快讯","newsEmpty":"今日暂无告示","newsItemsFmt":"{n} 条告示"})
+STR["ja"].update({"newsTitle":"今日の東京","newsUpdated":"{t} 更新","newsFly":"飛んでいく","newsYesterday":"昨日の東京","newsCountFmt":"全 {n} 件","newsLv_alert":"警報","newsLv_traffic":"交通","newsLv_event":"本日限定","newsLv_news":"ニュース","newsFlash":"速報","newsEmpty":"本日のお知らせはありません","newsItemsFmt":"{n} 件のお知らせ"})
+STR["en"].update({"newsTitle":"Tokyo Today","newsUpdated":"Updated {t}","newsFly":"Fly there","newsYesterday":"Tokyo Yesterday","newsCountFmt":"{n} notices","newsLv_alert":"Alert","newsLv_traffic":"Transit","newsLv_event":"Today only","newsLv_news":"News","newsFlash":"Bulletin","newsEmpty":"No notices today","newsItemsFmt":"{n} notices"})
+STR["ko"].update({"newsTitle":"오늘의 도쿄","newsUpdated":"{t} 업데이트","newsFly":"날아가기","newsYesterday":"어제의 도쿄","newsCountFmt":"총 {n}건","newsLv_alert":"경보","newsLv_traffic":"교통","newsLv_event":"오늘 한정","newsLv_news":"뉴스","newsFlash":"속보","newsEmpty":"오늘은 공지가 없습니다","newsItemsFmt":"공지 {n}건"})
+STR["hi"].update({"newsTitle":"आज का टोक्यो","newsUpdated":"{t} अपडेट","newsFly":"उड़कर जाएँ","newsYesterday":"कल का टोक्यो","newsCountFmt":"कुल {n} सूचनाएँ","newsLv_alert":"चेतावनी","newsLv_traffic":"यातायात","newsLv_event":"केवल आज","newsLv_news":"समाचार","newsFlash":"बुलेटिन","newsEmpty":"आज कोई सूचना नहीं","newsItemsFmt":"{n} सूचनाएँ"})
+
 # split narration scripts (narr_<spotid>) out of STR into a separate file
 IDS_SET = set(IDS)
 NARR = {}
