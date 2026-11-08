@@ -499,7 +499,7 @@ header #langMenu{right:auto;min-width:172px}
 
 <script src="i18n_ui.js"></script><script src="narr_ui.js"></script>
 <script type="module">
-const BUILD='20261108.32';
+const BUILD='20261108.33';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Sky } from 'three/addons/objects/Sky.js';
@@ -1217,7 +1217,6 @@ function narrVoiceTap(){ narrOn=!narrOn; try{ localStorage.setItem('tt_narr', na
 try{ setAudioOnHook(()=>{ if(narrOn){ narrOn=false; try{ localStorage.setItem('tt_narr','0'); }catch(e){} narrCancel(); paintNarr(); } }); }catch(e){}
 try{ const _as=audioGetState(); if(narrOn&&(_as.bgm||_as.amb)){ narrOn=false; try{ localStorage.setItem('tt_narr','0'); }catch(e){} } }catch(e){}
 paintNarr();
-(function(){ const bar=document.getElementById('tourbar'); if(!bar) return; let lV=0; bar.addEventListener('pointerdown',e=>{ const t=e.target; if(!t||!t.id||t.id!=='tbVoice') return; const n=Date.now(); if(n-lV<650) return; lV=n; t.classList.add('tbHit'); setTimeout(()=>t.classList.remove('tbHit'),220); narrVoiceTap(); },true); })();
 function tourPauseRead(){ if(TOUR && TOUR.playing){ TOUR.playing=false; TOUR.readPause=true; TOUR.tAcc=0; const bp=document.getElementById('tbPlay'); if(bp) bp.textContent=T('resume'); } }
 function tourResumeRead(){ if(TOUR && TOUR.readPause){ TOUR.readPause=false; TOUR.playing=true; TOUR.tAcc=0; TOUR.stopAt=Date.now(); if(NARR.doneAt) NARR.doneAt=Date.now(); const bp=document.getElementById('tbPlay'); if(bp) bp.textContent=T('pause'); } }
 window.tickTour=dt=>{ if(!TOUR||!tourCurve) return; TOUR.dotU=(TOUR.dotU+dt*0.03)%1; dayDot.position.copy(tourCurve.getPointAt(TOUR.dotU));
@@ -1228,6 +1227,7 @@ document.getElementById('tbPrev').onclick=()=>goStop((TOUR?TOUR.idx:0)-1);
 document.getElementById('tbNext').onclick=()=>goStop((TOUR?TOUR.idx:0)+1);
 document.getElementById('tbExit').onclick=()=>stopTour();
 document.getElementById('tbPlay').onclick=e=>{ if(!TOUR) return; TOUR.readPause=false; if(!TOUR.playing&&TOUR.idx>=TOUR.ids.length-1){ goStop(0); TOUR.playing=true; e.currentTarget.textContent=T('pause'); narrResume(); return; } TOUR.playing=!TOUR.playing; e.currentTarget.textContent=TOUR.playing?T('pause'):T('resume'); if(TOUR.playing) narrResume(); else narrPause(); };
+document.getElementById('tbVoice').onclick=e=>{ const b=e.currentTarget; b.classList.add('tbHit'); setTimeout(()=>b.classList.remove('tbHit'),220); narrVoiceTap(); }; /* narration toggle MUST be a real click: on iOS Safari a speak() issued from a pointerdown-capture handler (the old tourbar delegation) or a bare timer is silently dropped, while the click path (same as tbPlay's pause/resume, the user's known workaround) is accepted and unlocks later timer speaks */
 setPeek(T('welcome'),T('welcomeSub'), null);
 // ===== 欢迎提示 Toast：首屏不常驻欢迎卡，加载完成后轻提示问候，数秒自动消失，任意操作立即消失 =====
 infoEl.style.display='none';
