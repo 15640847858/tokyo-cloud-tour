@@ -85,16 +85,17 @@
   #favOnly{flex:none}
   #spotHits{font-size:12px;color:#e6c887;margin:0 2px 8px;display:none}
   #spotQuick{display:none;flex-wrap:wrap;gap:6px;margin-bottom:10px}
-  #spModal{position:fixed;inset:0;background:rgba(5,10,20,.74);display:none;align-items:center;justify-content:center;z-index:60;padding:10px}
+  #spModal,#tourModal{position:fixed;inset:0;background:rgba(5,10,20,.74);display:none;align-items:center;justify-content:center;z-index:60;padding:10px}
   .spBox{width:min(96vw,560px);height:min(93dvh,780px);display:flex;flex-direction:column;background:rgba(15,25,45,.96);border:1px solid rgba(230,200,135,.35);border-radius:16px;padding:12px;backdrop-filter:blur(14px);box-sizing:border-box}
   .spBox h3{color:#e6c887;margin:0;font-size:16.5px}
-  #spClose{width:34px;height:34px;border-radius:0;font-size:18px;flex:none;background:none!important;background-color:transparent!important;border:none!important;box-shadow:none!important;color:#e6c887;font-weight:700;text-shadow:0 1px 7px rgba(0,0,0,.65);cursor:pointer;line-height:1;padding:0}
+  #spClose,#tourClose{width:34px;height:34px;border-radius:0;font-size:18px;flex:none;background:none!important;background-color:transparent!important;border:none!important;box-shadow:none!important;color:#e6c887;font-weight:700;text-shadow:0 1px 7px rgba(0,0,0,.65);cursor:pointer;line-height:1;padding:0}
   #spModal #spots{flex:1;min-height:0;overflow-y:auto;padding-right:2px}
   #spSearch{width:100%;padding:8px 11px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:#fff;font-size:13px;outline:none;box-sizing:border-box}
   .searchWrap #spSearch{margin-bottom:0;padding-right:32px}
   #spSearch::placeholder{color:rgba(255,255,255,.55)}
   #spSearchX{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;border:none;background:rgba(255,255,255,.14);color:#e8e2d2;font-size:12px;line-height:1;cursor:pointer;display:none;padding:0}
   #spSearchX.on{display:block}
+  #tourModal .spBox{height:auto;max-height:93dvh}
   .spotGrp{font-size:11px;font-weight:700;letter-spacing:.14em;color:rgba(230,200,135,.78);margin:12px 2px 7px}
   .spotGrpWrap:first-child .spotGrp{margin-top:0}
   #search::placeholder{color:rgba(255,255,255,.55)}
@@ -494,7 +495,7 @@ header #langMenu{right:auto;min-width:172px}
   <div class="pScroll"><section class="mod" id="setMod"><h2 id="hSetT">设置</h2><div class="setGrid" id="setGrid"></div></section>
   <section class="mod"><h2 id="hWxT">实时天气 · 东京</h2><div id="wxBody">正在获取天气…</div><div id="wxHomeLine"></div></section>
   <section class="mod"><h2 id="hSpotsT">景点介绍</h2><div class="spotTools"><div class="searchWrap"><input id="search" type="text" placeholder="搜索景点，如：迪士尼 / 银座"><button id="searchX" aria-label="clear">✕</button></div></div><div id="spotHits"></div><div id="spotQuick"></div><button id="spOpen" class="route"><b id="spOpenB">全部景点</b><small id="spOpenS"></small></button></section>
-  <section class="mod"><h2 id="hToursT">精选玩法</h2><button id="daytripBtn" class="route"><b>东京经典一日游</b>：谷中银座 → 浅草寺 → 东京晴空塔 → 上野公园 → 秋叶原 → 皇居 → 东京站 → 银座<small>开始播放（白天·晴）</small></button><button class="route" data-tour="trendy"><b>东京潮流之旅</b>：池袋 → 新宿 → 原宿 → 明治神宫 → 涩谷 → 六本木 → 东京塔 → 品川<small>开始播放（黄昏）</small></button><button class="route" data-tour="night"><b>东京夜景之旅</b>：国立竞技场 → 东京巨蛋 → 丰洲市场 → teamLab → 台场 → 横滨 → 稻城 → 迪士尼<small>开始播放（自动切换夜晚）</small></button><button class="route" data-tour="culture"><b>东京文化之旅</b>：东京大学 → 早稻田大学 → 吉祥寺 → 吉卜力美术馆 → 川越 → 春日部 → 富士山 → 镰仓高校前<small>开始播放（白天·雪景）</small></button><p class="about" id="discEl">路线与机场线路均为示意：地图距离经过压缩，仅用于可视化，不能作为实际导航距离；时间与票价为参考值。</p></section>
+  <section class="mod"><h2 id="hToursT">精选玩法</h2><button id="tourOpen" class="route"><b id="tourOpenB">精选玩法</b><small id="tourOpenS"></small></button></section>
   <section class="mod"><h2 id="hGsT">御朱印护照</h2><p class="about" id="gsProg">已收集 0/24</p><button id="gsOpen" class="route"><b id="gsOpenB">打开护照</b><small id="gsOpenS">打开景点卡点「盖御朱印」，集齐 24 处朱印</small></button></section>
   <section class="mod"><h2 id="hAreasT">区域聚焦</h2><div class="areaBtns" id="areaBtns"></div></section>
   <section class="mod"><h2 id="hAboutT">关于云游东京</h2><p class="about" id="visitLine"></p><p class="about" id="aboutEl">真实地图与建筑数据来自 OpenStreetMap：市中心 14,000 栋建筑按真实轮廓生成，景点周边只保留高楼地标。景点照片来自 Wikimedia Commons，作者与授权标注在介绍卡内。<br>地图 © OpenStreetMap contributors<br>卫星影像 © Esri, Maxar, Earthstar Geographics<br>天空：three.js 官网示例 Sky</p><p class="about" id="modelCredit">明治神宫鸟居模型：Quaternius，CC0（经 Poly Pizza 取得）</p></section></div></aside>
@@ -504,6 +505,7 @@ header #langMenu{right:auto;min-width:172px}
 <div id="cfModal"><div class="cfBox"><p id="cfMsg"></p><div class="cfBtns"><button id="cfCancel" class="cfBtn"></button><button id="cfOk" class="cfBtn danger"></button></div></div></div>
 <div id="gsModal"><div class="gsBox"><div class="gsHead"><h3 id="gsTitle">御朱印护照</h3><button id="gsClose" aria-label="close">×</button></div><p class="gsSub" id="gsSub"></p><div class="gsGrid" id="gsGrid"></div></div></div>
 <div id="spModal"><div class="spBox"><div class="gsHead"><h3 id="spTitle">景点介绍</h3><button id="spClose" aria-label="close">×</button></div><div class="spotTools" style="margin-top:10px"><div class="searchWrap"><input id="spSearch" type="text" placeholder="搜索景点，如：迪士尼 / 银座"><button id="spSearchX" aria-label="clear">✕</button></div><button id="favOnly" class="chip">只看收藏 ★</button></div><div id="spots"></div></div></div>
+<div id="tourModal"><div class="spBox"><div class="gsHead"><h3 id="tourTitle">精选玩法</h3><button id="tourClose" aria-label="close">×</button></div><div style="margin-top:10px"><button id="daytripBtn" class="route"><b>东京经典一日游</b>：谷中银座 → 浅草寺 → 东京晴空塔 → 上野公园 → 秋叶原 → 皇居 → 东京站 → 银座<small>开始播放（白天·晴）</small></button><button class="route" data-tour="trendy"><b>东京潮流之旅</b>：池袋 → 新宿 → 原宿 → 明治神宫 → 涩谷 → 六本木 → 东京塔 → 品川<small>开始播放（黄昏）</small></button><button class="route" data-tour="night"><b>东京夜景之旅</b>：国立竞技场 → 东京巨蛋 → 丰洲市场 → teamLab → 台场 → 横滨 → 稻城 → 迪士尼<small>开始播放（自动切换夜晚）</small></button><button class="route" data-tour="culture"><b>东京文化之旅</b>：东京大学 → 早稻田大学 → 吉祥寺 → 吉卜力美术馆 → 川越 → 春日部 → 富士山 → 镰仓高校前<small>开始播放（白天·雪景）</small></button><p class="about" id="discEl">路线与机场线路均为示意：地图距离经过压缩，仅用于可视化，不能作为实际导航距离；时间与票价为参考值。</p></div></div></div>
 <div id="gsEdit"><div class="geBox"><div id="gsEditStamp"></div><input id="gsNoteIn" maxlength="24" autocomplete="off"><div class="geRow"><button id="gsSaveBtn">保存</button><button id="gsDelBtn">删除这枚章</button></div><button id="gsEditClose" aria-label="close">×</button></div></div>
 <div id="sheetShade"></div><section id="info"><div id="sheetHandle"></div><div id="sheetPeek"></div><button id="cardCollapse" aria-label="收起">⌄</button><button id="cardX" aria-label="关闭">×</button><div id="stampFx"></div><div id="infoBody"><h3>欢迎云游东京</h3><p>拖动旋转、滚轮缩放。点击地图上的立体景点查看介绍，地图上彩色的发光线路是机场进城的推荐走法，线路上的光点是列车前进的方向。</p><div class="meta">成田机场距离已压缩显示，否则市中心景点会小得看不清。</div></div></section>
 <div id="bldgStatus">正在加载真实建筑数据…</div>
@@ -511,7 +513,7 @@ header #langMenu{right:auto;min-width:172px}
 
 <script src="i18n_ui.js"></script><script src="narr_ui.js"></script><script src="news.js"></script>
 <script type="module">
-const BUILD='20261108.35';
+const BUILD='20261108.36';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Sky } from 'three/addons/objects/Sky.js';
@@ -1205,6 +1207,7 @@ function goStop(i){ if(!TOUR) return; TOUR.idx=Math.max(0, Math.min(TOUR.ids.len
   document.getElementById('tbProgFill').style.width=((TOUR.idx+1)/TOUR.ids.length*100)+'%';
   narrCancel(); narrSchedule(sp.id); paintNarrText(sp.id); paintNarr(); }
 function startTour(key){ const TT=TOURS[key]; if(!TT) return;
+  const _tm=document.getElementById('tourModal'); if(_tm) _tm.style.display='none';
   document.getElementById('panel').classList.add('hidden');
   const _pw=(TOUR&&TOUR.savedWx!==undefined)?TOUR.savedWx:null; TOUR={key, ids:TT.ids, idx:0, playing:true, tAcc:0, dotU:0};
   tourCurve=tourPts(TT.ids); dayTube.geometry.dispose(); dayTube.geometry=new THREE.TubeGeometry(tourCurve,120,0.3,8);
@@ -1214,7 +1217,7 @@ function startTour(key){ const TT=TOURS[key]; if(!TT) return;
   document.querySelectorAll('[data-tour],#daytripBtn').forEach(b=>b.classList.toggle('active', (key==='classic'&&b.id==='daytripBtn')||b.dataset.tour===key));
   goStop(0); if(narrOn&&narrSupported&&!NARR.unlocked){ clearTimeout(NARR.timer); NARR.pending=false; narrSpeakNow(TOUR.ids[0]); } paintNarr(); }
 function stopTour(){ narrCancel(); if(TOUR&&TOUR.savedWx!==undefined){ wxMode=TOUR.savedWx; renderWeatherFx(); paintWxBtn(); } TOUR=null; tourCurve=null; applyDpMode(); dayTube.visible=false; dayDot.visible=false; tourbar.style.display='none'; tourbar.style.bottom=''; tourbar.style.visibility='';
-  document.querySelectorAll('[data-tour],#daytripBtn').forEach(b=>b.classList.remove('active')); }
+  document.querySelectorAll('[data-tour],#daytripBtn').forEach(b=>b.classList.remove('active')); const _tm2=document.getElementById('tourModal'); if(_tm2) _tm2.style.display='none'; }
 
 /* ===== tour narration (SpeechSynthesis, added 2026-11-08) ===== */
 const NARR={gen:0, speaking:false, paused:false, pending:false, curId:null, timer:0, diag:'', doneAt:0, voiceName:'', unlocked:false, retried:false, warmed:false, spokeAt:0};
@@ -1248,6 +1251,11 @@ window.tickTour=dt=>{ if(!TOUR||!tourCurve) return; TOUR.dotU=(TOUR.dotU+dt*0.03
   if(TOUR.playing){ const _due=(narrOn&&narrSupported) ? (!!NARR.doneAt && Date.now()-NARR.doneAt>=2000) : (Date.now()-(TOUR.stopAt||Date.now())>=3000); if(_due){ if(TOUR.idx<TOUR.ids.length-1) goStop(TOUR.idx+1); else { TOUR.playing=false; document.getElementById('tbPlay').textContent=T('replay'); } } } };
 document.getElementById('daytripBtn').onclick=()=>{ if(TOUR&&TOUR.key==='classic') stopTour(); else startTour('classic'); };
 document.querySelectorAll('[data-tour]').forEach(b=>{ b.onclick=()=>{ const k=b.dataset.tour; if(TOUR&&TOUR.key===k) stopTour(); else startTour(k); }; });
+function paintTourEntry(){ const b=document.getElementById('tourOpenB'); if(b) b.textContent=T('toursTitle'); const s2=document.getElementById('tourOpenS'); if(s2) s2.textContent=T('tourOpenSub'); const tt=document.getElementById('tourTitle'); if(tt) tt.textContent=T('toursTitle'); }
+document.getElementById('tourOpen').onclick=()=>{ document.getElementById('tourModal').style.display='flex'; };
+document.getElementById('tourClose').onclick=()=>{ document.getElementById('tourModal').style.display='none'; };
+document.getElementById('tourModal').addEventListener('click', e=>{ if(e.target.id==='tourModal') e.currentTarget.style.display='none'; });
+paintTourEntry();
 document.getElementById('tbPrev').onclick=()=>goStop((TOUR?TOUR.idx:0)-1);
 document.getElementById('tbNext').onclick=()=>goStop((TOUR?TOUR.idx:0)+1);
 document.getElementById('tbExit').onclick=()=>stopTour();
@@ -1408,7 +1416,7 @@ async function applyLang(l){ LANG=l; try{ localStorage.setItem('tt_lang', l); }c
   const setT=(id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
   setT('brandEl',T('brand')); setT('ldLogo',T('brand')); setT('subEl',T('subtitle'));
   setT('menuBtn',T('menu')); setT('homeBtn',T('home')); setT('rotateBtn',T('rotate'));
-  setT('hSetT',T('settings')); setT('hWxT',T('wxTitle')); setT('hSpotsT',T('spotsTitle')); setT('hToursT',T('toursTitle')); setT('hAreasT',T('areasTitle')); setT('hAboutT',T('aboutTitle'));
+  setT('hSetT',T('settings')); setT('hWxT',T('wxTitle')); setT('hSpotsT',T('spotsTitle')); setT('hToursT',T('toursTitle')); setT('hAreasT',T('areasTitle')); setT('hAboutT',T('aboutTitle')); paintTourEntry();
   const si=document.getElementById('search'); if(si) si.placeholder=T('searchPh');
   const si2=document.getElementById('spSearch'); if(si2) si2.placeholder=T('searchPh');
   const spt=document.getElementById('spTitle'); if(spt) spt.textContent=T('spotsTitle');
