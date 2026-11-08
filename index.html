@@ -84,6 +84,17 @@
   #searchX.on{display:block}
   #favOnly{flex:none}
   #spotHits{font-size:12px;color:#e6c887;margin:0 2px 8px;display:none}
+  #spotQuick{display:none;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+  #spModal{position:fixed;inset:0;background:rgba(5,10,20,.74);display:none;align-items:center;justify-content:center;z-index:60;padding:10px}
+  .spBox{width:min(96vw,560px);height:min(93dvh,780px);display:flex;flex-direction:column;background:rgba(15,25,45,.96);border:1px solid rgba(230,200,135,.35);border-radius:16px;padding:12px;backdrop-filter:blur(14px);box-sizing:border-box}
+  .spBox h3{color:#e6c887;margin:0;font-size:16.5px}
+  #spClose{width:34px;height:34px;border-radius:0;font-size:18px;flex:none;background:none!important;background-color:transparent!important;border:none!important;box-shadow:none!important;color:#e6c887;font-weight:700;text-shadow:0 1px 7px rgba(0,0,0,.65);cursor:pointer;line-height:1;padding:0}
+  #spModal #spots{flex:1;min-height:0;overflow-y:auto;padding-right:2px}
+  #spSearch{width:100%;padding:8px 11px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:#fff;font-size:13px;outline:none;box-sizing:border-box}
+  .searchWrap #spSearch{margin-bottom:0;padding-right:32px}
+  #spSearch::placeholder{color:rgba(255,255,255,.55)}
+  #spSearchX{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;border:none;background:rgba(255,255,255,.14);color:#e8e2d2;font-size:12px;line-height:1;cursor:pointer;display:none;padding:0}
+  #spSearchX.on{display:block}
   .spotGrp{font-size:11px;font-weight:700;letter-spacing:.14em;color:rgba(230,200,135,.78);margin:12px 2px 7px}
   .spotGrpWrap:first-child .spotGrp{margin-top:0}
   #search::placeholder{color:rgba(255,255,255,.55)}
@@ -482,7 +493,7 @@ header #langMenu{right:auto;min-width:172px}
 <aside id="panel"><button id="panelClose" aria-label="关闭菜单">×</button>
   <div class="pScroll"><section class="mod" id="setMod"><h2 id="hSetT">设置</h2><div class="setGrid" id="setGrid"></div></section>
   <section class="mod"><h2 id="hWxT">实时天气 · 东京</h2><div id="wxBody">正在获取天气…</div><div id="wxHomeLine"></div></section>
-  <section class="mod"><h2 id="hSpotsT">景点介绍</h2><div class="spotTools"><div class="searchWrap"><input id="search" type="text" placeholder="搜索景点，如：迪士尼 / 银座"><button id="searchX" aria-label="clear">✕</button></div><button id="favOnly" class="chip">只看收藏 ★</button></div><div id="spotHits"></div><div id="spots"></div></section>
+  <section class="mod"><h2 id="hSpotsT">景点介绍</h2><div class="spotTools"><div class="searchWrap"><input id="search" type="text" placeholder="搜索景点，如：迪士尼 / 银座"><button id="searchX" aria-label="clear">✕</button></div></div><div id="spotHits"></div><div id="spotQuick"></div><button id="spOpen" class="route"><b id="spOpenB">全部景点</b><small id="spOpenS"></small></button></section>
   <section class="mod"><h2 id="hToursT">精选玩法</h2><button id="daytripBtn" class="route"><b>东京经典一日游</b>：谷中银座 → 浅草寺 → 东京晴空塔 → 上野公园 → 秋叶原 → 皇居 → 东京站 → 银座<small>开始播放（白天·晴）</small></button><button class="route" data-tour="trendy"><b>东京潮流之旅</b>：池袋 → 新宿 → 原宿 → 明治神宫 → 涩谷 → 六本木 → 东京塔 → 品川<small>开始播放（黄昏）</small></button><button class="route" data-tour="night"><b>东京夜景之旅</b>：国立竞技场 → 东京巨蛋 → 丰洲市场 → teamLab → 台场 → 横滨 → 稻城 → 迪士尼<small>开始播放（自动切换夜晚）</small></button><button class="route" data-tour="culture"><b>东京文化之旅</b>：东京大学 → 早稻田大学 → 吉祥寺 → 吉卜力美术馆 → 川越 → 春日部 → 富士山 → 镰仓高校前<small>开始播放（白天·雪景）</small></button><p class="about" id="discEl">路线与机场线路均为示意：地图距离经过压缩，仅用于可视化，不能作为实际导航距离；时间与票价为参考值。</p></section>
   <section class="mod"><h2 id="hGsT">御朱印护照</h2><p class="about" id="gsProg">已收集 0/24</p><button id="gsOpen" class="route"><b id="gsOpenB">打开护照</b><small id="gsOpenS">打开景点卡点「盖御朱印」，集齐 24 处朱印</small></button></section>
   <section class="mod"><h2 id="hAreasT">区域聚焦</h2><div class="areaBtns" id="areaBtns"></div></section>
@@ -492,6 +503,7 @@ header #langMenu{right:auto;min-width:172px}
 <div id="pcModal"><div class="pcBox"><img id="pcImg" alt="postcard"><div class="pcRow"><a id="pcSave" download="tokyo-postcard.png">保存图片</a><button id="pcClose" aria-label="close">×</button></div><p id="pcHint">也可以长按图片保存到相册</p></div></div>
 <div id="cfModal"><div class="cfBox"><p id="cfMsg"></p><div class="cfBtns"><button id="cfCancel" class="cfBtn"></button><button id="cfOk" class="cfBtn danger"></button></div></div></div>
 <div id="gsModal"><div class="gsBox"><div class="gsHead"><h3 id="gsTitle">御朱印护照</h3><button id="gsClose" aria-label="close">×</button></div><p class="gsSub" id="gsSub"></p><div class="gsGrid" id="gsGrid"></div></div></div>
+<div id="spModal"><div class="spBox"><div class="gsHead"><h3 id="spTitle">景点介绍</h3><button id="spClose" aria-label="close">×</button></div><div class="spotTools" style="margin-top:10px"><div class="searchWrap"><input id="spSearch" type="text" placeholder="搜索景点，如：迪士尼 / 银座"><button id="spSearchX" aria-label="clear">✕</button></div><button id="favOnly" class="chip">只看收藏 ★</button></div><div id="spots"></div></div></div>
 <div id="gsEdit"><div class="geBox"><div id="gsEditStamp"></div><input id="gsNoteIn" maxlength="24" autocomplete="off"><div class="geRow"><button id="gsSaveBtn">保存</button><button id="gsDelBtn">删除这枚章</button></div><button id="gsEditClose" aria-label="close">×</button></div></div>
 <div id="sheetShade"></div><section id="info"><div id="sheetHandle"></div><div id="sheetPeek"></div><button id="cardCollapse" aria-label="收起">⌄</button><button id="cardX" aria-label="关闭">×</button><div id="stampFx"></div><div id="infoBody"><h3>欢迎云游东京</h3><p>拖动旋转、滚轮缩放。点击地图上的立体景点查看介绍，地图上彩色的发光线路是机场进城的推荐走法，线路上的光点是列车前进的方向。</p><div class="meta">成田机场距离已压缩显示，否则市中心景点会小得看不清。</div></div></section>
 <div id="bldgStatus">正在加载真实建筑数据…</div>
@@ -499,7 +511,7 @@ header #langMenu{right:auto;min-width:172px}
 
 <script src="i18n_ui.js"></script><script src="narr_ui.js"></script><script src="news.js"></script>
 <script type="module">
-const BUILD='20261108.34';
+const BUILD='20261108.35';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Sky } from 'three/addons/objects/Sky.js';
@@ -770,11 +782,14 @@ function buildSpotList(){ if(!spotsEl) return; const byId={}; spots.forEach(sp=>
   grp('gFavs', spots.filter(sp=>FAVS.has(sp.id)).map(mkSpotBtn));
   SPOT_GROUPS_LIST.forEach(([key,ids])=>grp(key, ids.map(id=>byId[id]).filter(Boolean).map(mkSpotBtn)));
   const am=allSpotsMap(); grp('gAirport', ['hnd','nrt'].map(id=>am[id]).filter(Boolean).map(mkSpotBtn)); }
-function applySpotFilter(){ const inp=document.getElementById('search'); const q=(inp?inp.value:'').trim().toLowerCase(); const filtering=!!q||favOnlyOn; let n=0;
+let spotQ='';
+function applySpotFilter(){ const q=spotQ.trim().toLowerCase(); const filtering=!!q||favOnlyOn; let n=0;
   document.querySelectorAll('#spots .spotGrpWrap').forEach(w=>{ let c=0; w.querySelectorAll('.spot').forEach(b=>{ const vis=(!favOnlyOn||FAVS.has(b.dataset.sid))&&(!q||(b.dataset.names||b.textContent).toLowerCase().includes(q)); b.style.display=vis?'':'none'; if(vis){ c++; n++; } }); w.style.display=c?'':'none'; const h=w.querySelector('.spotGrp'); if(h) h.style.display=filtering?'none':''; });
   const hits=document.getElementById('spotHits'); if(hits){ hits.style.display=filtering?'block':'none'; if(filtering) hits.textContent=T('spotHits').replace('{n}',n); }
-  const sx=document.getElementById('searchX'); if(sx) sx.classList.toggle('on', !!q); }
-spotsEl.addEventListener('click', e=>{ const b=e.target.closest('.spot'); if(!b) return; const sp=allSpotsMap()[b.dataset.sid]; if(!sp) return; selectGroup(SPOT_GROUPS[sp.id]||sp); showInfo(sp); if(innerWidth<=760) document.getElementById('panel').classList.add('hidden'); });
+  const sx=document.getElementById('searchX'); if(sx) sx.classList.toggle('on', !!q);
+  const sx2=document.getElementById('spSearchX'); if(sx2) sx2.classList.toggle('on', !!q);
+  const qk=document.getElementById('spotQuick'); if(qk){ qk.innerHTML=''; if(q){ const seen=new Set(); document.querySelectorAll('#spots .spot').forEach(b=>{ if(b.style.display==='none'||seen.has(b.dataset.sid)||seen.size>=10) return; seen.add(b.dataset.sid); const c=document.createElement('button'); c.className='spot'; c.textContent=b.textContent; c.onclick=()=>b.click(); qk.appendChild(c); }); } qk.style.display=q?'flex':'none'; } }
+spotsEl.addEventListener('click', e=>{ const b=e.target.closest('.spot'); if(!b) return; const sp=allSpotsMap()[b.dataset.sid]; if(!sp) return; selectGroup(SPOT_GROUPS[sp.id]||sp); showInfo(sp); const sm=document.getElementById('spModal'); if(sm) sm.style.display='none'; if(innerWidth<=760) document.getElementById('panel').classList.add('hidden'); });
 
 const infoEl=document.getElementById('info');
 const infoBody=document.getElementById('infoBody');
@@ -898,9 +913,15 @@ function selectRoute(i){
 
 // 搜索、菜单、全景
 const searchEl=document.getElementById('search');
-searchEl.addEventListener('input', applySpotFilter);
-searchEl.addEventListener('keydown', e=>{ if(e.key==='Enter'){ const b=document.querySelector('#spots .spot:not([style*="none"])'); if(b) b.click(); } });
-document.getElementById('searchX').onclick=()=>{ searchEl.value=''; applySpotFilter(); searchEl.focus(); };
+const spSearchEl=document.getElementById('spSearch');
+function setSpotQ(v,src){ spotQ=v; if(src!==searchEl) searchEl.value=v; if(spSearchEl&&src!==spSearchEl) spSearchEl.value=v; applySpotFilter(); }
+searchEl.addEventListener('input', ()=>setSpotQ(searchEl.value, searchEl));
+if(spSearchEl) spSearchEl.addEventListener('input', ()=>setSpotQ(spSearchEl.value, spSearchEl));
+const spotEnter=e=>{ if(e.key==='Enter'){ const b=document.querySelector('#spots .spot:not([style*="none"])'); if(b) b.click(); } };
+searchEl.addEventListener('keydown', spotEnter);
+if(spSearchEl) spSearchEl.addEventListener('keydown', spotEnter);
+document.getElementById('searchX').onclick=()=>{ setSpotQ('', null); searchEl.focus(); };
+const spSearchXEl=document.getElementById('spSearchX'); if(spSearchXEl) spSearchXEl.onclick=()=>{ setSpotQ('', null); if(spSearchEl) spSearchEl.focus(); };
 document.getElementById('menuBtn').onclick=()=>document.getElementById('panel').classList.toggle('hidden');
 document.getElementById('panelClose').onclick=()=>document.getElementById('panel').classList.add('hidden');
 if(innerWidth<=760) document.getElementById('panel').classList.add('hidden');
@@ -1069,10 +1090,14 @@ window.setLoad(45,T('sbReady'));
 (function(){ const tick=()=>{ const el=document.getElementById('sbClock'); if(el){ try{ el.textContent=T('tokyo')+' '+new Intl.DateTimeFormat(LOCALES[LANG],{timeZone:'Asia/Tokyo',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date()); }catch(e){} } }; window.__tickClock=tick; tick(); setInterval(tick, 30000); })();
 
 const FAVS=new Set((()=>{ try{ return JSON.parse(localStorage.getItem('tt_favs')||'[]'); }catch(e){ return []; } })());
-function paintFavs(){ buildSpotList(); applySpotFilter(); }
+function paintFavs(){ buildSpotList(); applySpotFilter(); paintSpEntry(); }
 let favOnlyOn=false;
 document.getElementById('favOnly').onclick=e=>{ favOnlyOn=!favOnlyOn; e.currentTarget.classList.toggle('on', favOnlyOn); applySpotFilter(); };
+function paintSpEntry(){ const b=document.getElementById('spOpenB'); if(b) b.textContent=T('allSpots'); const s2=document.getElementById('spOpenS'); if(s2) s2.textContent=T('allSpotsSub').replace('{n}', spots.length+2)+(FAVS.size?' · ★ '+FAVS.size:''); }
 paintFavs();
+document.getElementById('spOpen').onclick=()=>{ document.getElementById('spModal').style.display='flex'; };
+document.getElementById('spClose').onclick=()=>{ document.getElementById('spModal').style.display='none'; };
+document.getElementById('spModal').addEventListener('click', e=>{ if(e.target.id==='spModal') e.currentTarget.style.display='none'; });
 
 const SHEET_STATES=['hide','peek','half','full']; let sheetState='peek';
 function setSheet(st){ sheetState=st; infoEl.classList.remove('st-peek','st-half','st-full','st-hide'); infoEl.classList.add('st-'+st);
@@ -1385,7 +1410,9 @@ async function applyLang(l){ LANG=l; try{ localStorage.setItem('tt_lang', l); }c
   setT('menuBtn',T('menu')); setT('homeBtn',T('home')); setT('rotateBtn',T('rotate'));
   setT('hSetT',T('settings')); setT('hWxT',T('wxTitle')); setT('hSpotsT',T('spotsTitle')); setT('hToursT',T('toursTitle')); setT('hAreasT',T('areasTitle')); setT('hAboutT',T('aboutTitle'));
   const si=document.getElementById('search'); if(si) si.placeholder=T('searchPh');
-  buildSpotList(); applySpotFilter();
+  const si2=document.getElementById('spSearch'); if(si2) si2.placeholder=T('searchPh');
+  const spt=document.getElementById('spTitle'); if(spt) spt.textContent=T('spotsTitle');
+  buildSpotList(); applySpotFilter(); paintSpEntry();
   setT('favOnly',T('favOnly')); setT('discEl',T('disclaimer'));
   const ab=document.getElementById('aboutEl'); if(ab) ab.innerHTML=T('aboutHtml');
   paintVisit();
