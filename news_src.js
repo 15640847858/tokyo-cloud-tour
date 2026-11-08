@@ -101,12 +101,12 @@ function injectCss(){
 
 function buildDom(){
   if($('newsModal')) return;
-  /* 面板入口（天气模块下方）：只在数据加载成功后显示 */
-  var wx=$('wxBody');
-  if(wx&&wx.closest('.mod')){
+  /* 面板入口（景点介绍模块上方）：只在数据加载成功后显示。锚点用景点模块——天气模块已移入弹窗，不能再作锚点 */
+  var spT=$('hSpotsT');
+  if(spT&&spT.closest('.mod')){
     var sec=document.createElement('section'); sec.className='mod'; sec.id='newsMod'; sec.style.display='none';
     sec.innerHTML='<button id="newsEntry" class="route" type="button"></button>';
-    wx.closest('.mod').after(sec);
+    spT.closest('.mod').before(sec);
     sec.querySelector('#newsEntry').addEventListener('click',function(){ openModal(); });
   }
   /* 快讯条 */
