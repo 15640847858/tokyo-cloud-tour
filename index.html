@@ -89,7 +89,8 @@
   .spBox{width:min(96vw,560px);height:min(93dvh,780px);display:flex;flex-direction:column;background:rgba(15,25,45,.96);border:1px solid rgba(230,200,135,.35);border-radius:16px;padding:12px;backdrop-filter:blur(14px);box-sizing:border-box}
   .spBox h3{color:#e6c887;margin:0;font-size:16.5px}
   #spClose,#tourClose,#wxClose,#areaClose{width:34px;height:34px;border-radius:0;font-size:18px;flex:none;background:none!important;background-color:transparent!important;border:none!important;box-shadow:none!important;color:#e6c887;font-weight:700;text-shadow:0 1px 7px rgba(0,0,0,.65);cursor:pointer;line-height:1;padding:0}
-  #spModal #spots{flex:1;min-height:0;overflow-y:auto;padding-right:2px}
+  #spModal #spScroll{flex:1;min-height:0;overflow-y:auto;padding-right:2px}
+  #spAreas{margin-top:4px}
   #spSearch{width:100%;padding:8px 11px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:#fff;font-size:13px;outline:none;box-sizing:border-box}
   .searchWrap #spSearch{margin-bottom:0;padding-right:32px}
   #spSearch::placeholder{color:rgba(255,255,255,.55)}
@@ -500,17 +501,15 @@ header #langMenu{right:auto;min-width:172px}
   <section class="mod"><h2 id="hSpotsT">景点介绍</h2><div class="spotTools"><div class="searchWrap"><input id="search" type="text" placeholder="搜索景点，如：迪士尼 / 银座"><button id="searchX" aria-label="clear">✕</button></div></div><div id="spotHits"></div><div id="spotQuick"></div><button id="spOpen" class="route"><b id="spOpenB">全部景点</b><small id="spOpenS"></small></button></section>
   <section class="mod"><h2 id="hToursT">精选玩法</h2><button id="tourOpen" class="route"><b id="tourOpenB">精选玩法</b><small id="tourOpenS"></small></button></section>
   <section class="mod"><h2 id="hGsT">御朱印护照</h2><p class="about" id="gsProg">已收集 0/24</p><button id="gsOpen" class="route"><b id="gsOpenB">打开护照</b><small id="gsOpenS">打开景点卡点「盖御朱印」，集齐 24 处朱印</small></button></section>
-  <section class="mod"><h2 id="hAreasT">区域聚焦</h2><button id="areaOpen" class="route"><b id="areaOpenB">区域聚焦</b><small id="areaOpenS"></small></button></section>
   <section class="mod"><h2 id="hAboutT">关于云游东京</h2><p class="about" id="visitLine"></p><p class="about" id="aboutEl">真实地图与建筑数据来自 OpenStreetMap：市中心 14,000 栋建筑按真实轮廓生成，景点周边只保留高楼地标。景点照片来自 Wikimedia Commons，作者与授权标注在介绍卡内。<br>地图 © OpenStreetMap contributors<br>卫星影像 © Esri, Maxar, Earthstar Geographics<br>天空：three.js 官网示例 Sky</p><p class="about" id="modelCredit">明治神宫鸟居模型：Quaternius，CC0（经 Poly Pizza 取得）</p></section></div></aside>
 <div id="flashFx"></div>
 <div id="statusbar"><span id="sbClock">东京 --:--</span><span id="sbWx"></span><span id="sbMode">白天</span></div><div id="tourbar"></div>
 <div id="pcModal"><div class="pcBox"><img id="pcImg" alt="postcard"><div class="pcRow"><a id="pcSave" download="tokyo-postcard.png">保存图片</a><button id="pcClose" aria-label="close">×</button></div><p id="pcHint">也可以长按图片保存到相册</p></div></div>
 <div id="cfModal"><div class="cfBox"><p id="cfMsg"></p><div class="cfBtns"><button id="cfCancel" class="cfBtn"></button><button id="cfOk" class="cfBtn danger"></button></div></div></div>
 <div id="gsModal"><div class="gsBox"><div class="gsHead"><h3 id="gsTitle">御朱印护照</h3><button id="gsClose" aria-label="close">×</button></div><p class="gsSub" id="gsSub"></p><div class="gsGrid" id="gsGrid"></div></div></div>
-<div id="spModal"><div class="spBox"><div class="gsHead"><h3 id="spTitle">景点介绍</h3><button id="spClose" aria-label="close">×</button></div><div class="spotTools" style="margin-top:10px"><div class="searchWrap"><input id="spSearch" type="text" placeholder="搜索景点，如：迪士尼 / 银座"><button id="spSearchX" aria-label="clear">✕</button></div><button id="favOnly" class="chip">只看收藏 ★</button></div><div id="spots"></div></div></div>
+<div id="spModal"><div class="spBox"><div class="gsHead"><h3 id="spTitle">景点介绍</h3><button id="spClose" aria-label="close">×</button></div><div class="spotTools" style="margin-top:10px"><div class="searchWrap"><input id="spSearch" type="text" placeholder="搜索景点，如：迪士尼 / 银座"><button id="spSearchX" aria-label="clear">✕</button></div><button id="favOnly" class="chip">只看收藏 ★</button></div><div id="spScroll"><div id="spots"></div><div id="spAreas"><div class="spotGrp" id="areaTitle">区域聚焦</div><div class="areaBtns" id="areaBtns"></div></div></div></div></div>
 <div id="tourModal"><div class="spBox"><div class="gsHead"><h3 id="tourTitle">精选玩法</h3><button id="tourClose" aria-label="close">×</button></div><div style="margin-top:10px"><button id="daytripBtn" class="route"><b>东京经典一日游</b>：谷中银座 → 浅草寺 → 东京晴空塔 → 上野公园 → 秋叶原 → 皇居 → 东京站 → 银座<small>开始播放（白天·晴）</small></button><button class="route" data-tour="trendy"><b>东京潮流之旅</b>：池袋 → 新宿 → 原宿 → 明治神宫 → 涩谷 → 六本木 → 东京塔 → 品川<small>开始播放（黄昏）</small></button><button class="route" data-tour="night"><b>东京夜景之旅</b>：国立竞技场 → 东京巨蛋 → 丰洲市场 → teamLab → 台场 → 横滨 → 稻城 → 迪士尼<small>开始播放（自动切换夜晚）</small></button><button class="route" data-tour="culture"><b>东京文化之旅</b>：东京大学 → 早稻田大学 → 吉祥寺 → 吉卜力美术馆 → 川越 → 春日部 → 富士山 → 镰仓高校前<small>开始播放（白天·雪景）</small></button><p class="about" id="discEl">路线与机场线路均为示意：地图距离经过压缩，仅用于可视化，不能作为实际导航距离；时间与票价为参考值。</p></div></div></div>
 <div id="wxModal"><div class="spBox"><div class="gsHead"><h3 id="hWxT">实时天气 · 东京</h3><button id="wxClose" aria-label="close">×</button></div><div id="wxBody" style="margin-top:12px">正在获取天气…</div><div id="wxHomeLine"></div></div></div>
-<div id="areaModal"><div class="spBox"><div class="gsHead"><h3 id="areaTitle">区域聚焦</h3><button id="areaClose" aria-label="close">×</button></div><div class="areaBtns" id="areaBtns" style="margin-top:10px"></div></div></div>
 <div id="gsEdit"><div class="geBox"><div id="gsEditStamp"></div><input id="gsNoteIn" maxlength="24" autocomplete="off"><div class="geRow"><button id="gsSaveBtn">保存</button><button id="gsDelBtn">删除这枚章</button></div><button id="gsEditClose" aria-label="close">×</button></div></div>
 <div id="sheetShade"></div><section id="info"><div id="sheetHandle"></div><div id="sheetPeek"></div><button id="cardCollapse" aria-label="收起">⌄</button><button id="cardX" aria-label="关闭">×</button><div id="stampFx"></div><div id="infoBody"><h3>欢迎云游东京</h3><p>拖动旋转、滚轮缩放。点击地图上的立体景点查看介绍，地图上彩色的发光线路是机场进城的推荐走法，线路上的光点是列车前进的方向。</p><div class="meta">成田机场距离已压缩显示，否则市中心景点会小得看不清。</div></div></section>
 <div id="bldgStatus">正在加载真实建筑数据…</div>
@@ -518,7 +517,7 @@ header #langMenu{right:auto;min-width:172px}
 
 <script src="i18n_ui.js"></script><script src="narr_ui.js"></script><script src="news.js"></script>
 <script type="module">
-const BUILD='20261108.39';
+const BUILD='20261108.40';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Sky } from 'three/addons/objects/Sky.js';
@@ -795,6 +794,7 @@ function applySpotFilter(){ const q=spotQ.trim().toLowerCase(); const filtering=
   const hits=document.getElementById('spotHits'); if(hits){ hits.style.display=filtering?'block':'none'; if(filtering) hits.textContent=T('spotHits').replace('{n}',n); }
   const sx=document.getElementById('searchX'); if(sx) sx.classList.toggle('on', !!q);
   const sx2=document.getElementById('spSearchX'); if(sx2) sx2.classList.toggle('on', !!q);
+  const sa=document.getElementById('spAreas'); if(sa) sa.style.display=filtering?'none':'';
   const qk=document.getElementById('spotQuick'); if(qk){ qk.innerHTML=''; if(q){ const seen=new Set(); document.querySelectorAll('#spots .spot').forEach(b=>{ if(b.style.display==='none'||seen.has(b.dataset.sid)||seen.size>=10) return; seen.add(b.dataset.sid); const c=document.createElement('button'); c.className='spot'; c.textContent=b.textContent; c.onclick=()=>b.click(); qk.appendChild(c); }); } qk.style.display=q?'flex':'none'; } }
 spotsEl.addEventListener('click', e=>{ const b=e.target.closest('.spot'); if(!b) return; const sp=allSpotsMap()[b.dataset.sid]; if(!sp) return; selectGroup(SPOT_GROUPS[sp.id]||sp); showInfo(sp); const sm=document.getElementById('spModal'); if(sm) sm.style.display='none'; if(innerWidth<=760) document.getElementById('panel').classList.add('hidden'); });
 
@@ -983,7 +983,7 @@ renderer.domElement.addEventListener('pointerup', e=>{
 const AREAS=[['新宿 · 原宿','shinjuku',54],['涩谷','shibuya',46],['浅草 · 上野 · 东大','sensoji',52],['东京站 · 银座','tokyost',48],['六本木 · 东京塔','roppongi',48],['台场 · 丰洲','odaiba',54],['池袋 · 早稻田','ikebukuro',46],['迪士尼度假区','disney',58],['富士山','fuji',66],['镰仓高校前','kamakura',62],['横滨港未来','yokohama',64],['三鹰 · 吉卜力','ghibli',56],['春日部','kasukabe',60],['吉祥寺','kichijoji',54],['teamLab 丰洲','teamlab',52],['川越小江户','kawagoe',62],['稻城·读卖乐园','inagi',58]];
 const areaEl=document.getElementById('areaBtns');
 AREAS.forEach((a,ai)=>{ const b=document.createElement('button'); b.className='areaBtn'; b.textContent=(window.I18NUI&&I18NUI.areas[LANG]&&I18NUI.areas[LANG][ai])||a[0];
-  b.onclick=()=>{ const sp=spots.find(x=>x&&x.id===a[1]); if(sp){ flyTo(sp.x, sp.z, a[2], a[2]*0.6); } const am=document.getElementById('areaModal'); if(am) am.style.display='none'; if(innerWidth<=760) document.getElementById('panel').classList.add('hidden'); };
+  b.onclick=()=>{ const sp=spots.find(x=>x&&x.id===a[1]); if(sp){ flyTo(sp.x, sp.z, a[2], a[2]*0.6); } const am=document.getElementById('spModal'); if(am) am.style.display='none'; if(innerWidth<=760) document.getElementById('panel').classList.add('hidden'); };
   areaEl.appendChild(b); });
 
 // 昼夜与旋转
@@ -1263,10 +1263,7 @@ document.getElementById('tourModal').addEventListener('click', e=>{ if(e.target.
 document.getElementById('statusbar').onclick=()=>{ document.getElementById('wxModal').style.display='flex'; };
 document.getElementById('wxClose').onclick=()=>{ document.getElementById('wxModal').style.display='none'; };
 document.getElementById('wxModal').addEventListener('click', e=>{ if(e.target.id==='wxModal') e.currentTarget.style.display='none'; });
-function paintAreaEntry(){ const b=document.getElementById('areaOpenB'); if(b) b.textContent=T('areasTitle'); const s2=document.getElementById('areaOpenS'); if(s2) s2.textContent=T('areaOpenSub').replace('{n}', AREAS.length); const at=document.getElementById('areaTitle'); if(at) at.textContent=T('areasTitle'); }
-document.getElementById('areaOpen').onclick=()=>{ document.getElementById('areaModal').style.display='flex'; };
-document.getElementById('areaClose').onclick=()=>{ document.getElementById('areaModal').style.display='none'; };
-document.getElementById('areaModal').addEventListener('click', e=>{ if(e.target.id==='areaModal') e.currentTarget.style.display='none'; });
+function paintAreaEntry(){ const at=document.getElementById('areaTitle'); if(at) at.textContent=T('areasTitle'); }
 paintAreaEntry();
 paintTourEntry();
 document.getElementById('tbPrev').onclick=()=>goStop((TOUR?TOUR.idx:0)-1);
