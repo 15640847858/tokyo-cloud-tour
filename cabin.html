@@ -40,7 +40,7 @@
 <div id="hint"></div>
 <button id="fwd">前进</button>
 <div id="bar">
-  <div class="grp"><span class="lab">视角</span><button id="vOrbit" class="on">环绕</button><button id="vFP">第一人称</button></div>
+  <div class="grp"><span class="lab">视角</span><button id="vOrbit" class="on">环绕</button><button id="vFP">第一人称</button><button id="vTP">第三人称</button></div>
   <div class="grp"><span class="lab">天气</span><button data-wx="clear" class="on">☀️ 晴</button><button data-wx="rain">🌧 雨</button><button data-wx="snow">❄️ 雪</button><button data-wx="night">🌙 夜</button></div>
   <div class="grp"><button id="sndBtn">🔇 音效</button><button id="rotBtn" class="on">⟳ 旋转</button></div>
 </div>
@@ -74,7 +74,7 @@ camera.position.set(20, 13, 24);
 const controls=new OrbitControls(camera, renderer.domElement);
 controls.target.set(0, 2.2, 0);
 controls.enableDamping=true; controls.dampingFactor=0.06;
-controls.maxPolarAngle=Math.PI*0.49; controls.minDistance=7; controls.maxDistance=64;
+controls.maxPolarAngle=Math.PI*0.49; controls.minDistance=3.5; controls.maxDistance=95; controls.enableZoom=true; controls.zoomSpeed=1.1;
 controls.autoRotate=true; controls.autoRotateSpeed=0.55;
 
 /* ============ sky dome + lights ============ */
@@ -209,8 +209,47 @@ function sh(m){ m.castShadow=true; m.receiveShadow=true; return m; }
 { /* foundation + floor */
   sh(M(new THREE.BoxGeometry(9.0, 0.55, 7.0), foundMat, 0, 0.27, 0, house));
   sh(M(new THREE.BoxGeometry(8.6, 0.16, 6.6), woodDark, 0, 0.6, 0, house));
-  /* walls */
-  sh(M(new THREE.BoxGeometry(8.4, 3.0, 6.4), wallMat, 0, 2.1, 0, house));
+  /* walls: perimeter segments with a real door opening in the front wall
+     (door gap x -2.18..-1.02, head height 2.75) so the cabin can be entered */
+  sh(M(new THREE.BoxGeometry(2.02, 3.0, 0.5), wallMat, -3.19, 2.1, 2.95, house));
+  sh(M(new THREE.BoxGeometry(5.22, 3.0, 0.5), wallMat, 1.59, 2.1, 2.95, house));
+  sh(M(new THREE.BoxGeometry(1.16, 0.85, 0.5), wallMat, -1.6, 3.18, 2.95, house));
+  sh(M(new THREE.BoxGeometry(8.4, 3.0, 0.5), wallMat, 0, 2.1, -2.95, house));
+  sh(M(new THREE.BoxGeometry(0.5, 3.0, 5.4), wallMat, -3.95, 2.1, 0, house));
+  sh(M(new THREE.BoxGeometry(0.5, 3.0, 5.4), wallMat, 3.95, 2.1, 0, house));
+  /* ceiling so the room reads as a room from inside */
+  sh(M(new THREE.BoxGeometry(8.4, 0.12, 6.4), woodDark, 0, 3.56, 0, house));
+  /* ---- interior ---- */
+  const tatamiMat=std(0xcfc08a, {roughness:1});
+  for(const dx of [-0.61, 1.21]) for(const dz of [-0.21, 0.71]){
+    sh(M(new THREE.BoxGeometry(1.78, 0.05, 0.88), tatamiMat, dx, 0.71, dz, house));
+    M(new THREE.BoxGeometry(1.84, 0.03, 0.94), timberMat, dx, 0.685, dz, house); }
+  /* low round table + teapot + cushions */
+  sh(M(new THREE.CylinderGeometry(0.58, 0.58, 0.05, 18), woodMat, 0.3, 1.05, 0.25, house));
+  sh(M(new THREE.CylinderGeometry(0.07, 0.09, 0.3, 8), woodDark, 0.3, 0.88, 0.25, house));
+  M(new THREE.SphereGeometry(0.13, 12, 10), std(0x37424e, {roughness:.35, metalness:.5}), 0.42, 1.16, 0.18, house);
+  M(new THREE.CylinderGeometry(0.3, 0.32, 0.08, 14), std(0x51638c, {roughness:.9}), 0.3, 0.78, 1.25, house);
+  M(new THREE.CylinderGeometry(0.3, 0.32, 0.08, 14), std(0xa8542f, {roughness:.9}), 0.3, 0.78, -0.75, house);
+  /* irori hearth under the chimney: sand box, logs, flame, warm light */
+  sh(M(new THREE.BoxGeometry(1.1, 0.14, 1.1), std(0x5c564c, {roughness:1}), 2.3, 0.72, -0.9, house));
+  for(let i=0;i<3;i++){ const lg=M(new THREE.CylinderGeometry(0.055, 0.055, 0.62, 6), timberMat, 2.3+Math.cos(i*2.1)*0.14, 0.84, -0.9+Math.sin(i*2.1)*0.14, house); lg.rotation.z=Math.PI/2; lg.rotation.y=i*2.1; }
+  const flameMat=new THREE.MeshStandardMaterial({color:0x572a08, emissive:0xff7a26, emissiveIntensity:2.4, roughness:1});
+  const flames=[];
+  for(const [fx, fs] of [[2.3, 1], [2.16, 0.66], [2.45, 0.6]]){ const fl=M(new THREE.ConeGeometry(0.13*fs, 0.52*fs, 7), flameMat, fx, 1.12, -0.9+(fx-2.3)*0.4, house); flames.push(fl); }
+  const fireLight=new THREE.PointLight(0xff8a3c, 3, 10, 1.8); fireLight.position.set(2.3, 1.5, -0.9); house.add(fireLight);
+  house.userData.fire={light: fireLight, flames, mat: flameMat};
+  /* back-wall shelf with books + a hanging scroll */
+  sh(M(new THREE.BoxGeometry(2.2, 0.07, 0.42), woodMat, -2.6, 1.52, -2.5, house));
+  const bookCols=[0xa8542f, 0x51638c, 0x708c46, 0xc9a86a, 0x7a4a6e, 0x37424e];
+  bookCols.forEach((c, i)=>{ M(new THREE.BoxGeometry(0.13, rnd(0.34, 0.48), 0.24), std(c, {roughness:.85}), -3.45+i*0.21, 1.74, -2.5, house); });
+  M(new THREE.BoxGeometry(0.78, 1.34, 0.05), timberMat, -2.6, 2.15, -2.66, house);
+  M(new THREE.BoxGeometry(0.66, 1.22, 0.06), std(0xe9e1c9, {roughness:.95}), -2.6, 2.15, -2.65, house);
+  M(new THREE.BoxGeometry(0.1, 0.6, 0.07), std(0x39543a, {roughness:.6}), -2.6, 2.05, -2.64, house);
+  /* futon in the corner + paper floor lantern (glows with the windows) */
+  sh(M(new THREE.BoxGeometry(1.9, 0.17, 0.95), std(0xdfe6ee, {roughness:1}), -2.9, 0.77, 1.85, house));
+  M(new THREE.BoxGeometry(0.55, 0.12, 0.32), std(0xffffff, {roughness:1}), -3.55, 0.9, 1.85, house);
+  M(new THREE.CylinderGeometry(0.035, 0.035, 0.55, 6), timberMat, 3.35, 0.95, 2.25, house);
+  M(new THREE.CylinderGeometry(0.17, 0.19, 0.34, 10), winMat, 3.35, 1.35, 2.25, house);
   /* timber framing: corner posts + beams on front/back */
   for(const sx of [-4.2, 4.2]) for(const sz of [-3.2, 3.2]) sh(M(new THREE.BoxGeometry(0.26, 3.0, 0.26), timberMat, sx, 2.1, sz, house));
   for(const sz of [-3.24, 3.24]){ sh(M(new THREE.BoxGeometry(8.5, 0.24, 0.1), timberMat, 0, 3.45, sz, house)); sh(M(new THREE.BoxGeometry(8.5, 0.2, 0.1), timberMat, 0, 0.85, sz, house));
@@ -232,14 +271,20 @@ function sh(m){ m.castShadow=true; m.receiveShadow=true; return m; }
   sh(M(new THREE.BoxGeometry(8.6, 0.14, 0.14), timberMat, 0, 2.95, 4.72, house));
   const vroof=sh(M(new THREE.BoxGeometry(9.4, 0.12, 2.3), roofMat, 0, 3.18, 4.05, house)); vroof.rotation.x=0.24;
   const vsnow=M(new THREE.BoxGeometry(9.44, 0.06, 2.34), roofSnowMat, 0, 3.3, 4.08, house); vsnow.rotation.x=0.24;
-  for(const px of [-3.4, -1.15, 1.15, 3.4]) M(new THREE.BoxGeometry(0.07, 0.62, 0.07), timberMat, px, 1.12, 4.78, house);
-  sh(M(new THREE.BoxGeometry(8.6, 0.08, 0.1), timberMat, 0, 1.42, 4.78, house));
+  for(const px of [-3.4, 1.15, 3.4]) M(new THREE.BoxGeometry(0.07, 0.62, 0.07), timberMat, px, 1.12, 4.78, house);
+  /* veranda rail with a gap at the entrance steps so you can walk in */
+  sh(M(new THREE.BoxGeometry(1.8, 0.08, 0.1), timberMat, -3.4, 1.42, 4.78, house));
+  sh(M(new THREE.BoxGeometry(5.0, 0.08, 0.1), timberMat, 1.8, 1.42, 4.78, house));
   /* entrance steps */
   sh(M(new THREE.BoxGeometry(1.7, 0.14, 0.55), foundMat, -1.6, 0.42, 5.15, house));
   sh(M(new THREE.BoxGeometry(2.0, 0.12, 0.6), foundMat, -1.6, 0.16, 5.5, house));
   /* front door + windows */
-  sh(M(new THREE.BoxGeometry(1.15, 2.15, 0.1), woodDark, -1.6, 1.72, 3.24, house));
-  M(new THREE.SphereGeometry(0.05, 8, 8), std(0xc9a86a, {roughness:.4, metalness:.6}), -1.15, 1.72, 3.32, house);
+  /* the door stands open, swung in against the left wall */
+  const doorG=new THREE.Group(); doorG.position.set(-2.18, 0, 3.2); doorG.rotation.y=1.82; house.add(doorG);
+  sh(M(new THREE.BoxGeometry(1.15, 2.15, 0.08), woodDark, 0.58, 1.7, 0, doorG));
+  M(new THREE.BoxGeometry(0.9, 0.07, 0.1), timberMat, 0.58, 2.35, 0, doorG);
+  M(new THREE.BoxGeometry(0.9, 0.07, 0.1), timberMat, 0.58, 1.05, 0, doorG);
+  M(new THREE.SphereGeometry(0.05, 8, 8), std(0xc9a86a, {roughness:.4, metalness:.6}), 1.02, 1.7, 0.08, doorG);
   function window_(x, y, z, ry=0){ const g=new THREE.Group(); g.position.set(x, y, z); g.rotation.y=ry; house.add(g);
     M(new THREE.BoxGeometry(1.35, 1.25, 0.09), timberMat, 0, 0, 0, g);
     M(new THREE.BoxGeometry(1.16, 1.06, 0.11), winMat, 0, 0, 0.01, g);
@@ -291,6 +336,59 @@ function autumn(x, z, s=1){ const g=new THREE.Group(); g.position.set(x, groundH
 function bush(x, z, s=1){ const g=new THREE.Group(); g.position.set(x, groundH(x,z), z); scene.add(g);
   const b=sh(M(new THREE.IcosahedronGeometry(0.55*s, 1), bushMat, 0, 0.32*s, 0, g)); b.scale.y=0.72;
   const cap=M(new THREE.SphereGeometry(0.44*s, 10, 8), capMat, 0, 0.52*s, 0, g); cap.scale.y=0.4; }
+/* ============ the golden ginkgo (hero tree) ============ */
+let ginkLeafMat=null, ginkLamp=null, ginkFall=null;
+const ginkPos={x:12.5, z:-6.5};
+const ginkLeafTex=cnv(128,128,(g,w,h)=>{
+  g.clearRect(0,0,w,h); g.translate(64,122);
+  const grad=g.createLinearGradient(0,0,0,-95); grad.addColorStop(0,'#e8930c'); grad.addColorStop(0.55,'#f7b733'); grad.addColorStop(1,'#ffd94d');
+  g.beginPath(); g.moveTo(0,0);
+  g.bezierCurveTo(-58,-16, -57,-82, -15,-88);
+  g.bezierCurveTo(-6,-89.5, -3,-79, 0,-72);
+  g.bezierCurveTo(3,-79, 6,-89.5, 15,-88);
+  g.bezierCurveTo(57,-82, 58,-16, 0,0);
+  g.fillStyle=grad; g.fill();
+  g.strokeStyle='rgba(146,84,4,.5)'; g.lineWidth=1.4; g.stroke();
+  g.strokeStyle='rgba(255,240,180,.55)'; g.lineWidth=1.1;
+  for(let a=-62; a<=62; a+=11){ const r=a*Math.PI/180; g.beginPath(); g.moveTo(0,-2); g.lineTo(Math.sin(r)*84, -Math.cos(r)*84); g.stroke(); }
+  g.strokeStyle='rgba(120,70,5,.8)'; g.lineWidth=3; g.beginPath(); g.moveTo(0,4); g.lineTo(0,-6); g.stroke();
+});
+function ginkgo(x, z){
+  const g=new THREE.Group(); g.position.set(x, groundH(x,z)-0.05, z); g.rotation.y=rnd(0,6.3); scene.add(g);
+  sh(M(new THREE.CylinderGeometry(0.30, 0.55, 5.8, 9), std(0x6e5138, {roughness:1}), 0, 2.9, 0, g));
+  sh(M(new THREE.CylinderGeometry(0.55, 0.85, 0.8, 9), std(0x654a33, {roughness:1}), 0, 0.35, 0, g));
+  for(let i=0;i<6;i++){ const a=i/6*Math.PI*2+0.5; const br=M(new THREE.CylinderGeometry(0.07, 0.15, 3.1, 6), trunkMat, Math.cos(a)*1.15, 6.3, Math.sin(a)*1.15, g);
+    br.rotation.z=Math.cos(a)*0.62; br.rotation.x=-Math.sin(a)*0.62; sh(br); }
+  /* dense inner canopy so the crown never reads hollow */
+  const blobMat=std(0xd9941e, {roughness:1});
+  const blobs=[[0,8.5,0,3.4],[2.6,7.6,1.2,2.4],[-2.5,7.8,-1,2.5],[0.8,9.6,-1.8,2.3],[-1.4,9.4,1.9,2.2],[3.1,8.8,-2.2,1.9],[-3.2,8.6,2.3,1.9]];
+  for(const [bx,by,bz,r] of blobs){ sh(M(new THREE.IcosahedronGeometry(r, 1), blobMat, bx, by, bz, g)); }
+  const cap1=M(new THREE.SphereGeometry(3.1, 12, 8), capMat, 0, 9.9, 0, g); cap1.scale.y=0.42;
+  const cap2=M(new THREE.SphereGeometry(2.1, 12, 8), capMat, -2.4, 9.2, -0.9, g); cap2.scale.y=0.4;
+  /* hundreds of fan leaves on the crown shell */
+  ginkLeafMat=new THREE.MeshStandardMaterial({map:ginkLeafTex, alphaTest:.42, side:THREE.DoubleSide, roughness:.85,
+    emissive:0xff9d2e, emissiveIntensity:.06, emissiveMap:ginkLeafTex});
+  const leafGeo=new THREE.PlaneGeometry(0.62, 0.62);
+  const N=680; const leaves=new THREE.InstancedMesh(leafGeo, ginkLeafMat, N);
+  { const d=new THREE.Object3D(); const c=new THREE.Color(); const v=new THREE.Vector3();
+    for(let i=0;i<N;i++){ do{ v.set(rnd(-1,1), rnd(-1,1), rnd(-1,1)); }while(v.lengthSq()>1||v.lengthSq()<0.04);
+      const shell=0.62+0.38*Math.random();
+      d.position.set(v.x*4.9*shell, 8.5+v.y*2.75*shell, v.z*4.9*shell);
+      d.rotation.set(rnd(0,6.3), rnd(0,6.3), rnd(0,6.3)); const s=rnd(0.75,1.5); d.scale.set(s,s,s); d.updateMatrix();
+      leaves.setMatrixAt(i, d.matrix); c.setHSL(0.115+rnd(-0.018,0.018), 0.88, rnd(0.46,0.62)); leaves.setColorAt(i, c); } }
+  g.add(leaves);
+  /* warm uplight so the crown glows gold at night, like the photo */
+  ginkLamp=new THREE.PointLight(0xffb45e, 0, 24, 1.7); ginkLamp.position.set(0, 5.6, 0); g.add(ginkLamp);
+  /* falling leaves drifting around the crown */
+  { const n=90; const pos=new Float32Array(n*3); const seed=new Float32Array(n);
+    for(let i=0;i<n;i++){ const a=rnd(0,6.3), r=rnd(0.5,5.2); pos[i*3]=Math.cos(a)*r; pos[i*3+1]=rnd(0.3,10.5); pos[i*3+2]=Math.sin(a)*r; seed[i]=rnd(0,100); }
+    const geo=new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    ginkFall=new THREE.Points(geo, new THREE.PointsMaterial({size:.42, map:ginkLeafTex, color:0xffcf4d, transparent:true, opacity:.95, alphaTest:.3, depthWrite:false}));
+    ginkFall.userData={seed}; g.add(ginkFall); }
+  trees.push({g, ph:rnd(0,6.3), amp:0.012});
+}
+ginkgo(ginkPos.x, ginkPos.z);
+
 /* tree placement: ring the island, keep the stream / house / bridge clear */
 const treeSpots=[[-16,-14],[-20,-2],[-24,6],[-19,14],[-25,-12],[14,-16],[20,-10],[24,-2],[26,8],[18,16],[8,-19],[-6,-20],[-14,-19],[4,24],[-16,22],[22,20],[12,25],[-26,16],[27,-14],[-3,-24],[16,-22],[-22,-18],[9,19.5],[-13,17.5]];
 treeSpots.forEach(([x,z],i)=>{ if(distToStream(x,z)<4.4) return; (i%3===1? autumn : pine)(x, z, rnd(0.85,1.35)); });
@@ -355,6 +453,8 @@ function applyEnv(){
   autMats.forEach((m,i)=>m.color.copy(autBase[i]).multiply(curC.fol));
   bushMat.color.copy(bushBase).multiply(curC.fol);
   grassMat.color.copy(curC.fol);
+  if(ginkLeafMat){ ginkLeafMat.color.copy(curC.fol); ginkLeafMat.emissiveIntensity=0.06+(cur.lamp/26)*0.55; }
+  if(ginkLamp) ginkLamp.intensity=cur.lamp*1.6;
   for(const f of flowers) f.scale.setScalar(Math.max(.12, cur.flower));
 }
 
@@ -397,29 +497,98 @@ function chirp(){ if(!AC||!sndOn||curWx!=='clear') return;
 /* ============ view modes ============ */
 let mode='orbit';
 const fp={yaw:0.15, pitch:-0.04, keys:{}, fwd:false, bob:0};
+const tp={pos:new THREE.Vector3(-1.8, 0, 8.6), head:Math.PI, camYaw:0, camPitch:0.34, dist:6.5, phase:0};
 const hintEl=document.getElementById('hint'); let hintTimer=0;
 function showHint(txt, ms=3600){ hintEl.textContent=txt; hintEl.classList.add('show'); clearTimeout(hintTimer); hintTimer=setTimeout(()=>hintEl.classList.remove('show'), ms); }
-function enterFP(){ mode='fp'; controls.enabled=false; controls.autoRotate=false;
-  camera.position.set(-2.2, 0, 10.5); fp.yaw=0.15; fp.pitch=-0.04;
-  document.getElementById('vFP').classList.add('on'); document.getElementById('vOrbit').classList.remove('on');
-  if(matchMedia('(pointer:coarse)').matches){ document.getElementById('fwd').style.display='block'; showHint('拖动屏幕看四周 · 按住「前进」走路 · 点「环绕」退出'); }
-  else showHint('点击画面锁定视角 · WASD / 方向键走路 · Esc 或点「环绕」退出');
+/* ---- the walker (third person character) ---- */
+const charG=new THREE.Group(); charG.visible=false; scene.add(charG);
+const charParts={};
+{ const skin=std(0xf2c49b,{roughness:.65}), topM=std(0x3f5a78,{roughness:.9}), pantsM=std(0x8a7a5c,{roughness:.95}), hatM=std(0xd9b96a,{roughness:.9}), hairM=std(0x3a2c20,{roughness:.95}), shoeM=std(0x4a3826,{roughness:.9});
+  const body=new THREE.Group(); charG.add(body); charParts.body=body;
+  sh(M(new THREE.CylinderGeometry(0.20, 0.24, 0.62, 10), topM, 0, 0.99, 0, body));
+  sh(M(new THREE.SphereGeometry(0.205, 14, 12), skin, 0, 1.52, 0, body));
+  const hair=sh(M(new THREE.SphereGeometry(0.215, 14, 12), hairM, 0, 1.56, -0.02, body)); hair.scale.set(1, 0.78, 1);
+  sh(M(new THREE.CylinderGeometry(0.37, 0.38, 0.035, 14), hatM, 0, 1.665, 0, body));
+  sh(M(new THREE.ConeGeometry(0.30, 0.17, 14), hatM, 0, 1.76, 0, body));
+  sh(M(new THREE.BoxGeometry(0.34, 0.44, 0.17), std(0xb0563a, {roughness:.9}), 0, 1.04, -0.26, body));
+  function limb(x, y, mat, w, len){ const g=new THREE.Group(); g.position.set(x, y, 0); body.add(g);
+    sh(M(new THREE.BoxGeometry(w, len, w), mat, 0, -len/2+0.04, 0, g)); return g; }
+  charParts.armL=limb(-0.31, 1.26, topM, 0.11, 0.54); charParts.armR=limb(0.31, 1.26, topM, 0.11, 0.54);
+  charParts.legL=limb(-0.11, 0.70, pantsM, 0.13, 0.68); charParts.legR=limb(0.11, 0.70, pantsM, 0.13, 0.68);
+  M(new THREE.BoxGeometry(0.14, 0.07, 0.24), shoeM, 0, -0.66, 0.04, charParts.legL);
+  M(new THREE.BoxGeometry(0.14, 0.07, 0.24), shoeM, 0, -0.66, 0.04, charParts.legR);
 }
-function exitFP(){ if(document.pointerLockElement) document.exitPointerLock();
-  mode='orbit'; controls.enabled=true;
-  document.getElementById('fwd').style.display='none';
-  document.getElementById('vOrbit').classList.add('on'); document.getElementById('vFP').classList.remove('on');
+/* ---- collision + floor height (shared by first and third person) ---- */
+const _hv=new THREE.Vector3();
+function houseLocal(wx, wz){ _hv.set(wx, 0, wz); house.worldToLocal(_hv); return _hv; }
+function floorHeightAt(wx, wz){
+  const p=houseLocal(wx, wz); const lx=p.x, lz=p.z; const hy=house.position.y;
+  if(Math.abs(lx)<3.95 && Math.abs(lz)<2.95) return hy+0.68;
+  if(Math.abs(lx+1.6)<0.62 && lz>=2.6 && lz<3.4) return hy+0.68;
+  if(Math.abs(lx)<4.35 && lz>=2.95 && lz<4.95) return hy+0.79;
+  if(lx>-2.6 && lx<-0.6 && lz>=4.95 && lz<5.9) return hy+0.47;
+  return groundH(wx, wz);
+}
+const WALLS=[ /* house-local AABBs: front segments (door gap left open), back, sides, furniture */
+  {x1:-4.2, x2:-2.18, z1:2.70, z2:3.20}, {x1:-1.02, x2:4.2, z1:2.70, z2:3.20},
+  {x1:-4.2, x2:4.2, z1:-3.20, z2:-2.70},
+  {x1:-4.20, x2:-3.70, z1:-2.70, z2:2.70}, {x1:3.70, x2:4.20, z1:-2.70, z2:2.70},
+  {x1:-0.25, x2:0.85, z1:-0.30, z2:0.80},
+  {x1:1.70, x2:2.90, z1:-1.50, z2:-0.30},
+  {x1:-3.75, x2:-1.45, z1:-2.85, z2:-2.25}
+];
+function collide(nx, nz, r){
+  const rr=Math.hypot(nx, nz); if(rr>26.5){ nx*=26.5/rr; nz*=26.5/rr; }
+  { const dx=nx-ginkPos.x, dz=nz-ginkPos.z; const d=Math.hypot(dx, dz); const min=0.62+r;
+    if(d<min && d>0.001){ nx=ginkPos.x+dx/d*min; nz=ginkPos.z+dz/d*min; } }
+  const p=houseLocal(nx, nz); let lx=p.x, lz=p.z;
+  for(const w of WALLS){
+    const cx=Math.max(w.x1, Math.min(lx, w.x2)), cz=Math.max(w.z1, Math.min(lz, w.z2));
+    const dx=lx-cx, dz=lz-cz; const d2=dx*dx+dz*dz;
+    if(d2>r*r) continue;
+    if(d2>1e-9){ const d=Math.sqrt(d2); lx=cx+dx/d*r; lz=cz+dz/d*r; }
+    else { const pl=lx-w.x1, pr=w.x2-lx, pb=lz-w.z1, pf=w.z2-lz; const m=Math.min(pl, pr, pb, pf);
+      if(m===pl) lx=w.x1-r; else if(m===pr) lx=w.x2+r; else if(m===pb) lz=w.z1-r; else lz=w.z2+r; }
+  }
+  _hv.set(lx, 0, lz); house.localToWorld(_hv); return [_hv.x, _hv.z];
+}
+function paintViewBtns(){ document.getElementById('vOrbit').classList.toggle('on', mode==='orbit');
+  document.getElementById('vFP').classList.toggle('on', mode==='fp');
+  document.getElementById('vTP').classList.toggle('on', mode==='tp');
+  document.getElementById('fwd').style.display=(mode!=='orbit' && matchMedia('(pointer:coarse)').matches)? 'block':'none'; }
+function enterFP(){ if(document.pointerLockElement) document.exitPointerLock();
+  mode='fp'; controls.enabled=false; controls.autoRotate=false; charG.visible=false;
+  camera.position.set(-2.2, floorHeightAt(-2.2, 10.5)+1.7, 10.5); fp.yaw=0.15; fp.pitch=-0.04;
+  paintViewBtns();
+  if(matchMedia('(pointer:coarse)').matches) showHint('拖动屏幕看四周 · 按住「前进」走路 · 推门可以进小屋');
+  else showHint('点击画面锁定视角 · WASD 走路 · 推门可以进小屋坐坐');
+}
+function enterTP(){ if(document.pointerLockElement) document.exitPointerLock();
+  if(mode==='fp'){ const [px, pz]=collide(camera.position.x, camera.position.z, 0.34); tp.pos.set(px, 0, pz); tp.head=fp.yaw+Math.PI; tp.camYaw=fp.yaw; }
+  mode='tp'; controls.enabled=false; controls.autoRotate=false; charG.visible=true;
+  charG.position.set(tp.pos.x, floorHeightAt(tp.pos.x, tp.pos.z), tp.pos.z); charG.rotation.y=tp.head;
+  camera.position.set(tp.pos.x+Math.sin(tp.camYaw)*tp.dist*0.9, charG.position.y+3.1, tp.pos.z+Math.cos(tp.camYaw)*tp.dist*0.9);
+  paintViewBtns();
+  if(matchMedia('(pointer:coarse)').matches) showHint('拖动转镜头 · 按住「前进」让小人散步 · 滚轮/双指缩放距离');
+  else showHint('WASD 让小人散步 · 鼠标拖动转镜头 · 滚轮拉近拉远');
+}
+function exitToOrbit(){ if(document.pointerLockElement) document.exitPointerLock();
+  mode='orbit'; controls.enabled=true; charG.visible=false;
+  paintViewBtns();
   camera.position.set(20, 13, 24); controls.target.set(0, 2.2, 0);
   if(document.getElementById('rotBtn').classList.contains('on')) controls.autoRotate=true;
 }
+function exitFP(){ exitToOrbit(); }
 renderer.domElement.addEventListener('click', ()=>{ if(mode==='fp' && !matchMedia('(pointer:coarse)').matches && !document.pointerLockElement){ const pr=renderer.domElement.requestPointerLock(); if(pr&&pr.catch) pr.catch(()=>{}); } });
 document.addEventListener('mousemove', e=>{ if(mode==='fp' && document.pointerLockElement){ fp.yaw-=e.movementX*0.0022; fp.pitch=Math.max(-1.25, Math.min(1.25, fp.pitch-e.movementY*0.0022)); } });
-document.addEventListener('keydown', e=>{ fp.keys[e.code]=true; if(mode==='fp' && e.code==='Escape') exitFP(); });
+document.addEventListener('keydown', e=>{ fp.keys[e.code]=true; if(e.code==='Escape' && mode!=='orbit') exitToOrbit(); });
 document.addEventListener('keyup', e=>{ fp.keys[e.code]=false; });
 { let lx=0, ly=0;
-  renderer.domElement.addEventListener('touchstart', e=>{ if(mode!=='fp') return; lx=e.touches[0].clientX; ly=e.touches[0].clientY; }, {passive:true});
-  renderer.domElement.addEventListener('touchmove', e=>{ if(mode!=='fp') return; const t=e.touches[0];
-    fp.yaw-=(t.clientX-lx)*0.0045; fp.pitch=Math.max(-1.25, Math.min(1.25, fp.pitch-(t.clientY-ly)*0.0045)); lx=t.clientX; ly=t.clientY; }, {passive:true});
+  renderer.domElement.addEventListener('touchstart', e=>{ if(mode!=='fp' && mode!=='tp') return; lx=e.touches[0].clientX; ly=e.touches[0].clientY; }, {passive:true});
+  renderer.domElement.addEventListener('touchmove', e=>{ if(mode!=='fp' && mode!=='tp') return; const t=e.touches[0];
+    const dx=t.clientX-lx, dy=t.clientY-ly; lx=t.clientX; ly=t.clientY;
+    if(mode==='fp'){ fp.yaw-=dx*0.0045; fp.pitch=Math.max(-1.25, Math.min(1.25, fp.pitch-dy*0.0045)); }
+    else { tp.camYaw-=dx*0.005; tp.camPitch=Math.max(0.06, Math.min(1.05, tp.camPitch+dy*0.004)); } }, {passive:true});
   const fw=document.getElementById('fwd');
   fw.addEventListener('touchstart', e=>{ e.preventDefault(); fp.fwd=true; }, {passive:false});
   fw.addEventListener('touchend', ()=>{ fp.fwd=false; });
@@ -432,24 +601,50 @@ function tickFP(dt){
   let mx=(-sin*(f-b) + cos*(r-l)), mz=(-cos*(f-b) - sin*(r-l));
   const ml=Math.hypot(mx, mz); const moving=ml>0.01;
   if(moving){ mx=mx/ml*sp*dt; mz=mz/ml*sp*dt;
-    let nx=camera.position.x+mx, nz=camera.position.z+mz;
-    const rr=Math.hypot(nx, nz); if(rr>26.5){ nx*=26.5/rr; nz*=26.5/rr; }
-    const hx=house.position.x, hz=house.position.z;
-    if(!(Math.abs(nx-hx)<5.6 && Math.abs(nz-hz)<4.8)){ camera.position.x=nx; camera.position.z=nz; }
+    const [nx, nz]=collide(camera.position.x+mx, camera.position.z+mz, 0.34);
+    camera.position.x=nx; camera.position.z=nz;
     fp.bob+=dt*8;
   }
-  const gy=groundH(camera.position.x, camera.position.z);
-  camera.position.y=gy+1.7+(moving? Math.sin(fp.bob)*0.05 : 0);
+  const gy=floorHeightAt(camera.position.x, camera.position.z)+1.7+(moving? Math.sin(fp.bob)*0.05 : 0);
+  camera.position.y+=(gy-camera.position.y)*Math.min(1, dt*12);
   const dir=new THREE.Vector3(-Math.sin(fp.yaw)*Math.cos(fp.pitch), Math.sin(fp.pitch), -Math.cos(fp.yaw)*Math.cos(fp.pitch));
   camera.lookAt(camera.position.clone().add(dir));
+}
+function tickTP(dt){
+  const sp=(fp.keys.ShiftLeft||fp.keys.ShiftRight)? 6.4 : 3.9;
+  const f=(fp.keys.KeyW||fp.keys.ArrowUp||fp.fwd)? 1:0, b=(fp.keys.KeyS||fp.keys.ArrowDown)? 1:0;
+  const l=(fp.keys.KeyA||fp.keys.ArrowLeft)? 1:0, r=(fp.keys.KeyD||fp.keys.ArrowRight)? 1:0;
+  const s=Math.sin(tp.camYaw), c=Math.cos(tp.camYaw);
+  let mx=(-s*(f-b) + c*(r-l)), mz=(-c*(f-b) - s*(r-l));
+  const ml=Math.hypot(mx, mz); const moving=ml>0.01;
+  if(moving){ mx/=ml; mz/=ml;
+    const tgtA=Math.atan2(mx, mz);
+    let dh=tgtA-tp.head; while(dh>Math.PI) dh-=Math.PI*2; while(dh<-Math.PI) dh+=Math.PI*2;
+    tp.head+=dh*Math.min(1, dt*10);
+    const [nx, nz]=collide(tp.pos.x+mx*sp*dt, tp.pos.z+mz*sp*dt, 0.34);
+    tp.pos.x=nx; tp.pos.z=nz; tp.phase+=dt*sp*2.4;
+  }
+  const gy=floorHeightAt(tp.pos.x, tp.pos.z);
+  charG.position.set(tp.pos.x, charG.position.y+(gy-charG.position.y)*Math.min(1, dt*10), tp.pos.z);
+  charG.rotation.y=tp.head;
+  const sw=moving? Math.sin(tp.phase)*0.55 : 0;
+  charParts.legL.rotation.x=sw; charParts.legR.rotation.x=-sw;
+  charParts.armL.rotation.x=-sw*0.8; charParts.armR.rotation.x=sw*0.8;
+  charParts.body.position.y=moving? Math.abs(Math.sin(tp.phase))*0.05 : 0;
+  const cd=tp.dist, cp=tp.camPitch;
+  _hv.set(tp.pos.x+Math.sin(tp.camYaw)*Math.cos(cp)*cd, charG.position.y+1.5+Math.sin(cp)*cd, tp.pos.z+Math.cos(tp.camYaw)*Math.cos(cp)*cd);
+  camera.position.lerp(_hv, Math.min(1, dt*5.5));
+  camera.lookAt(tp.pos.x, charG.position.y+1.35, tp.pos.z);
 }
 
 /* ============ UI wiring ============ */
 function setWx(name){ curWx=name; tgt=PRESETS[name]; for(const k of COLK) tgtC[k].set(PRESETS[name][k]);
   document.querySelectorAll('[data-wx]').forEach(b=>b.classList.toggle('on', b.dataset.wx===name)); paintAudioGains(); }
 document.querySelectorAll('[data-wx]').forEach(b=>b.addEventListener('click', ()=>setWx(b.dataset.wx)));
-document.getElementById('vOrbit').addEventListener('click', exitFP);
+document.getElementById('vOrbit').addEventListener('click', exitToOrbit);
 document.getElementById('vFP').addEventListener('click', enterFP);
+document.getElementById('vTP').addEventListener('click', enterTP);
+renderer.domElement.addEventListener('wheel', e=>{ if(mode==='tp') tp.dist=Math.max(3.5, Math.min(13, tp.dist+e.deltaY*0.01)); }, {passive:true});
 document.getElementById('rotBtn').addEventListener('click', e=>{ const on=e.currentTarget.classList.toggle('on'); if(mode==='orbit') controls.autoRotate=on; });
 document.getElementById('sndBtn').addEventListener('click', e=>{ sndOn=!sndOn;
   if(sndOn){ startAudio(); e.currentTarget.textContent='🔊 音效'; e.currentTarget.classList.add('on'); }
@@ -469,7 +664,7 @@ function animate(){ requestAnimationFrame(animate);
   lamp.intensity=cur.lamp*(0.9+0.1*Math.sin(t*11.3)*Math.sin(t*5.1));
   waterTex.offset.y-=dt*0.16*cur.wSpd;
   tickSmoke(dt, 0.35+cur.sway*0.9, cur.smoke);
-  for(const tr of trees) tr.g.rotation.z=Math.sin(t*1.05+tr.ph)*0.028*cur.sway;
+  for(const tr of trees) tr.g.rotation.z=Math.sin(t*1.05+tr.ph)*(tr.amp||0.028)*cur.sway;
   if(cur.rain>0.02){ const pos=rainPts.geometry.attributes.position;
     for(let i=0;i<pos.count;i++){ let y=pos.getY(i)-27*dt; let x=pos.getX(i)-3.2*dt;
       if(y<0){ y=28; x=rnd(-38,38); pos.setZ(i, rnd(-38,38)); } pos.setY(i, y); pos.setX(i, x); }
@@ -483,10 +678,23 @@ function animate(){ requestAnimationFrame(animate);
       pos.setXYZ(i, bx+Math.sin(t*0.4+seed[i])*2.2, 1.3+Math.sin(t*0.8+seed[i]*2)*0.7, bz+Math.cos(t*0.33+seed[i])*2.2); }
     pos.needsUpdate=true; }
   if(AC && sndOn && curWx==='clear'){ birdTimer-=dt; if(birdTimer<=0){ chirp(); birdTimer=rnd(3.5, 9); } }
-  if(mode==='fp') tickFP(dt); else controls.update();
+  { const fr=house.userData.fire;
+    if(fr){ const fl=0.85+0.22*Math.sin(t*13.7)*Math.sin(t*7.3+1.7);
+      fr.light.intensity=(3+cur.lamp*0.4)*fl;
+      fr.mat.emissiveIntensity=2.4*fl;
+      fr.flames.forEach((fm, i)=>{ fm.scale.y=fl*(1+i*0.07); }); } }
+  if(ginkFall){ const show=(curWx==='clear'||curWx==='night');
+    ginkFall.visible=show;
+    if(show){ const pos=ginkFall.geometry.attributes.position; const seed=ginkFall.userData.seed;
+      for(let i=0;i<pos.count;i++){ let y=pos.getY(i)-dt*(0.5+(seed[i]%0.5));
+        let x=pos.getX(i)+Math.sin(t*1.2+seed[i])*dt*0.7;
+        if(y<0.15){ y=rnd(8,11); const a=rnd(0,6.3), r=rnd(0.5,5.2); x=Math.cos(a)*r; pos.setZ(i, Math.sin(a)*r); }
+        pos.setY(i, y); pos.setX(i, x); }
+      pos.needsUpdate=true; } }
+  if(mode==='fp') tickFP(dt); else if(mode==='tp') tickTP(dt); else controls.update();
   renderer.render(scene, camera);
   if(firstFrame){ firstFrame=false; window.__cabinOK=true; document.getElementById('loading').classList.add('gone');
-    setTimeout(()=>showHint('点底部按钮换天气，或进第一人称在林间散步', 4200), 600); }
+    setTimeout(()=>showHint('小屋可以推门进去 · 第三人称能带小人散步 · 屋旁有一棵大银杏', 4600), 600); }
 }
 applyEnv();
 animate();
