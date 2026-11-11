@@ -57,7 +57,7 @@ for _blob, _dg in ((info, digest), (info2, digest2)):
 
 # extra static assets (e.g. user-supplied photos) deployed alongside the site;
 # each must be uploaded by digest and referenced in every deployment
-ASSETS = [("data/kaedena.jpg", "kaedena.jpg"), ("data/favicon.svg", "favicon.svg"), ("data/apple-touch-icon.png", "apple-touch-icon.png"), ("data/favicon-32.png", "favicon-32.png"), ("data/torii_quaternius.glb", "torii_quaternius.glb"), ("data/news.json", "news.json")]
+ASSETS = [("cabin.html", "cabin.html"), ("cabin.html", "cabin/index.html"), ("data/kaedena.jpg", "kaedena.jpg"), ("data/favicon.svg", "favicon.svg"), ("data/apple-touch-icon.png", "apple-touch-icon.png"), ("data/favicon-32.png", "favicon-32.png"), ("data/torii_quaternius.glb", "torii_quaternius.glb"), ("data/news.json", "news.json")]
 # i18n: UI dictionary script + per-language content files (globbed so new
 # languages are picked up automatically; each must stay under ~95KB)
 import glob as _glob
