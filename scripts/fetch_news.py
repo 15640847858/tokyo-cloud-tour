@@ -97,8 +97,12 @@ def src_jma(now):
 
 
 # ---------------------------------------------------------------- NHK RSS
-NHK_FEEDS = ["https://www3.nhk.or.jp/rss/news/cat0.xml",
-             "https://www3.nhk.or.jp/rss/news/cat1.xml"]
+# 2026-11-13: 旧域名 www3.nhk.or.jp/rss/news/cat0.xml 自 2026-08-08 起冻结
+# （NHK ONE 改版后 RSS 迁至 www.nhk.or.jp，旧源仍返回 8 月旧条目）。
+# 另加 7 天新鲜度 guard：源再冻结时也不再把旧闻当成「今日」头条。
+NHK_FEEDS = ["https://www.nhk.or.jp/rss/news/cat0.xml",
+             "https://www.nhk.or.jp/rss/news/cat1.xml"]
+MAX_AGE_DAYS = 7
 KW_STRONG = ["東京", "都内", "都庁", "渋谷", "新宿", "池袋", "浅草", "羽田", "成田"]
 KW_REGION = ["首都圏", "関東", "東日本"]
 
@@ -118,6 +122,13 @@ def src_nhk(now):
             if not title or title in seen:
                 continue
             seen.add(title)
+            try:
+                dt = datetime.strptime(pub, "%a, %d %b %Y %H:%M:%S %z")
+                if (now - dt.astimezone(JST)).days > MAX_AGE_DAYS:
+                    NOTES.append(f"NHK: 跳过超 {MAX_AGE_DAYS} 天旧条目「{title[:20]}…」({dt.strftime('%m-%d')})")
+                    continue
+            except ValueError:
+                pass
             score = 2 if any(k in title for k in KW_STRONG) else (1 if any(k in title for k in KW_REGION) else 0)
             if score:
                 scored.append((score, title, link, pub))
