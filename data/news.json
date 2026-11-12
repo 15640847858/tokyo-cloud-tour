@@ -1,41 +1,41 @@
 {
- "date": "2026-11-12",
- "updated": "06:12",
+ "date": "2026-11-13",
+ "updated": "07:11",
  "items": [
   {
    "id": "nhk-1",
    "level": "news",
    "cat": null,
-   "title": "東京五輪 競泳銀の本多灯選手 危険運転傷害の罪で在宅起訴",
+   "title": "中野ブロードウェイ時計窃盗事件 「仕事探すため東京に」供述",
    "desc": "",
    "source": "NHK",
-   "time": "08-07 19:53",
+   "time": "11-12 13:33",
    "spotId": null,
-   "url": "http://www3.nhk.or.jp/news/html/20260807/k10015199211000.html",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261112de74709",
    "expires": null
   },
   {
    "id": "nhk-2",
    "level": "news",
    "cat": null,
-   "title": "東京都の最低賃金 10月から時給1280円に引き上げへ",
+   "title": "新宿・歌舞伎町で無許可で客を接待するバーを営業か 5人逮捕",
    "desc": "",
    "source": "NHK",
-   "time": "08-05 19:03",
+   "time": "11-12 12:21",
    "spotId": null,
-   "url": "http://www3.nhk.or.jp/news/html/20260805/k10015197351000.html",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261112de74653",
    "expires": null
   },
   {
    "id": "nhk-3",
    "level": "news",
    "cat": null,
-   "title": "東京 多摩動物公園 ライオン3頭が相次ぎ死ぬ 熱中症か",
+   "title": "東京 上野の強盗予備事件 18歳の容疑者を逮捕 指示役か",
    "desc": "",
    "source": "NHK",
-   "time": "08-03 22:50",
+   "time": "11-11 16:17",
    "spotId": null,
-   "url": "http://www3.nhk.or.jp/news/html/20260803/k10015195441000.html",
+   "url": "https://news.web.nhk/newsweb/na/nd-20261111de74181",
    "expires": null
   }
  ],
